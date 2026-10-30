@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to **Free GST Billing Software** are documented here.
+All notable changes to **E-Munim Software** are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -42,7 +42,7 @@ because Mac users could not start the app at all.
 #### Mac
 1. Download `Free-GST-Billing.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
-2. Double-click it to unzip, then double-click **Free GST Billing - MAC**.
+2. Double-click it to unzip, then double-click **E-Munim - MAC**.
 3. The first time, macOS may say it "cannot be opened because Apple cannot
    check it". **Hold Control, click the file, choose Open, then Open again.**
    Only once.
@@ -50,7 +50,7 @@ because Mac users could not start the app at all.
    instead. **Never drag the new folder over the old one on a Mac**: Finder's
    Replace swaps the whole folder, including `_system/data` with your
    invoices. Step-by-step:
-   [Updating on a Mac](https://dicecodes.com/free-gst-software-documentation/update.html#mac).
+   [Updating on a Mac](https://freeinvoicefast.com/docs/update.html#mac).
 
 #### Windows (1.10.73 and later)
 Click **Update to v1.10.82** in the sidebar, or **Settings → App Updates →
@@ -63,7 +63,7 @@ Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
 the old folder. Restart the app afterwards.
 
 ### Fixed
-- **Mac: "Free GST Billing - MAC.command could not be executed because you do
+- **Mac: "E-Munim - MAC.command could not be executed because you do
   not have appropriate access privileges"** (#120, thanks
   @saraiwalaneeraj-cell). The ZIP is built on Windows, which has no
   "executable" mark, so the Mac launcher and the Linux scripts arrived as
@@ -89,7 +89,7 @@ welcome for new users.**
 > **If the app does not start since the last update (#109):** download
 > `Free-GST-Billing.zip` from the
 > [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest),
-> extract it over your Free GST Billing folder (replace files when asked) and
+> extract it over your E-Munim folder (replace files when asked) and
 > click **Open App**. It sets itself up; your data is kept.
 
 #### If the in-app Update button works for you (1.10.73 and later)
@@ -106,8 +106,8 @@ Use the launcher: **More options → Update to the latest version**, then
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
-5. Double-click **Free GST Billing - WINDOWS**.
+4. Extract over your existing E-Munim folder, replacing files when asked.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -190,10 +190,10 @@ Use the launcher: **More options → Update to the latest version**, then
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
+4. Extract over your existing E-Munim folder, replacing files when asked.
    (Extracted it somewhere else? Its launcher offers **Update the installed
    copy**, which works without internet.)
-5. Double-click **Free GST Billing - WINDOWS**.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -293,10 +293,10 @@ Use the launcher: **More options → Update to the latest version**, then
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
+4. Extract over your existing E-Munim folder, replacing files when asked.
    (Extracted it somewhere else? Its launcher offers **Update the installed
    copy**, which works without internet.)
-5. Double-click **Free GST Billing - WINDOWS**.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -388,10 +388,10 @@ Use the launcher: **More options → Update to the latest version**, then
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
+4. Extract over your existing E-Munim folder, replacing files when asked.
    (Extracted it somewhere else? Its launcher offers **Update the installed
    copy**, which works without internet.)
-5. Double-click **Free GST Billing - WINDOWS**.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -454,10 +454,10 @@ Use the launcher: **More options → Update to the latest version**, then
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
+4. Extract over your existing E-Munim folder, replacing files when asked.
    (Extracted it somewhere else? Its launcher offers **Update the installed
    copy**, which works without internet.)
-5. Double-click **Free GST Billing - WINDOWS**.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -567,10 +567,10 @@ Use the launcher: **More options → Update to the latest version**, then
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
+4. Extract over your existing E-Munim folder, replacing files when asked.
    (Extracted it somewhere else? Its launcher offers **Update the installed
    copy**, which works without internet.)
-5. Double-click **Free GST Billing - WINDOWS**.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -646,10 +646,10 @@ Use the launcher: **More options → Update to the latest version**, then
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
+4. Extract over your existing E-Munim folder, replacing files when asked.
    (If you extract it somewhere else instead, the launcher there now tells you
    where your app is installed and offers **Update the installed copy**.)
-5. Double-click **Free GST Billing - WINDOWS**.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -673,7 +673,7 @@ https://github.com/aman1455/gst-billing-desktop/issues
   you extracted, so it needs no download and works offline. Your invoices,
   saved PDFs and trash are never replaced.
 - **Old files from earlier versions are removed** on the next Open App:
-  launchers under their old names (`Free GST Billing.command`/`.sh`, the old
+  launchers under their old names (`E-Munim.command`/`.sh`, the old
   `.bat` files) and the old `_system-scripts` folder - only when the file that
   replaced each one is present. Your data, backups and Node.js are never
   touched.
@@ -694,7 +694,7 @@ https://github.com/aman1455/gst-billing-desktop/issues
   and always shows that invoice's own options (the app-wide defaults used to
   replace them a moment after it opened).
 - **User Guide** in the sidebar (and "Read the 5-minute guide" on the Dashboard)
-  now opens the [online documentation](https://dicecodes.com/free-gst-software-documentation/),
+  now opens the [online documentation](https://freeinvoicefast.com/docs/),
   which covers every screen. The old built-in guide had fallen behind the app
   and is removed.
 - **Support & About** in the sidebar: who makes the app, free ways to help
@@ -703,7 +703,7 @@ https://github.com/aman1455/gst-billing-desktop/issues
   small thank-you card (Maybe later / Don't show again). Nothing is locked and
   nothing is printed on your invoices.
   The documentation has the same page, linked from its top bar next to the
-  name: [Support & About](https://dicecodes.com/free-gst-software-documentation/support.html).
+  name: [Support & About](https://freeinvoicefast.com/docs/support.html).
 - A one-line **"Star on GitHub"** note at the top of the app, at most once a
   month: first 3 days after you start using the app, then 30 days after you
   close it with ✕. **Star on GitHub** or **Already starred** hides it for good.
@@ -741,8 +741,8 @@ Use the launcher: **More options → Update to the latest version**, then
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
-5. Double-click **Free GST Billing - WINDOWS**.
+4. Extract over your existing E-Munim folder, replacing files when asked.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -823,7 +823,7 @@ online guide.**
 #### Use the launcher for this update
 Versions up to 1.10.71 cannot update themselves from inside the app (fixed
 in 1.10.72, below). Use the launcher:
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **More options → Update to the latest version**.
 3. Wait for it to finish, then click **Open App**.
 
@@ -832,8 +832,8 @@ in 1.10.72, below). Use the launcher:
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
-5. Double-click **Free GST Billing - WINDOWS**.
+4. Extract over your existing E-Munim folder, replacing files when asked.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -913,7 +913,7 @@ button have one now, and the User Guide links to the online docs.
 #### Use the launcher for this update
 The in-app **Update Now** button is the thing this version fixes, so on your
 current version it cannot update itself. Use the launcher instead:
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **More options → Update to the latest version**.
 3. Wait for it to finish, then click **Open App**.
 
@@ -924,8 +924,8 @@ From 1.10.72 on, **Update Now** inside the app works again.
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
-5. Double-click **Free GST Billing - WINDOWS**.
+4. Extract over your existing E-Munim folder, replacing files when asked.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -967,7 +967,7 @@ invoices keep their settings.**
 **Current version:** 1.10.70 (or 1.10.69)  →  **New version:** 1.10.71
 
 #### If the in-app Update button works for you
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **More options → Update to the latest version**.
 3. Wait for it to finish, then click **Open App**.
 
@@ -978,8 +978,8 @@ That is all — your data is not touched.
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
-5. Double-click **Free GST Billing - WINDOWS**.
+4. Extract over your existing E-Munim folder, replacing files when asked.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 The in-app **Control Panel → Update Now** works here too. It needs `unzip`
@@ -1057,7 +1057,7 @@ signature block — and you can add a "system-generated invoice" note (#72).**
 **Current version:** 1.10.69  →  **New version:** 1.10.70
 
 #### If the in-app Update button works for you
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **More options → Update to the latest version**.
 3. Wait for it to finish, then click **Open App**.
 
@@ -1068,8 +1068,8 @@ That is all — your data is not touched.
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
-5. Double-click **Free GST Billing - WINDOWS**.
+4. Extract over your existing E-Munim folder, replacing files when asked.
+5. Double-click **E-Munim - WINDOWS**.
 
 #### Linux / NAS
 The in-app **Control Panel → Update Now** works here too. It needs `unzip`
@@ -1130,7 +1130,7 @@ one-command install for anyone who prefers a terminal.**
 **Current version:** 1.10.68  →  **New version:** 1.10.69
 
 #### If the in-app Update button works for you
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -1142,7 +1142,7 @@ That is all — your data is not touched.
 2. Close the app completely (click **Stop Server** first if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open the launcher from inside
    the ZIP — Windows unpacks only that one file and the app cannot start.
-4. Extract over your existing Free GST Billing folder, replacing files when asked.
+4. Extract over your existing E-Munim folder, replacing files when asked.
 5. Double-click the launcher again.
 
 #### Linux / NAS
@@ -1299,13 +1299,13 @@ are done, and there is an X if you would rather not see it at all.
 
 ### Changed - the launchers say which system they are for
 
-The ZIP used to hold three files called `Free GST Billing` with three
+The ZIP used to hold three files called `E-Munim` with three
 extensions most people never see, because Windows hides them. They are now:
 
 ```
-Free GST Billing - WINDOWS.hta
-Free GST Billing - MAC.command
-Free GST Billing - LINUX.sh
+E-Munim - WINDOWS.hta
+E-Munim - MAC.command
+E-Munim - LINUX.sh
 ```
 
 Nothing to work out, and nothing to click by mistake.
@@ -1313,7 +1313,7 @@ Nothing to work out, and nothing to click by mistake.
 **Already installed?** The update copies the new launcher in beside the old
 one. The first time you click **Open App** afterwards, your Desktop and
 Start-Menu shortcuts are moved over to the new launcher and the old
-`Free GST Billing.hta` is removed. Only shortcuts pointing at *this*
+`E-Munim.hta` is removed. Only shortcuts pointing at *this*
 install are touched, and nothing is removed while a shortcut still needs it.
 
 ### Changed - the launcher explains itself
@@ -1381,7 +1381,7 @@ GSTIN is caught on the spot. No internet, no account, no API key.**
 **Current version:** 1.10.67  →  **New version:** 1.10.68
 
 #### If the in-app Update button works for you
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -1391,7 +1391,7 @@ That is all — your data is not touched.
 1. Download `Free-GST-Billing-v1.10.68.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when asked.
 4. Double-click the launcher again.
 
@@ -1453,7 +1453,7 @@ Mode, and a stamp of your own.**
 **Current version:** 1.10.66  →  **New version:** 1.10.67
 
 #### If the in-app Update button works for you
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -1463,7 +1463,7 @@ That is all — your data is not touched.
 1. Download `Free-GST-Billing-v1.10.67.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when asked.
 4. Double-click the launcher again.
 
@@ -1569,7 +1569,7 @@ Reported in #64 by @sangwanmail-eng, #61 / #62 / #63 by @Yashparmar1125, and
 **Current version:** 1.10.65  →  **New version:** 1.10.66
 
 #### If the in-app Update button works for you
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -1579,7 +1579,7 @@ That is all — your data is not touched.
 1. Download `Free-GST-Billing-v1.10.66.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when asked.
 4. Double-click the launcher again.
 
@@ -2418,7 +2418,7 @@ added in v1.10.50.
 
 **If the in-app Update button works for you**
 
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2429,7 +2429,7 @@ That is all - your data is not touched.
 1. Download `Free-GST-Billing-v1.10.54.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2487,7 +2487,7 @@ of every year; the other made the Income Tax screen quietly compute zero.
 
 **If the in-app Update button works for you**
 
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2498,7 +2498,7 @@ That is all - your data is not touched.
 1. Download `Free-GST-Billing-v1.10.53.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2575,7 +2575,7 @@ supplier recall added in v1.10.50 the previous day.
 
 **If the in-app Update button works for you**
 
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2586,7 +2586,7 @@ That is all - your data is not touched.
 1. Download `Free-GST-Billing-v1.10.52.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2642,7 +2642,7 @@ Adapted from a fix proposed by **@venkateshpabbati** in #38.
 
 **If the in-app Update button works for you**
 
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2653,7 +2653,7 @@ That is all — your data is not touched.
 1. Download `Free-GST-Billing-v1.10.51.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2722,7 +2722,7 @@ supplier name, gst number, address, item name etc"*.
 
 **If the in-app Update button works for you**
 
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2733,7 +2733,7 @@ That is all — your data is not touched.
 1. Download `Free-GST-Billing-v1.10.50.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2907,7 +2907,7 @@ updating is the only way to get the fix.
 
 **If the in-app Update button works for you**
 
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2918,7 +2918,7 @@ That is all — your data is not touched.
 1. Download `Free-GST-Billing-v1.10.49.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -3004,7 +3004,7 @@ machine — one needs Firefox, the other needs a screen narrower than about
 
 **If the in-app Update button works for you**
 
-1. Open the Free GST Billing launcher.
+1. Open the E-Munim launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -3015,7 +3015,7 @@ That is all — your data is not touched.
 1. Download `Free-GST-Billing-v1.10.48.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -3137,7 +3137,7 @@ Four scripts were broken, not just the updater:
   both BOM handling and the user's locale.
 - Root `.bat` launchers ASCII-ified too — they were printing mojibake
   under the cp437/cp850 OEM codepage (cosmetic, not fatal).
-- `Free GST Billing.hta` declared no charset, so the launcher UI was
+- `E-Munim.hta` declared no charset, so the launcher UI was
   being decoded with the system codepage. Added
   `<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />`.
 
@@ -3157,7 +3157,7 @@ offending `file:line` if a non-ASCII character is reintroduced.
 1. Download `Free-GST-Billing-v1.10.47.zip` from the
    [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/tag/v1.10.47).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing Free GST Billing folder, replacing
+3. Extract the ZIP over your existing E-Munim folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -3189,18 +3189,18 @@ Control Panel so the user never has to touch the folder again.
 
 ### Added — three platform launchers under `release-templates/`
 
-- **`Free GST Billing.hta`** (Windows) — real HTML app opened by
+- **`E-Munim.hta`** (Windows) — real HTML app opened by
   `mshta.exe`. Detects install state (Node? deps? corrupt install?)
   and renders only the buttons that make sense right now — one
   "Install Node & App" button when nothing's installed, or a grid
   of "Open App / Update / Backup / Restore / Move / Stop" once
   everything's ready. DOM API used throughout instead of innerHTML
   strings to avoid HTA-quirky escaping bugs.
-- **`Free GST Billing.command`** (macOS) — Finder double-click opens
+- **`E-Munim.command`** (macOS) — Finder double-click opens
   Terminal, walks the user through Node install if missing (points
   at Homebrew + official pkg), then runs npm install and starts
   the server. Opens `/control-panel` in the default browser.
-- **`Free GST Billing.sh`** (Linux) — same shape as `.command` with
+- **`E-Munim.sh`** (Linux) — same shape as `.command` with
   Debian / Fedora / Arch / nvm install instructions when Node is
   missing.
 
@@ -8268,7 +8268,7 @@ whether the server's already running and skip directly to "Open Billing
 App", or show the broken state with recovery steps.
 
 Power users who want the old auto-start behaviour can use the new
-**"Open Free GST Billing"** shortcut in the Start Menu folder, which
+**"Open E-Munim"** shortcut in the Start Menu folder, which
 still runs `Start FreeGSTBill.bat` directly.
 
 ### Added — `freegstbill-stop://` URL protocol

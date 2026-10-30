@@ -1,11 +1,11 @@
-# Free GST Billing - Windows backup.
+# E-Munim - Windows backup.
 #
 # Zips the entire data/ folder into
 #   %USERPROFILE%\Documents\FreeGSTBill Backups\YYYY-MM-DD_HH-mm-ss.zip
 # Opens the folder in Explorer so the user knows where it went.
 
 $ErrorActionPreference = 'Stop'
-$Host.UI.RawUI.WindowTitle = 'Free GST Billing - Backup'
+$Host.UI.RawUI.WindowTitle = 'E-Munim - Backup'
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SystemDir = $ScriptDir

@@ -7,7 +7,7 @@ export default [
 // =============================================================================
 {
   slug: 'index',
-  title: 'Free GST Billing documentation',
+  title: 'E-Munim documentation',
   nav: 'Welcome',
   lead: 'Make GST invoices, keep track of who owes you, and prepare your GST returns. On your own computer, with no account and no monthly fee.',
   body: `
@@ -19,7 +19,7 @@ export default [
 
 <section id="what-it-does">
 <h2>What it does</h2>
-<p>Free GST Billing is invoicing and GST software for small businesses in India, and for anyone billing in other currencies: 20 are supported. It runs on your computer and opens in your web browser, the way a website does, but nothing leaves your machine.</p>
+<p>E-Munim is invoicing and GST software for small businesses in India, and for anyone billing in other currencies: 20 are supported. It runs on your computer and opens in your web browser, the way a website does, but nothing leaves your machine.</p>
 <ul>
   <li><strong>Invoices</strong>: tax invoices, bills of supply, proforma estimates, credit notes and delivery challans, with CGST, SGST, IGST and UTGST worked out for you.</li>
   <li><strong>Getting paid</strong>: record payments, print receipts, see who is overdue and by how much.</li>

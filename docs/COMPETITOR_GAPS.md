@@ -1,6 +1,6 @@
 # Competitor Gap Analysis & Roadmap
 
-A snapshot of where Free GST Billing Software stands against the leading
+A snapshot of where E-Munim Software stands against the leading
 open-source GitHub projects and the major commercial Indian GST tools, plus
 the prioritized roadmap that came out of that comparison. Pair this with
 [CHANGELOG.md](./CHANGELOG.md) for what's already shipped.

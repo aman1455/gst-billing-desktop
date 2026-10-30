@@ -1,6 +1,6 @@
 # Documentation
 
-Detailed reference for **Free GST Billing Software**. The main project [README](../README.md) is the
+Detailed reference for **E-Munim Software**. The main project [README](../README.md) is the
 overview and feature list — everything below is the deep-dive material.
 
 | Document | What's in it |

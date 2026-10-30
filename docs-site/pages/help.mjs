@@ -30,7 +30,7 @@ export default [
 <h2>Support &amp; About</h2>
 <p>Who makes the app, and how to help it grow. Free ways come first: star it on GitHub, tell another business, report a bug or ask for a feature. If you want to give money, scan the UPI QR with any UPI app, for any amount. The page also lists what DiceCodes builds for businesses: custom software and web apps, changes to this app, setup and data migration, support plans, AI integration and automation, and mobile apps.</p>
 <p>The app stays free whatever you choose. Nothing is locked, and nothing is ever printed on your invoices. Once you have made 10 invoices, the Dashboard shows a small <a href="dashboard.html#support-card">support card</a> once a day; ${ui('Not today')} hides it until tomorrow and ${ui('Hide for 30 days')} for a month.</p>
-<p>Scanning the QR fills in the payment note "Free GST Billing support - <i>your business name</i>", so DiceCodes can thank you; untick <b>Include my business name</b> to leave it out. The page also shows how much users have given so far and what it is going towards.</p>
+<p>Scanning the QR fills in the payment note "E-Munim support - <i>your business name</i>", so DiceCodes can thank you; untick <b>Include my business name</b> to leave it out. The page also shows how much users have given so far and what it is going towards.</p>
 <p>Once a month at most, a one-line note at the top of the app asks for a star on GitHub. ${ui('✕')} hides it for 30 days; ${ui('Star on GitHub')} or ${ui('Already starred')} hides it for good. It never appears while you are making an invoice.</p>
 </section>
 
@@ -90,7 +90,7 @@ export default [
 
 <section id="app-not-running">
 <h2>"Needs a Quick Start"</h2>
-<p>If the app's engine is not running, the page says <b>Free GST Billing Software Needs a Quick Start</b>. Your data is safe. Double-click <b>Free GST Billing</b> on your Desktop and click ${ui('Open App')}; the page carries on by itself once it is running.</p>
+<p>If the app's engine is not running, the page says <b>E-Munim Needs a Quick Start</b>. Your data is safe. Double-click <b>E-Munim</b> on your Desktop and click ${ui('Open App')}; the page carries on by itself once it is running.</p>
 </section>
 `,
 },
@@ -110,8 +110,8 @@ export default [
 <section id="mac-blocked">
 <h2>The Mac will not open the launcher</h2>
 <ul>
-  <li><strong>"could not be executed because you do not have appropriate access privileges"</strong>: open <b>Terminal</b> (Applications → Utilities), type <code>chmod +x </code> with a space after it, drag <b>Free GST Billing - MAC</b> into the Terminal window, press Enter, and open the file again. Downloads from v1.10.82 do not need this.</li>
-  <li><strong>"cannot be opened because Apple cannot check it for malicious software"</strong> or <strong>"unidentified developer"</strong>: the app is not signed by Apple. Hold <kbd>Control</kbd>, click <b>Free GST Billing - MAC</b>, choose <b>Open</b>, then <b>Open</b> again. Only the first time. Or use <b>System Settings → Privacy &amp; Security → Open Anyway</b>.</li>
+  <li><strong>"could not be executed because you do not have appropriate access privileges"</strong>: open <b>Terminal</b> (Applications → Utilities), type <code>chmod +x </code> with a space after it, drag <b>E-Munim - MAC</b> into the Terminal window, press Enter, and open the file again. Downloads from v1.10.82 do not need this.</li>
+  <li><strong>"cannot be opened because Apple cannot check it for malicious software"</strong> or <strong>"unidentified developer"</strong>: the app is not signed by Apple. Hold <kbd>Control</kbd>, click <b>E-Munim - MAC</b>, choose <b>Open</b>, then <b>Open</b> again. Only the first time. Or use <b>System Settings → Privacy &amp; Security → Open Anyway</b>.</li>
   <li><strong>"Node.js is not installed"</strong> or <strong>too old</strong>: install Node.js LTS from <a href="https://nodejs.org">nodejs.org</a> (or <code>brew install node@20</code>), then open the launcher again.</li>
 </ul>
 </section>
@@ -127,7 +127,7 @@ export default [
   <li><strong>"Could not download Node.js"</strong> or <strong>"could not install the app's dependencies"</strong>: the first install needs the internet. Check the connection, or a work proxy or firewall, and click ${ui('Install')} again. It carries on where it stopped.</li>
   <li><strong>"Node.js was downloaded but will not run"</strong>: antivirus probably removed it. Add the app's folder to your antivirus exclusions, or install Node.js yourself from <a href="https://nodejs.org">nodejs.org</a>, then click ${ui('Install')} again.</li>
   <li><strong>"The Node.js on this PC (v6...) is too old"</strong>, <strong><code>npm ERR!</code></strong>, or a file named <code>npm-debug.log</code> in the <code>_system</code> folder: the PC has an old Node.js. From v1.10.81 the app sets up a current one in its own folder by itself. On an older version: install Node.js LTS from <a href="https://nodejs.org">nodejs.org</a>, delete the <code>_system\node_modules</code> folder (the <code>_system</code> folder is hidden: in File Explorer, <b>View → Show → Hidden items</b>), and click ${ui('Install')} again. Never delete the <code>data</code> folder.</li>
-  <li><strong>"Free GST Billing is already installed on this computer, in: ..."</strong>: you extracted a new ZIP into a new folder. Your invoices are in the folder it names. Open that copy from your Desktop shortcut and use ${ui('More options')} → ${ui('Update to the latest version')}; the new folder can be deleted.</li>
+  <li><strong>"E-Munim is already installed on this computer, in: ..."</strong>: you extracted a new ZIP into a new folder. Your invoices are in the folder it names. Open that copy from your Desktop shortcut and use ${ui('More options')} → ${ui('Update to the latest version')}; the new folder can be deleted.</li>
   <li><strong>"The app cannot write to its own folder"</strong>: it is inside <code>C:\Program Files</code>, on a read-only drive, or blocked by antivirus. Move the Free-GST-Billing folder to Documents or <code>D:\</code> and open it from there.</li>
   <li><strong>"Drive ... is almost full"</strong>: the install needs about 400 MB free. Empty the Recycle Bin or delete old downloads, then try again.</li>
   <li><strong>"Windows can install Node.js LTS for this PC ... Install Node.js LTS now?"</strong>: the app could not download Node.js itself, so it offers Windows' own installer. Type <b>Y</b> to accept (Windows may ask for permission), or anything else to install it yourself from the page it opens.</li>
@@ -141,7 +141,7 @@ export default [
 
 <section id="cannot-connect">
 <h2>"Cannot connect", a blank page, or "Needs a Quick Start"</h2>
-<p>The app is not running. Open the <b>Free GST Billing</b> shortcut and click ${ui('Open App')}; it starts the app if needed and opens the right address. You never need to type the address yourself; if its usual port is busy, the app picks another and the shortcut follows it.</p>
+<p>The app is not running. Open the <b>E-Munim</b> shortcut and click ${ui('Open App')}; it starts the app if needed and opens the right address. You never need to type the address yourself; if its usual port is busy, the app picks another and the shortcut follows it.</p>
 </section>
 
 <section id="wrong-tax">

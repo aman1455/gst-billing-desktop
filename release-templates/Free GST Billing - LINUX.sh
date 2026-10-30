@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Free GST Billing — Linux launcher.
+# E-Munim — Linux launcher.
 #
 # Mark this executable once (chmod +x) and either double-click in
 # most file managers (Nautilus, Dolphin, Nemo — prompt to run) or

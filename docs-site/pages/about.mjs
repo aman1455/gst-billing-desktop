@@ -5,31 +5,31 @@ import { SITE } from '../site.mjs';
 
 const UPI_ID = '7455899201-3@ybl';
 const upi = (amount) => `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=DiceCodes&cu=INR`
-  + `&tn=${encodeURIComponent('Free GST Billing support')}${amount ? `&am=${amount}.00` : ''}`;
+  + `&tn=${encodeURIComponent('E-Munim support')}${amount ? `&am=${amount}.00` : ''}`;
 // Drawn at build time: the page needs no script, and the QR works offline once saved.
 const qrSvg = await QRCode.toString(upi(0), { type: 'svg', margin: 1, errorCorrectionLevel: 'M' });
 
 const SERVICES = [
   ['Custom software &amp; web apps', 'Websites, web apps and business tools built for how you work.'],
-  ['Customising this app', 'Your own invoice layout, reports or features in Free GST Billing.'],
+  ['Customising this app', 'Your own invoice layout, reports or features in E-Munim.'],
   ['Setup &amp; data migration', 'Installation, moving your data from Tally or Excel, and training.'],
   ['Support plans for businesses', 'Priority help and updates on a yearly plan.'],
   ['AI integration', 'Add AI to your product: assistants, document reading, smart search.'],
   ['AI automation', 'Automate the repetitive work in the software you already use.'],
   ['Mobile apps', 'Android and iPhone apps for your business or customers.'],
 ];
-const share = encodeURIComponent(`I make my GST invoices with Free GST Billing Software. It's free, works offline and keeps data on your own computer: ${SITE.repo}`);
+const share = encodeURIComponent(`I make my GST invoices with E-Munim. It's free, works offline and keeps data on your own computer: ${SITE.repo}`);
 
 export default [
 {
   slug: 'support',
   title: 'Support & About',
   nav: 'Support & About',
-  lead: 'Who makes Free GST Billing, how you can help it grow, and what DiceCodes builds for businesses.',
+  lead: 'Who makes E-Munim, how you can help it grow, and what DiceCodes builds for businesses.',
   body: `
 <section id="about">
 <h2>Free, and it stays free</h2>
-<p>Free GST Billing is built and maintained by <a href="${SITE.publisher.url}">DiceCodes</a> in India. No ads, no account, no locked features, and your invoices never leave your computer. The full source code is on <a href="${SITE.repo}">GitHub</a> under the MIT licence.</p>
+<p>E-Munim is built and maintained by <a href="${SITE.publisher.url}">DiceCodes</a> in India. No ads, no account, no locked features, and your invoices never leave your computer. The full source code is on <a href="${SITE.repo}">GitHub</a> under the MIT licence.</p>
 <p>If it saves you time every month, you can help keep the fixes and new features coming.</p>
 </section>
 
@@ -45,7 +45,7 @@ export default [
       <a href="${upi(101)}">₹101</a> <a href="${upi(251)}">₹251</a> <a href="${upi(501)}">₹501</a> <a href="${upi(0)}">Any amount</a></p>
   </div>
 </div>
-<p>The payment note says "Free GST Billing support". Paying from the app's Support &amp; About page adds your business name to it, so DiceCodes can thank you.</p>
+<p>The payment note says "E-Munim support". Paying from the app's Support &amp; About page adds your business name to it, so DiceCodes can thank you.</p>
 </section>
 
 <section id="supporters" class="supporters" hidden>
@@ -87,7 +87,7 @@ export default [
 <div class="service-grid">
 ${SERVICES.map(([t, d]) => `  <div class="service"><strong>${t}</strong><span>${d}</span></div>`).join('\n')}
 </div>
-<p>Email <a href="mailto:contact@dicecodes.com?subject=${encodeURIComponent('Project enquiry (from the Free GST Billing docs)')}">contact@dicecodes.com</a> or visit <a href="${SITE.publisher.url}">dicecodes.com</a>.</p>
+<p>Email <a href="mailto:contact@dicecodes.com?subject=${encodeURIComponent('Project enquiry (from the E-Munim docs)')}">contact@dicecodes.com</a> or visit <a href="${SITE.publisher.url}">dicecodes.com</a>.</p>
 </section>
 
 <section id="in-the-app">

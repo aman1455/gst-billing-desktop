@@ -86,7 +86,7 @@ testing in `pwsh` gives a false pass.
 **Symptom:** launcher window shows `â€"` and garbled button icons
 instead of `—` and emoji.
 
-**Cause:** `Free GST Billing.hta` declared no charset, so MSHTML fell
+**Cause:** `E-Munim.hta` declared no charset, so MSHTML fell
 back to the system codepage.
 
 **Rule**
@@ -725,8 +725,8 @@ and confirm the browser opens on `http://localhost:47371` with no warning.
 **Version:** since v1.10.66 (ZIP built with Windows tar) · fixed in v1.10.82
 **Reported by:** saraiwalaneeraj-cell, issue #120
 
-**Symptom** - double-clicking `Free GST Billing - MAC.command` showed *"The file
-"Free GST Billing - MAC.command" could not be executed because you do not have
+**Symptom** - double-clicking `E-Munim - MAC.command` showed *"The file
+"E-Munim - MAC.command" could not be executed because you do not have
 appropriate access privileges."* Get Info showed it as a plain, non-executable
 file.
 
@@ -1041,7 +1041,7 @@ quotation is not".
 **Version:** since the wizard was added · fixed in v1.10.77
 **Reported by:** @sangwanmail-eng (#84 items 1 and 4)
 
-**Symptom** - the "Welcome to Free GST Billing" wizard appeared again and
+**Symptom** - the "Welcome to E-Munim" wizard appeared again and
 again, and Region set to India came back as Both / Auto after restarting.
 
 **Cause** - these settings lived only in the browser's localStorage. Some
@@ -1311,7 +1311,7 @@ function). By hand: one export without GSTIN must appear only in 3.1(b).
 **Version:** since the continuous server check · fixed in v1.10.73
 **Reported by:** found by the release test on a machine at 100% CPU
 
-**Symptom** - mid-session, the whole app was replaced by "Free GST Billing
+**Symptom** - mid-session, the whole app was replaced by "E-Munim
 Software Needs a Quick Start ... Starting..." although the server was running
 and answered in milliseconds a moment later.
 

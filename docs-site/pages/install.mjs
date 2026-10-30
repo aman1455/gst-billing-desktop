@@ -37,7 +37,7 @@ ${which}
 <section id="download">
 <h2>Step 1: Download</h2>
 <ol class="steps">
-  <li><strong>Click this button</strong><a class="download" href="${SITE.download}">Download Free GST Billing</a></li>
+  <li><strong>Click this button</strong><a class="download" href="${SITE.download}">Download E-Munim</a></li>
   <li><strong>Wait for the download to finish</strong>Your browser shows it at the top right (Chrome and Edge) or bottom left. The file is called <code>Free-GST-Billing.zip</code>.</li>
   <li><strong>Open your Downloads folder</strong>Click the folder icon next to the download, or open <b>File Explorer</b> (the yellow folder on the taskbar) and click <b>Downloads</b> on the left.</li>
 </ol>
@@ -51,7 +51,7 @@ ${which}
 <ol class="steps">
   <li><strong>Right-click the ZIP</strong>Right-click <code>Free-GST-Billing.zip</code> and choose ${ui('Extract All\u2026')}. (On Windows 11 it may be under ${ui('Show more options')}.)</li>
   <li><strong>Choose where</strong>Click ${ui('Browse\u2026')} and pick <b>Documents</b>, or a drive like <code>D:\\</code>. Not <b>Downloads</b>: things there get deleted when people tidy up. Do not choose <code>C:\\Program Files</code>.</li>
-  <li><strong>Click Extract</strong>A new folder called <b>Free-GST-Billing</b> opens. Inside you see <b>Free GST Billing - WINDOWS</b>, <b>READ ME FIRST</b>, and launchers for Mac and Linux.</li>
+  <li><strong>Click Extract</strong>A new folder called <b>Free-GST-Billing</b> opens. Inside you see <b>E-Munim - WINDOWS</b>, <b>READ ME FIRST</b>, and launchers for Mac and Linux.</li>
 </ol>
 <p>If you double-click the launcher while still looking inside the ZIP, it says <i>Please extract the ZIP first</i>. Close it and do this step.</p>
 <figure class="narrow"><img src="${img('launcher-zip.png')}" alt="The launcher explaining that the ZIP needs to be extracted first"></figure>
@@ -60,7 +60,7 @@ ${which}
 <section id="launch">
 <h2>Step 3: Open the launcher and click Install</h2>
 <ol class="steps">
-  <li><strong>Double-click "Free GST Billing - WINDOWS"</strong>In the Free-GST-Billing folder.</li>
+  <li><strong>Double-click "E-Munim - WINDOWS"</strong>In the Free-GST-Billing folder.</li>
   <li><strong>If Windows warns you</strong>See <a href="#windows-protected">"Windows protected your PC"</a> just below: click ${ui('More info')}, then ${ui('Run anyway')}. If it asks <i>Do you want to run this file?</i>, click ${ui('Run')} or ${ui('Open')}.</li>
   <li><strong>Click Install</strong>A small window opens with one big button. Click ${ui('Install')}. There is nothing to fill in.</li>
   <li><strong>Leave the black window alone</strong>A black window appears and does the work: it may get Node.js (the engine the app runs on, about 30 MB, kept inside the app folder) and then the app's parts. This takes 1 to 3 minutes. Don't close it; it closes by itself.</li>
@@ -82,14 +82,14 @@ ${which}
   <li>Click the small link ${ui('More info')}.</li>
   <li>Click the button ${ui('Run anyway')}.</li>
 </ol>
-<p>If the file will not open at all: right-click <b>Free GST Billing - WINDOWS</b>, choose ${ui('Properties')}, tick ${ui('Unblock')} at the bottom, click ${ui('OK')}, and double-click it again.</p>
+<p>If the file will not open at all: right-click <b>E-Munim - WINDOWS</b>, choose ${ui('Properties')}, tick ${ui('Unblock')} at the bottom, click ${ui('OK')}, and double-click it again.</p>
 <p>If your antivirus deletes a file during the install, add the Free-GST-Billing folder to its exclusions (often under <i>Exclusions</i> or <i>Allowed apps</i>) and click ${ui('Install')} again.</p>
 </section>
 
 <section id="every-day">
 <h2>Every day after that</h2>
 <ol class="steps">
-  <li><strong>Double-click "Free GST Billing" on your Desktop</strong>The install put this shortcut there (and in the Start menu).</li>
+  <li><strong>Double-click "E-Munim" on your Desktop</strong>The install put this shortcut there (and in the Start menu).</li>
   <li><strong>Click Open App</strong>The app opens in your browser. You can close the launcher window.</li>
 </ol>
 <p>To stop the app: open the launcher, click ${ui('More options')}, then ${ui('Stop the app')}. Restarting the computer also stops it.</p>
@@ -102,7 +102,7 @@ ${which}
   <li><strong>Checks your PC</strong>: Windows 10 or 11, enough free space, a folder it can write to, and the internet.</li>
   <li><strong>Sets up Node.js inside the app folder</strong> if the PC does not have a recent one. It is downloaded once from nodejs.org into <code>_system\\node</code>. Nothing is installed into Windows and no administrator password is needed. If that download fails, it asks before using Windows' own installer (winget), and otherwise opens the download page.</li>
   <li><strong>Downloads the app's parts</strong> from the internet.</li>
-  <li><strong>Adds a Free GST Billing shortcut</strong> to your Desktop and Start menu.</li>
+  <li><strong>Adds a E-Munim shortcut</strong> to your Desktop and Start menu.</li>
   <li><strong>Opens the app</strong> in your browser.</li>
 </ul>
 </section>
@@ -111,7 +111,7 @@ ${which}
 <h2>Install with one command (for IT people)</h2>
 <p>Open PowerShell and paste:</p>
 <pre><code>irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex</code></pre>
-<p>It installs to <code>%LOCALAPPDATA%\\Programs\\Free GST Billing</code>; set <code>$env:FREEGSTBILL_DIR = 'D:\\Apps\\Free GST Billing'</code> first to choose another folder. It stops if the app is already installed there with data in it.</p>
+<p>It installs to <code>%LOCALAPPDATA%\\Programs\\E-Munim</code>; set <code>$env:FREEGSTBILL_DIR = 'D:\\Apps\\E-Munim'</code> first to choose another folder. It stops if the app is already installed there with data in it.</p>
 </section>
 
 <section id="uninstall">
@@ -120,7 +120,7 @@ ${which}
 <ol>
   <li><strong>Back up your data first</strong> if you may want it again. See <a href="backup.html#export-import">Export everything to one file</a>.</li>
   <li>In the launcher, ${ui('More options')} → ${ui('Stop the app')}.</li>
-  <li>Delete the Free-GST-Billing folder and the <b>Free GST Billing</b> shortcuts on the Desktop and in the Start menu.</li>
+  <li>Delete the Free-GST-Billing folder and the <b>E-Munim</b> shortcuts on the Desktop and in the Start menu.</li>
 </ol>
 </section>
 `,
@@ -158,7 +158,7 @@ ${which}
 <section id="download">
 <h2>Part 2: Download and unzip the app</h2>
 <ol class="steps">
-  <li><strong>Download</strong><a class="download" href="${SITE.download}">Download Free GST Billing</a></li>
+  <li><strong>Download</strong><a class="download" href="${SITE.download}">Download E-Munim</a></li>
   <li><strong>Find it in Downloads</strong>Open <b>Finder</b> (the blue face in the Dock) and click <b>Downloads</b> on the left. <b>Safari</b> usually unzips it for you, so you see a folder called <b>Free-GST-Billing</b>. If you see <code>Free-GST-Billing.zip</code> instead, double-click it to unzip.</li>
   <li><strong>Move the folder to Documents</strong>Drag the <b>Free-GST-Billing</b> folder onto <b>Documents</b> on the left of Finder, so it is not deleted when Downloads is cleared. Your invoices will be kept inside it.</li>
 </ol>
@@ -168,9 +168,9 @@ ${which}
 <h2>Part 3: Open it the first time</h2>
 <p>Apple asks you to confirm apps that are not from the App Store. This is needed <b>once</b>.</p>
 <ol class="steps">
-  <li><strong>Control-click the launcher</strong>In the Free-GST-Billing folder, hold the ${key('Control')} key and click <b>Free GST Billing - MAC</b> (or right-click it, or click with two fingers on a trackpad). Choose ${ui('Open')}.</li>
+  <li><strong>Control-click the launcher</strong>In the Free-GST-Billing folder, hold the ${key('Control')} key and click <b>E-Munim - MAC</b> (or right-click it, or click with two fingers on a trackpad). Choose ${ui('Open')}.</li>
   <li><strong>Confirm</strong>A box says macOS cannot check the developer. Click ${ui('Open')}.</li>
-  <li><strong>On macOS 15 Sequoia or newer, if there is no Open button</strong>Click ${ui('Done')}. Open the Apple menu (the apple logo) → ${ui('System Settings')} → ${ui('Privacy &amp; Security')}, scroll down to the message about <b>Free GST Billing - MAC</b>, click ${ui('Open Anyway')}, type your password, then ${ui('Open Anyway')} again.</li>
+  <li><strong>On macOS 15 Sequoia or newer, if there is no Open button</strong>Click ${ui('Done')}. Open the Apple menu (the apple logo) → ${ui('System Settings')} → ${ui('Privacy &amp; Security')}, scroll down to the message about <b>E-Munim - MAC</b>, click ${ui('Open Anyway')}, type your password, then ${ui('Open Anyway')} again.</li>
   <li><strong>A Terminal window opens</strong>It is a plain text window; you do not need to type anything in it except one key. It says <i>App dependencies not installed yet ... Install now? [Y/n]</i>. Press ${key('Return')}.</li>
   <li><strong>Wait 2 to 3 minutes</strong>Text scrolls past while it sets up. When it says <i>Server running. This window can be closed</i>, the app opens in your browser at <code>http://localhost:47371</code>.</li>
   <li><strong>Close the Terminal window</strong>The app keeps running. A short welcome asks for your business details; see <a href="first-run.html">The first-run setup</a>.</li>
@@ -180,7 +180,7 @@ ${which}
 <section id="mac-messages">
 <h2>If the Mac shows a message</h2>
 <ul>
-  <li><strong>"could not be executed because you do not have appropriate access privileges"</strong>: you have a download from before v1.10.82. Download it again (Part 2), or fix this copy: open Terminal (see <a href="terminal.html#mac">Opening Terminal on a Mac</a>), type <code>chmod +x</code> and a space, drag <b>Free GST Billing - MAC</b> from Finder into the Terminal window, press ${key('Return')}, then go back to Part 3.</li>
+  <li><strong>"could not be executed because you do not have appropriate access privileges"</strong>: you have a download from before v1.10.82. Download it again (Part 2), or fix this copy: open Terminal (see <a href="terminal.html#mac">Opening Terminal on a Mac</a>), type <code>chmod +x</code> and a space, drag <b>E-Munim - MAC</b> from Finder into the Terminal window, press ${key('Return')}, then go back to Part 3.</li>
   <li><strong>"Node.js is not installed"</strong> in the Terminal window: do Part 1, then open the launcher again. If it asks <i>Open the Node.js download page now? [y/N]</i>, type <code>y</code> and press ${key('Return')}.</li>
   <li><strong>"Node.js ... is too old"</strong>: install the current LTS from nodejs.org (Part 1); it replaces the old one.</li>
   <li><strong>"The app cannot reach the internet"</strong> or the install stops: check the Wi-Fi, then open the launcher again; it carries on.</li>
@@ -191,7 +191,7 @@ ${which}
 <section id="every-day">
 <h2>Every day after that</h2>
 <ol class="steps">
-  <li><strong>Double-click "Free GST Billing - MAC"</strong>After the first time, a normal double-click works. If the app is already running it just opens your browser.</li>
+  <li><strong>Double-click "E-Munim - MAC"</strong>After the first time, a normal double-click works. If the app is already running it just opens your browser.</li>
 </ol>
 <p><b>Tip:</b> make a Desktop shortcut. Control-click the launcher → ${ui('Make Alias')}, and drag the alias to your Desktop. You can also bookmark <code>http://localhost:47371</code> in your browser; it works while the app is running.</p>
 <p>To stop the app: in the app open <b>Control Panel</b> in the sidebar and click ${ui('Stop Server')}. Restarting the Mac also stops it.</p>
@@ -231,7 +231,7 @@ ${which}
 <section id="download">
 <h2>Step 2: Download and unzip</h2>
 <ol class="steps">
-  <li><strong>Download</strong><a class="download" href="${SITE.download}">Download Free GST Billing</a> It goes into your <b>Downloads</b> folder.</li>
+  <li><strong>Download</strong><a class="download" href="${SITE.download}">Download E-Munim</a> It goes into your <b>Downloads</b> folder.</li>
   <li><strong>Unzip it</strong>Paste this in the Terminal and press ${key('Enter')}: it unpacks the app into a folder in your home folder.
 <pre><code>cd ~ && unzip -o ~/Downloads/Free-GST-Billing.zip</code></pre></li>
 </ol>
@@ -239,7 +239,7 @@ ${which}
 
 <section id="start">
 <h2>Step 3: Start the app</h2>
-<pre><code>cd ~/Free-GST-Billing && bash "Free GST Billing - LINUX.sh"</code></pre>
+<pre><code>cd ~/Free-GST-Billing && bash "E-Munim - LINUX.sh"</code></pre>
 <ol class="steps">
   <li><strong>Press Enter to install</strong>It asks <i>Install now? [Y/n]</i>. Press ${key('Enter')}.</li>
   <li><strong>Wait 2 to 3 minutes</strong>When it says <i>Server running</i>, the app opens in your browser at <code>http://localhost:47371</code>. You can close the Terminal; the app keeps running.</li>
@@ -278,16 +278,16 @@ bash "_system/start-unix.sh"</code></pre>
 
 <section id="windows">
 <h2>Windows: other ways</h2>
-<p><b>From the launcher:</b> double-click <b>Free GST Billing</b> on your Desktop → ${ui('More options')} → ${ui('Update to the latest version')} → then ${ui('Open App')}.</p>
+<p><b>From the launcher:</b> double-click <b>E-Munim</b> on your Desktop → ${ui('More options')} → ${ui('Update to the latest version')} → then ${ui('Open App')}.</p>
 <p><b>By hand, with the ZIP</b> (if the app does not open at all):</p>
 <ol class="steps">
-  <li><strong>Download</strong><a class="download" href="${SITE.download}">Download Free GST Billing</a></li>
+  <li><strong>Download</strong><a class="download" href="${SITE.download}">Download E-Munim</a></li>
   <li><strong>Stop the app</strong>Launcher → ${ui('More options')} → ${ui('Stop the app')}.</li>
   <li><strong>Extract into the same place as before</strong>Right-click the ZIP → ${ui('Extract All\u2026')} → ${ui('Browse\u2026')} → choose the folder that <i>contains</i> your Free-GST-Billing folder (for example <b>Documents</b>) → ${ui('Extract')}.</li>
   <li><strong>Replace the files</strong>Windows asks about files that already exist: choose ${ui('Replace the files in the destination')}. On Windows this <b>adds</b> to your folder; your <code>_system\\data</code> folder is not touched.</li>
-  <li><strong>Open the app</strong>Double-click <b>Free GST Billing - WINDOWS</b> → ${ui('Open App')}. The first start after an update takes a minute.</li>
+  <li><strong>Open the app</strong>Double-click <b>E-Munim - WINDOWS</b> → ${ui('Open App')}. The first start after an update takes a minute.</li>
 </ol>
-<p>If you extracted the new ZIP somewhere else and opened its launcher, it says <i>Free GST Billing is already installed on this computer</i> and offers ${ui('Update the installed copy')}: use that, and delete the new folder.</p>
+<p>If you extracted the new ZIP somewhere else and opened its launcher, it says <i>E-Munim is already installed on this computer</i> and offers ${ui('Update the installed copy')}: use that, and delete the new folder.</p>
 </section>
 
 <section id="mac">
@@ -355,7 +355,7 @@ bash "_system/start-unix.sh"</code></pre>
 <ul>
   <li><strong>Drag a file in to type its location.</strong> Instead of typing a long folder path, drag the file from Finder or File Explorer into the Terminal window; its full path appears, ready to use.</li>
   <li><strong>Passwords are invisible.</strong> When it asks for your password, nothing appears as you type, not even dots. Type it anyway and press ${key('Enter')}.</li>
-  <li><strong>Names with spaces need quotes.</strong> <code>"Free GST Billing - MAC.command"</code>. Dragging the file in adds what is needed for you.</li>
+  <li><strong>Names with spaces need quotes.</strong> <code>"E-Munim - MAC.command"</code>. Dragging the file in adds what is needed for you.</li>
   <li><strong>To stop a command</strong> that keeps running, press ${key('Ctrl', 'C')}.</li>
 </ul>
 </section>
@@ -366,7 +366,7 @@ bash "_system/start-unix.sh"</code></pre>
 <ol class="steps">
   <li><strong>Open Terminal</strong>${key('Cmd', 'Space')}, type <code>Terminal</code>, ${key('Return')}.</li>
   <li><strong>Type the start of the command</strong>Type <code>chmod +x</code> and then one space. Do not press Return yet.</li>
-  <li><strong>Drag the launcher in</strong>Drag <b>Free GST Billing - MAC</b> from your Free-GST-Billing folder into the Terminal window. The line now ends with its location.</li>
+  <li><strong>Drag the launcher in</strong>Drag <b>E-Munim - MAC</b> from your Free-GST-Billing folder into the Terminal window. The line now ends with its location.</li>
   <li><strong>Press Return</strong>Nothing is printed: that means it worked. Close Terminal and open the launcher again (Control-click → ${ui('Open')}).</li>
 </ol>
 </section>

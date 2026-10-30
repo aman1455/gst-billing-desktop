@@ -1,4 +1,4 @@
-# Free GST Billing - Windows installer.
+# E-Munim - Windows installer.
 #
 # Invoked by the HTA launcher on first run. Idempotent - safe to
 # re-run any time. Installs Node.js if missing, runs npm install
@@ -7,12 +7,12 @@
 # again.
 
 $ErrorActionPreference = 'Continue'
-$Host.UI.RawUI.WindowTitle = 'Free GST Billing - Installer'
+$Host.UI.RawUI.WindowTitle = 'E-Munim - Installer'
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SystemDir = $ScriptDir
 $RootDir   = Split-Path -Parent $ScriptDir
-$LauncherHTA = Join-Path $RootDir 'Free GST Billing - WINDOWS.hta'
+$LauncherHTA = Join-Path $RootDir 'E-Munim - WINDOWS.hta'
 
 Write-Host ''
 Write-Host '  ============================================================'
@@ -32,11 +32,11 @@ function Find-OtherInstall {
   foreach ($dir in @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))) {
     # One unreadable or empty shortcut must not stop the others being checked.
     try {
-      $lnk = Join-Path $dir 'Free GST Billing.lnk'
+      $lnk = Join-Path $dir 'E-Munim.lnk'
       if (Test-Path -LiteralPath $lnk) { $roots += Split-Path -Parent ([string](New-Object -ComObject WScript.Shell).CreateShortcut($lnk).Arguments).Trim().Trim('"') }
     } catch { }
   }
-  $roots += Join-Path $env:LOCALAPPDATA 'Programs\Free GST Billing'
+  $roots += Join-Path $env:LOCALAPPDATA 'Programs\E-Munim'
   foreach ($r in $roots) {
     if (-not $r -or $r.TrimEnd('\') -eq $here) { continue }
     if ((Test-Path -LiteralPath (Join-Path $r '_system\server.js')) -and (Test-Path -LiteralPath (Join-Path $r '_system\node_modules'))) { return $r }
@@ -46,12 +46,12 @@ function Find-OtherInstall {
 if (-not $env:FREEGSTBILL_DIR) {
   $other = Find-OtherInstall
   if ($other) {
-    Write-Host '  Free GST Billing is already installed on this computer, in:' -ForegroundColor Yellow
+    Write-Host '  E-Munim is already installed on this computer, in:' -ForegroundColor Yellow
     Write-Host "    $other"
     Write-Host ''
     Write-Host '  Installing again here would make a second copy with no invoices in it.'
     Write-Host '  To get the newest version, update the installed copy instead:'
-    Write-Host '  open it from your Free GST Billing shortcut, then'
+    Write-Host '  open it from your E-Munim shortcut, then'
     Write-Host '  More options -> Update to the latest version.'
     Write-Host ''
     Write-Host '  Nothing was changed. This folder is not needed; you can delete it.'
@@ -109,7 +109,7 @@ Write-Host ''
 Write-Host '  Creating Desktop shortcut...'
 try {
   $desktop = [Environment]::GetFolderPath('Desktop')
-  $shortcutPath = Join-Path $desktop 'Free GST Billing.lnk'
+  $shortcutPath = Join-Path $desktop 'E-Munim.lnk'
   $wsh = New-Object -ComObject WScript.Shell
   $sc = $wsh.CreateShortcut($shortcutPath)
   # Point the shortcut at mshta.exe with the HTA as its argument.
@@ -129,7 +129,7 @@ try {
 
 # --- Step 4: Start Menu shortcut (Programs list) ---
 try {
-  $startMenu = Join-Path ([Environment]::GetFolderPath('Programs')) 'Free GST Billing.lnk'
+  $startMenu = Join-Path ([Environment]::GetFolderPath('Programs')) 'E-Munim.lnk'
   $wsh = New-Object -ComObject WScript.Shell
   $sc = $wsh.CreateShortcut($startMenu)
   $sc.TargetPath = 'mshta.exe'
@@ -178,7 +178,7 @@ Write-Host '  ============================================================'
 Write-Host ''
 Write-Host '  Opening the app in your browser now...'
 Write-Host ''
-Write-Host '  Next time, use the Free GST Billing shortcut on your Desktop.'
+Write-Host '  Next time, use the E-Munim shortcut on your Desktop.'
 Write-Host ''
 
 # v1.10.69 - finish the job. Leaving a console window saying "now go and

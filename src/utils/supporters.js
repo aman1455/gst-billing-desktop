@@ -7,7 +7,7 @@
 export const SUPPORTERS_URL = 'https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/supporters.json';
 
 // The note UPI apps fill in when the QR is scanned, so the maintainer can see
-// who paid: "Free GST Billing support - Kaveri Stationers". Kept to letters,
+// who paid: "E-Munim support - Kaveri Stationers". Kept to letters,
 // digits, spaces, "." and "-" (some UPI apps refuse anything else) and to 50
 // characters, which every app accepts.
 const NOTE_BASE = 'E-Munim support';

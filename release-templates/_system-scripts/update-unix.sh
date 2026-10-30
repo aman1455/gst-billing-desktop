@@ -1,5 +1,5 @@
 #!/bin/sh
-# Free GST Billing - Linux / macOS / NAS updater.
+# E-Munim - Linux / macOS / NAS updater.
 #
 # The Unix counterpart of update-windows.ps1, run by the Control Panel's
 # "Update Now" button. Before v1.10.66 there was no Unix updater at all, so on

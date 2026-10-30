@@ -2,13 +2,13 @@
 // Previous / Next order at the foot of each page.
 
 export const SITE = {
-  name: 'Free GST Billing',
+  name: 'E-Munim',
   // The folder is also the web address, so it carries the words people search.
-  folder: 'free-gst-software-documentation',
+  folder: 'docs',
   // Where the folder is published. Used for canonical links, the sitemap,
   // social previews and llms.txt, which all need full addresses.
-  url: 'https://dicecodes.com/free-gst-software-documentation/',
-  publisher: { name: 'DiceCodes', url: 'https://dicecodes.com' },
+  url: 'https://freeinvoicefast.com/docs/',
+  publisher: { name: 'Free Invoice Fast', url: 'https://freeinvoicefast.com' },
   version: '1.10.82',
   repo: 'https://github.com/aman1455/gst-billing-desktop',
   // Always the newest release: GitHub resolves this to the latest release's
@@ -20,11 +20,11 @@ export const SITE = {
 // Other pages use their own title and the first ~155 characters of their lead.
 export const SEO = {
   index: {
-    title: 'Free GST Billing Software for India: documentation and user guide',
+    title: 'E-Munim for India: documentation and user guide',
     description: 'Free, open-source GST billing software for Windows, Mac and Linux. Make GST invoices, track payments and stock, and prepare GSTR-1 and GSTR-3B. No signup, works offline.',
   },
   install: {
-    title: 'How to install Free GST Billing Software on Windows, Mac and Linux',
+    title: 'How to install E-Munim on Windows, Mac and Linux',
     description: 'Download one ZIP, extract it and click Install. Sets up everything on Windows without admin rights. Step-by-step install for Windows, macOS and Linux.',
   },
   'first-invoice': {

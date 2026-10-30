@@ -1,4 +1,4 @@
-# Free GST Billing - Windows updater.
+# E-Munim - Windows updater.
 #
 # Pulls the latest release ZIP from GitHub, extracts _system/ over
 # the existing one, re-runs npm install. Data folder is preserved.
@@ -19,7 +19,7 @@
 param([string]$InstallTo = '')
 
 $ErrorActionPreference = 'Stop'
-$Host.UI.RawUI.WindowTitle = 'Free GST Billing - Update'
+$Host.UI.RawUI.WindowTitle = 'E-Munim - Update'
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SystemDir = $ScriptDir
@@ -90,7 +90,7 @@ Write-Host '  Extracting...'
 Expand-Archive -Path $zipPath -DestinationPath $tmp -Force
 
 # The extract may contain either the pretty release structure
-# (root has Free GST Billing - WINDOWS.hta + _system/) or the source zipball
+# (root has E-Munim - WINDOWS.hta + _system/) or the source zipball
 # (root has aman1455-gst-billing-desktop-HASH/).
 $extracted = Get-ChildItem -Path $tmp -Directory | Select-Object -First 1
 $candidateSystem = Join-Path $extracted.FullName '_system'
@@ -116,7 +116,7 @@ Get-ChildItem -Path $newSystem -Force | Where-Object { $keep -notcontains $_.Nam
   Copy-Item -Path $_.FullName -Destination $dest -Recurse -Force
 }
 # If the new release ships new launcher/HTA files at root, refresh those too
-Get-ChildItem -Path $sourceRoot -File | Where-Object { $_.Extension -match '\.(hta|command|sh)$' -or $_.Name -match '^Free GST Billing' } | ForEach-Object {
+Get-ChildItem -Path $sourceRoot -File | Where-Object { $_.Extension -match '\.(hta|command|sh)$' -or $_.Name -match '^E-Munim' } | ForEach-Object {
   Copy-Item -Path $_.FullName -Destination (Join-Path $RootDir $_.Name) -Force
 }
 

@@ -64,7 +64,7 @@ else {
   if (e) {
     check('every path uses "/" (ERR-014, ERR-061)', !e.some((x) => x.name.includes('\\')), 'Backslash paths unpack as flat files on Linux / Mac. Build with npm run release:zip, never Compress-Archive.');
     check('server.js is at Free-GST-Billing/_system/', e.some((x) => x.name === 'Free-GST-Billing/_system/server.js'), 'The layout is wrong; the launchers will not find the app.');
-    for (const l of ['Free GST Billing - WINDOWS.hta', 'Free GST Billing - MAC.command', 'Free GST Billing - LINUX.sh', 'READ ME FIRST.txt']) {
+    for (const l of ['E-Munim - WINDOWS.hta', 'E-Munim - MAC.command', 'E-Munim - LINUX.sh', 'READ ME FIRST.txt']) {
       check(`${l} is in the ZIP`, e.some((x) => x.name === `Free-GST-Billing/${l}`), `${l} is missing from the ZIP.`);
     }
     const scripts = e.filter((x) => /\.(command|sh)$/.test(x.name));
@@ -89,7 +89,7 @@ console.log('\nScripts that users run');
 const tdir = join(ROOT, 'release-templates', '_system-scripts');
 const nonAscii = readdirSync(tdir).filter((f) => f.endsWith('.ps1') && /[^\x00-\x7F]/.test(readFileSync(join(tdir, f), 'latin1')));
 check('every .ps1 is plain ASCII (ERR-001: Windows PowerShell misreads it)', !nonAscii.length, `Non-ASCII in ${nonAscii.join(', ')}.`);
-const unixScripts = [...readdirSync(tdir).filter((f) => f.endsWith('.sh')).map((f) => join(tdir, f)), join(ROOT, 'release-templates', 'Free GST Billing - MAC.command'), join(ROOT, 'release-templates', 'Free GST Billing - LINUX.sh')];
+const unixScripts = [...readdirSync(tdir).filter((f) => f.endsWith('.sh')).map((f) => join(tdir, f)), join(ROOT, 'release-templates', 'E-Munim - MAC.command'), join(ROOT, 'release-templates', 'E-Munim - LINUX.sh')];
 const crlf = unixScripts.filter((f) => readFileSync(f, 'latin1').includes('\r'));
 check('every .sh / .command uses LF line endings (ERR-014)', !crlf.length, `CRLF in ${crlf.join(', ')}.`);
 check('READ ME FIRST.txt is plain ASCII', !/[^\x00-\x7F]/.test(read('release-templates/READ ME FIRST.txt')), 'Notepad on some PCs garbles other characters.');

@@ -29,22 +29,22 @@
 
   Double-click the one that matches your computer:
 
-    Windows ..... Free GST Billing - WINDOWS
-    Mac ......... Free GST Billing - MAC
-    Linux / NAS . Free GST Billing - LINUX
+    Windows ..... E-Munim - WINDOWS
+    Mac ......... E-Munim - MAC
+    Linux / NAS . E-Munim - LINUX
 
   A small window opens with one button.
 
   MAC: install Node.js first (free): https://nodejs.org ->
   macOS Installer (LTS). Then hold Control, click
-  "Free GST Billing - MAC" and choose Open, then Open again.
+  "E-Munim - MAC" and choose Open, then Open again.
   A Terminal window asks "Install now? [Y/n]": press Return.
 
   LINUX: see the step-by-step guide below.
 
   STEP-BY-STEP GUIDES, for every computer, with every click
   explained (no technical knowledge needed):
-  https://dicecodes.com/free-gst-software-documentation/install.html
+  https://freeinvoicefast.com/docs/install.html
 
 
 -----------------------------------------------------------
@@ -73,7 +73,7 @@
   FROM NOW ON
 -----------------------------------------------------------
 
-  A "Free GST Billing" shortcut is put on your Desktop.
+  A "E-Munim" shortcut is put on your Desktop.
   Use that to open the app every day.
 
   You can also open the launcher again any time. It is your
@@ -143,13 +143,13 @@
   appropriate access privileges"
       Open Terminal (Applications -> Utilities), type
       chmod +x  (with a space after it), drag the file
-      "Free GST Billing - MAC" into the Terminal window,
+      "E-Munim - MAC" into the Terminal window,
       press Enter, then open the file again.
 
   Mac: "cannot be opened because Apple cannot check it" /
   "unidentified developer"
       The app is not signed by Apple. Hold Control and click
-      "Free GST Billing - MAC", choose Open, then Open again.
+      "E-Munim - MAC", choose Open, then Open again.
       Only the first time. (Or: System Settings -> Privacy &
       Security -> Open Anyway.)
 
@@ -182,7 +182,7 @@
       nothing? Close the black window and click Open App
       again.
 
-  "Free GST Billing is already installed on this computer"
+  "E-Munim is already installed on this computer"
       You extracted a new ZIP into a new folder. Your
       invoices are in the folder it names. Open that copy
       from your Desktop shortcut and use More options ->
@@ -223,7 +223,7 @@
       and anything urgent straight away.
 
       The full guide, with every screen explained:
-      https://dicecodes.com/free-gst-software-documentation/
+      https://freeinvoicefast.com/docs/
 
 
 ===========================================================

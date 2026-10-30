@@ -1,4 +1,4 @@
-# Running Free GST Billing Software Online
+# Running E-Munim Software Online
 
 > **Important.** This app is designed to run on **your own computer** as an offline-first PWA — every invoice, GSTIN, and bank detail stays in a local `data/` folder that never touches a network. The "run online" paths below trade that privacy for remote access from multiple devices. If you don't have a hard need for online access, **the local install is still the recommended default** — see the main [README](../README.md#-install-in-60-seconds-windows-one-click).
 >

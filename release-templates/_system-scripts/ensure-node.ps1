@@ -1,4 +1,4 @@
-# Free GST Billing - check this PC has what the app needs, fix what can be
+# E-Munim - check this PC has what the app needs, fix what can be
 # fixed safely, and say in plain words what to do about the rest.
 #
 # Dot-sourced by install-windows.ps1, update-windows.ps1 and start-windows.ps1.
@@ -88,7 +88,7 @@ function Find-GoodNode {
 function Test-WindowsVersion {
   if ([Environment]::OSVersion.Version.Major -ge 10) { return $true }
   Write-Problem 'This version of Windows is too old.' @(
-    'Free GST Billing needs Windows 10 or Windows 11.',
+    'E-Munim needs Windows 10 or Windows 11.',
     'Node.js, which the app runs on, no longer works on Windows 7 or 8.')
   return $false
 }
@@ -174,7 +174,7 @@ function Show-NodeHelp {
     'The app needs Node.js 18 or newer. To install it yourself:',
     '  1. Open https://nodejs.org (opening it now) and download the LTS version.',
     '  2. Run the installer and keep the default options.',
-    '  3. Open Free GST Billing again.',
+    '  3. Open E-Munim again.',
     'If your antivirus removed it, add the Free-GST-Billing folder to its exclusions.')
   try { Start-Process 'https://nodejs.org/en/download' } catch { }
 }

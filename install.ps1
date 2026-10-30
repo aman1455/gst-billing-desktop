@@ -1,4 +1,4 @@
-# Free GST Billing - one-command Windows installer.
+# E-Munim - one-command Windows installer.
 #
 #   irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex
 #
@@ -10,7 +10,7 @@
 # It runs through `iex`, so it cannot take -Parameters. Point it somewhere
 # else with an environment variable instead:
 #
-#   $env:FREEGSTBILL_DIR = 'D:\Apps\Free GST Billing'
+#   $env:FREEGSTBILL_DIR = 'D:\Apps\E-Munim'
 #
 # Keep this file pure ASCII: it is fetched and parsed by Windows
 # PowerShell 5.1, which mangles UTF-8 without a BOM (see ERR-001).
@@ -19,7 +19,7 @@ $ErrorActionPreference = 'Stop'
 
 $Repo = 'aman1455/gst-billing-desktop'
 $Dest = $env:FREEGSTBILL_DIR
-if (-not $Dest) { $Dest = Join-Path $env:LOCALAPPDATA 'Programs\Free GST Billing' }
+if (-not $Dest) { $Dest = Join-Path $env:LOCALAPPDATA 'Programs\E-Munim' }
 
 Write-Host ''
 Write-Host '  ============================================================'
@@ -38,14 +38,14 @@ $existingData = Join-Path $Dest '_system\data'
 if (Test-Path $existingData) {
   $hasBooks = @(Get-ChildItem -Path $existingData -Recurse -File -ErrorAction SilentlyContinue).Count -gt 0
   if ($hasBooks) {
-    Write-Host "  Free GST Billing is already installed at:" -ForegroundColor Yellow
+    Write-Host "  E-Munim is already installed at:" -ForegroundColor Yellow
     Write-Host "    $Dest"
     Write-Host ''
     Write-Host '  To update it, open the app and use Control Panel -> Update Now.'
     Write-Host '  That keeps your invoices, clients and settings, and backs them up first.'
     Write-Host ''
     Write-Host '  To install a second, separate copy, set a different folder and re-run:'
-    Write-Host '    $env:FREEGSTBILL_DIR = ''D:\Apps\Free GST Billing'''
+    Write-Host '    $env:FREEGSTBILL_DIR = ''D:\Apps\E-Munim'''
     Write-Host ''
     return
   }
@@ -59,19 +59,19 @@ if (-not $env:FREEGSTBILL_DIR) {
   foreach ($dir in @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))) {
     # One unreadable or empty shortcut must not stop the others being checked.
     try {
-      $lnk = Join-Path $dir 'Free GST Billing.lnk'
+      $lnk = Join-Path $dir 'E-Munim.lnk'
       if (-not (Test-Path -LiteralPath $lnk)) { continue }
       $root = Split-Path -Parent ([string](New-Object -ComObject WScript.Shell).CreateShortcut($lnk).Arguments).Trim().Trim('"')
       if ($root -and $root.TrimEnd('\') -ne $Dest.TrimEnd('\') -and (Test-Path -LiteralPath (Join-Path $root '_system\node_modules'))) { $installedAt = $root; break }
     } catch { }
   }
   if ($installedAt) {
-    Write-Host "  Free GST Billing is already installed at:" -ForegroundColor Yellow
+    Write-Host "  E-Munim is already installed at:" -ForegroundColor Yellow
     Write-Host "    $installedAt"
     Write-Host ''
     Write-Host '  To update it, open the app and use Control Panel -> Update Now.'
     Write-Host '  To install a second, separate copy anyway, set a folder and re-run:'
-    Write-Host '    $env:FREEGSTBILL_DIR = ''D:\Apps\Free GST Billing'''
+    Write-Host '    $env:FREEGSTBILL_DIR = ''D:\Apps\E-Munim'''
     Write-Host ''
     return
   }
