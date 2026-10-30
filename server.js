@@ -15,7 +15,7 @@ import { fileURLToPath } from 'url';
 import { templateTotals, clientYearToDate, nextCounterValue, startFor, numberSeriesFor, counterKeyFor, formatDocNumber, businessKeyOf, getFinancialYearLabel, INVOICE_TYPES } from './src/utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = path.join(__dirname, 'data');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 
 // Port choice — we deliberately default to a high, unusual number rather than
 // the conventional 3001. The 3000-range is heavily used by every other Node /
@@ -26,8 +26,8 @@ const DATA_DIR = path.join(__dirname, 'data');
 // by any common software we could find. The persisted `data/port.txt` always
 // wins over this default — so a single user who genuinely needs 47371 for
 // something else can edit that file and we'll respect it forever.
-const DEFAULT_PORT = 47371;
-const PORT_FILE = path.join(__dirname, 'data', 'port.txt');
+const DEFAULT_PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 47371;
+const PORT_FILE = path.join(DATA_DIR, 'port.txt');
 
 // Read the persisted port (if any) — written once on first successful start
 // and every time we get bumped off our preferred port by EADDRINUSE.
@@ -1269,7 +1269,7 @@ app.post('/api/control-panel/launch-script', async (req, res) => {
 // start before `vite build` finishes — common in StackBlitz, Codespaces, or
 // when a user accidentally runs `node server.js` directly — and seamlessly
 // flips to serving the app the moment dist/ appears.
-const distPath = path.join(__dirname, 'dist');
+const distPath = process.env.DIST_PATH || path.join(__dirname, 'dist');
 const indexPath = path.join(distPath, 'index.html');
 app.use(express.static(distPath, { fallthrough: true })); // fallthrough = ok if dist doesn't exist
 

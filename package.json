@@ -96,7 +96,10 @@
     "test:update-unix": "node scripts/test-update-unix.mjs",
     "release:check": "node scripts/release-check.mjs",
     "docs:zip": "node scripts/build-docs-zip.mjs",
-    "verify:release": "node scripts/verify-release.mjs"
+    "verify:release": "node scripts/verify-release.mjs",
+    "electron:start": "electron .",
+    "dist": "npm run build && electron-builder --win",
+    "dist:dir": "npm run build && electron-builder --win --dir"
   },
   "dependencies": {
     "cors": "^2.8.6",
@@ -125,5 +128,41 @@
     "sharp": "^0.35.5",
     "vite": "^7.3.7",
     "vite-plugin-pwa": "^1.3.0"
+  },
+  "main": "electron/main.cjs",
+  "build": {
+    "appId": "com.dicecodes.freegstbilling",
+    "productName": "Free GST Billing Software",
+    "asar": false,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "server.js",
+      "src/utils.js",
+      "release-templates/_system-scripts/app-icon.ico",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "release-templates/_system-scripts/app-icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Free GST Billing Software"
+    }
   }
 }
