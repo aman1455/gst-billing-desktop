@@ -1,4 +1,4 @@
-// v1.10.81 - on Support & About: the weekly update (a new version every
+﻿// v1.10.81 - on Support & About: the weekly update (a new version every
 // Saturday, decided with the maintainer), where to report problems and ask
 // for features (GitHub issue forms), and "What's new" from the CHANGELOG.md
 // that ships with the app. The changelog is shown as text (changelog.js
@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { Bug, Lightbulb, CalendarClock, ListChecks, Sparkles } from 'lucide-react';
 import { parseChangelog, inlineParts } from '../utils/changelog';
 
-const REPO = 'https://github.com/IamRamgarhia/Free-GST-Billing-Software';
+const REPO = 'https://github.com/aman1455/gst-billing-desktop';
 const CHANGELOG_URL = `${REPO}/blob/main/CHANGELOG.md`;
 const card = { padding: '1.25rem 1.5rem' };
 

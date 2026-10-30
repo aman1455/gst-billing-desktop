@@ -1,4 +1,4 @@
-// Site-wide settings and the sidebar. The sidebar order is also the
+﻿// Site-wide settings and the sidebar. The sidebar order is also the
 // Previous / Next order at the foot of each page.
 
 export const SITE = {
@@ -10,10 +10,10 @@ export const SITE = {
   url: 'https://dicecodes.com/free-gst-software-documentation/',
   publisher: { name: 'DiceCodes', url: 'https://dicecodes.com' },
   version: '1.10.82',
-  repo: 'https://github.com/IamRamgarhia/Free-GST-Billing-Software',
+  repo: 'https://github.com/aman1455/gst-billing-desktop',
   // Always the newest release: GitHub resolves this to the latest release's
   // file of exactly this name (see docs/RELEASE_CHECKLIST.md, step 4b).
-  download: 'https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest/download/Free-GST-Billing.zip',
+  download: 'https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip',
 };
 
 // Search-result titles and descriptions for the pages people search for most.

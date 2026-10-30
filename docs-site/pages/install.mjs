@@ -1,4 +1,4 @@
-// Step-by-step install and update guides, written for people who have never
+﻿// Step-by-step install and update guides, written for people who have never
 // unzipped a file or opened a Terminal (asked for by the maintainer: "so many
 // people don't know how to use things or use the terminal"). Every step says
 // what to click and what you should see next.
@@ -110,7 +110,7 @@ ${which}
 <section id="one-command">
 <h2>Install with one command (for IT people)</h2>
 <p>Open PowerShell and paste:</p>
-<pre><code>irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex</code></pre>
+<pre><code>irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex</code></pre>
 <p>It installs to <code>%LOCALAPPDATA%\\Programs\\Free GST Billing</code>; set <code>$env:FREEGSTBILL_DIR = 'D:\\Apps\\Free GST Billing'</code> first to choose another folder. It stops if the app is already installed there with data in it.</p>
 </section>
 

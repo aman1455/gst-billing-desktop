@@ -1,4 +1,4 @@
-# Weekly releases: one update every Saturday
+﻿# Weekly releases: one update every Saturday
 
 From v1.10.81, Free GST Billing ships **one update every Saturday** with that
 week's fixes and new features. Users are told this in the app (Support &
@@ -52,7 +52,7 @@ The app's Support & About page links straight to both forms.
 - [ ] `npm run release:zip` passes (lint 0 errors, unit tests, smoke on a fresh install)
 - [ ] Docker fresh install passes, and `npm run test:update-unix`
 - [ ] Committed and pushed; release `v<version>` with one `Free-GST-Billing.zip`
-- [ ] `gh api repos/IamRamgarhia/Free-GST-Billing-Software/releases/latest` shows the new tag
+- [ ] `gh api repos/aman1455/gst-billing-desktop/releases/latest` shows the new tag
 - [ ] Replies posted, shipped issues closed
 - [ ] Docs site rebuilt and zipped into `release-build/` (never with PowerShell's
       `Compress-Archive`: it writes `\` paths and the site 404s on the host, ERR-061):

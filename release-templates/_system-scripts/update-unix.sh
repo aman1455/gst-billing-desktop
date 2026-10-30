@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 # Free GST Billing - Linux / macOS / NAS updater.
 #
 # The Unix counterpart of update-windows.ps1, run by the Control Panel's
@@ -30,7 +30,7 @@ set -eu
 # installing dependencies is worse than one that finishes or rolls back.
 trap '' HUP PIPE
 
-REPO_API='https://api.github.com/repos/IamRamgarhia/Free-GST-Billing-Software/releases/latest'
+REPO_API='https://api.github.com/repos/aman1455/gst-billing-desktop/releases/latest'
 
 say()  { printf '  %s\n' "$*" 2>/dev/null || true; }
 fail() { printf '\n  ERROR: %s\n\n' "$*" >&2 2>/dev/null || true; exit 1; }

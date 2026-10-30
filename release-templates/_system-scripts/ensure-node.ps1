@@ -1,4 +1,4 @@
-# Free GST Billing - check this PC has what the app needs, fix what can be
+﻿# Free GST Billing - check this PC has what the app needs, fix what can be
 # fixed safely, and say in plain words what to do about the rest.
 #
 # Dot-sourced by install-windows.ps1, update-windows.ps1 and start-windows.ps1.
@@ -226,7 +226,7 @@ function Show-InstallHelp {
     'The internet, the disk and the folder all look fine, so the usual cause is',
     'antivirus blocking files as they are written. Add the Free-GST-Billing folder',
     'to its exclusions and try again. If it keeps failing, open an issue at',
-    'https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues with a',
+    'https://github.com/aman1455/gst-billing-desktop/issues with a',
     'photo of this window.')
 }
 

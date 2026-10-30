@@ -1,10 +1,10 @@
-// Support page (v1.10.80): the payment note in the UPI QR, and the supporters
+﻿// Support page (v1.10.80): the payment note in the UPI QR, and the supporters
 // tracker the maintainer keeps in supporters.json at the root of the GitHub
 // repo. The app and the docs site read that file when online; editing it on
 // GitHub updates every copy, no release needed. It comes from the internet, so
 // everything in it is checked before it is shown (parseSupporters).
 
-export const SUPPORTERS_URL = 'https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/supporters.json';
+export const SUPPORTERS_URL = 'https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/supporters.json';
 
 // The note UPI apps fill in when the QR is scanned, so the maintainer can see
 // who paid: "Free GST Billing support - Kaveri Stationers". Kept to letters,

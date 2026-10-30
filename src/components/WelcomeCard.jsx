@@ -1,4 +1,4 @@
-// v1.10.81 - a welcome for new users at the top of the Dashboard (asked for by
+﻿// v1.10.81 - a welcome for new users at the top of the Dashboard (asked for by
 // the maintainer): thanks them, and whoever told them about the app, says it
 // is free for good, and that support of any amount is welcome but never
 // needed. On the page, not a popup; shown until closed and only while the
@@ -9,7 +9,7 @@ import { Heart, Share2, X } from 'lucide-react';
 import { SUPPORT_NUDGE_MIN_INVOICES } from '../utils/supporters';
 
 const KEY = 'freegstbill_welcomeCard';
-const SHARE_TEXT = 'I use Free GST Billing for my GST invoices. It is free, works offline and keeps the data on your own PC: https://github.com/IamRamgarhia/Free-GST-Billing-Software';
+const SHARE_TEXT = 'I use Free GST Billing for my GST invoices. It is free, works offline and keeps the data on your own PC: https://github.com/aman1455/gst-billing-desktop';
 
 const isClosed = () => { try { return localStorage.getItem(KEY) === 'closed'; } catch { return false; } };
 

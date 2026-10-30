@@ -1,4 +1,4 @@
-import express from 'express';
+﻿import express from 'express';
 // v1.10.0 — `cors` package no longer imported. The CORS-lockdown
 // middleware below is intentionally custom + strict (localhost only)
 // where `cors()` echoed `*` for every origin.
@@ -1070,8 +1070,8 @@ app.get('/api/check-update', async (req, res) => {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 4000);
     const [pkgRes, relRes] = await Promise.all([
-      fetch('https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/package.json', { signal: ctrl.signal }).catch(() => null),
-      fetch('https://api.github.com/repos/IamRamgarhia/Free-GST-Billing-Software/releases/latest', {
+      fetch('https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/package.json', { signal: ctrl.signal }).catch(() => null),
+      fetch('https://api.github.com/repos/aman1455/gst-billing-desktop/releases/latest', {
         signal: ctrl.signal,
         headers: { 'Accept': 'application/vnd.github+json', 'User-Agent': 'FreeGSTBill-update-check' },
       }).catch(() => null),

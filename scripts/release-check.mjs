@@ -1,4 +1,4 @@
-// npm run release:check - the last automated check before publishing a
+﻿// npm run release:check - the last automated check before publishing a
 // release. Run it after `npm run release:zip` and `npm run docs:zip`.
 // Every check here exists because the mistake it catches already happened
 // once (the ERR numbers point to docs/KNOWN_ERRORS.md). The manual checks that
@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { parseSupporters } from '../src/utils/supporters.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const REPO = 'IamRamgarhia/Free-GST-Billing-Software';
+const REPO = 'aman1455/gst-billing-desktop';
 const offline = process.argv.includes('--offline');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
 let failed = 0;

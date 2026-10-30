@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 # Free GST Billing Software — 100% Free, No Subscription, No Limits
 
@@ -6,9 +6,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue.svg)](#quick-start--installation)
-[![Latest release](https://img.shields.io/github/v/release/IamRamgarhia/Free-GST-Billing-Software?label=Latest&color=orange)](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/aman1455/gst-billing-desktop?label=Latest&color=orange)](https://github.com/aman1455/gst-billing-desktop/releases/latest)
 [![PWA](https://img.shields.io/badge/PWA-installable-purple.svg)](#install-as-a-desktop-app-pwa)
-[![GitHub Stars](https://img.shields.io/github/stars/IamRamgarhia/Free-GST-Billing-Software?style=social)](https://github.com/IamRamgarhia/Free-GST-Billing-Software)
+[![GitHub Stars](https://img.shields.io/github/stars/aman1455/gst-billing-desktop?style=social)](https://github.com/aman1455/gst-billing-desktop)
 [![Countries](https://img.shields.io/badge/Countries-22-blue.svg)](#key-features)
 [![GST](https://img.shields.io/badge/GST-Compliant-success.svg)](#clipboard-gst-compliance--filing)
 
@@ -16,11 +16,11 @@
 
 Your data never leaves your computer. No cloud. No signup. No tracking. No limits. Open-source and offline-first.
 
-<a href="https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest/download/Free-GST-Billing.zip"><img src="https://img.shields.io/github/v/release/IamRamgarhia/Free-GST-Billing-Software?style=for-the-badge&label=%E2%AC%87%EF%B8%8F%20Download&color=16a34a&labelColor=15803d" alt="Download the latest version" height="48"></a>&nbsp;&nbsp;<a href="https://dicecodes.com/free-gst-software-documentation/"><img src="https://img.shields.io/badge/%F0%9F%93%96%20Documentation-Read%20the%20guide-2563eb?style=for-the-badge&labelColor=1d4ed8" alt="Read the documentation" height="48"></a>
+<a href="https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip"><img src="https://img.shields.io/github/v/release/aman1455/gst-billing-desktop?style=for-the-badge&label=%E2%AC%87%EF%B8%8F%20Download&color=16a34a&labelColor=15803d" alt="Download the latest version" height="48"></a>&nbsp;&nbsp;<a href="https://dicecodes.com/free-gst-software-documentation/"><img src="https://img.shields.io/badge/%F0%9F%93%96%20Documentation-Read%20the%20guide-2563eb?style=for-the-badge&labelColor=1d4ed8" alt="Read the documentation" height="48"></a>
 
-<sub>Always the newest version · about 16 MB · Windows, macOS and Linux in one ZIP · <a href="https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest">release notes</a></sub>
+<sub>Always the newest version · about 16 MB · Windows, macOS and Linux in one ZIP · <a href="https://github.com/aman1455/gst-billing-desktop/releases/latest">release notes</a></sub>
 
-[⬇ Download ZIP](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest/download/Free-GST-Billing.zip) &nbsp;|&nbsp; [📦 Releases](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases) &nbsp;|&nbsp; [📖 Documentation](https://dicecodes.com/free-gst-software-documentation/) &nbsp;|&nbsp; [⚡ 3-Step Install](#quick-start--installation) &nbsp;|&nbsp; [☁ Run Online (Vercel / Supabase / Railway)](./docs/DEPLOY_ONLINE.md) &nbsp;|&nbsp; [🧾 First Invoice in 5 Minutes](#your-first-invoice-in-5-minutes) &nbsp;|&nbsp; [📸 Screenshots](#screenshots) &nbsp;|&nbsp; [🐛 Report Bug](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues)
+[⬇ Download ZIP](https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip) &nbsp;|&nbsp; [📦 Releases](https://github.com/aman1455/gst-billing-desktop/releases) &nbsp;|&nbsp; [📖 Documentation](https://dicecodes.com/free-gst-software-documentation/) &nbsp;|&nbsp; [⚡ 3-Step Install](#quick-start--installation) &nbsp;|&nbsp; [☁ Run Online (Vercel / Supabase / Railway)](./docs/DEPLOY_ONLINE.md) &nbsp;|&nbsp; [🧾 First Invoice in 5 Minutes](#your-first-invoice-in-5-minutes) &nbsp;|&nbsp; [📸 Screenshots](#screenshots) &nbsp;|&nbsp; [🐛 Report Bug](https://github.com/aman1455/gst-billing-desktop/issues)
 
 </div>
 
@@ -47,7 +47,7 @@ Free-GST-Billing/
 </p>
 
 ```
-1. Download the ZIP → https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest/download/Free-GST-Billing.zip
+1. Download the ZIP → https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip
 2. Right-click the ZIP → Extract All → pick a folder you'll remember
 3. Open the EXTRACTED folder. Each launcher is named after the system it is for
    — double-click yours:
@@ -64,7 +64,7 @@ Free-GST-Billing/
 **Prefer one command?** Paste this into PowerShell — no admin rights needed:
 
 ```powershell
-irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex
 ```
 
 It fetches the latest release, installs it to
@@ -137,7 +137,7 @@ You need: Windows 10/11 PC, ~50 MB free disk, your business name + bank details 
 
 ### Step 1 — Install (1 minute)
 
-1. **[Download the ZIP](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest/download/Free-GST-Billing.zip)** — always the latest version.
+1. **[Download the ZIP](https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip)** — always the latest version.
    (Do **not** use the green *Code -> Download ZIP* button — that gives the source code without the built app.)
 2. Right-click the downloaded ZIP → **Extract All** → pick a folder you'll remember (e.g. `Documents\FreeGSTBill`)
 3. Open the **extracted** folder → double-click **`Free GST Billing - WINDOWS`** (each launcher is named after the system it is for)
@@ -145,7 +145,7 @@ You need: Windows 10/11 PC, ~50 MB free disk, your business name + bank details 
 5. Click **Open App** — the app opens in your browser at `http://localhost:47371`, and a Desktop shortcut is waiting for you next time
 
 > **In a hurry?** One PowerShell command does steps 1–4 for you:
-> `irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex`
+> `irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex`
 
 > 💡 **Tip:** Click the small **Install App** icon in your browser's address bar to make the app open in its own window like Tally or Word — no browser chrome, looks and feels native.
 
@@ -434,7 +434,7 @@ If we priced every 🆕 feature at the going rate on the paid alternatives:
 
 ### Option 1: Windows — extract, then double-click the launcher (recommended — no terminal)
 
-1. **Download the ZIP** → [click here](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest/download/Free-GST-Billing.zip) or grab the latest from [Releases](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases)
+1. **Download the ZIP** → [click here](https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip) or grab the latest from [Releases](https://github.com/aman1455/gst-billing-desktop/releases)
 2. **Extract** it anywhere (e.g. `Documents\FreeGSTBill`) — right-click the ZIP → *Extract All*
 3. Open the extracted folder and **double-click** `Free GST Billing - WINDOWS.hta`
 4. Click **Install Node & App** once. When it finishes, click **Open App** — the app opens at **http://localhost:47371**, and a **Desktop shortcut** and **Start-Menu entry** are created for you
@@ -453,7 +453,7 @@ That's it. The launcher installs Node.js if you don't have it. From then on, cli
 For anyone comfortable with a terminal. No admin rights, nothing written outside your own user profile:
 
 ```powershell
-irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex
 ```
 
 It finds the latest release, downloads and extracts it to `%LOCALAPPDATA%\Programs\Free GST Billing`, installs Node.js if missing, runs `npm install`, and creates the Desktop and Start-Menu shortcuts.
@@ -462,7 +462,7 @@ To install somewhere else, set the folder first:
 
 ```powershell
 $env:FREEGSTBILL_DIR = 'D:\Apps\Free GST Billing'
-irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex
 ```
 
 If the app is already installed in that folder with data in it, the command stops and points you at **Control Panel → Update Now** rather than writing over your books.
@@ -472,7 +472,7 @@ If the app is already installed in that folder with data in it, the command stop
 ### Option 2: macOS / Linux (Developer Setup)
 
 ```bash
-git clone https://github.com/IamRamgarhia/Free-GST-Billing-Software.git
+git clone https://github.com/aman1455/gst-billing-desktop.git
 cd Free-GST-Billing-Software
 npm install
 npm start                # production build + serve on http://localhost:47371
@@ -646,14 +646,14 @@ The app includes a **step-by-step interactive filing guide** with screenshots an
 - [ ] More industry-specific *invoice templates* (separate from the 13 Terms presets we already ship)
 - [ ] Branch-wise reporting
 
-> **Want a feature?** [Ask for it here](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues/new?template=feature_request.yml) and let us know.
+> **Want a feature?** [Ask for it here](https://github.com/aman1455/gst-billing-desktop/issues/new?template=feature_request.yml) and let us know.
 
 ### :calendar: A new update every Saturday
 
 Every **Saturday** we release one update with that week's fixes and new features. The app tells you when it is ready (**Update** in the sidebar) and keeps your data. Anything urgent, such as the app not opening, is fixed straight away.
 
-- 🐛 **[Report a problem](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues/new?template=bug_report.yml)**: the version, your computer and the steps help us fix it the same week.
-- 💡 **[Ask for a feature](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues/new?template=feature_request.yml)**: we read every request each week, and the ones most people ask for come first. Add a 👍 to an [open request](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues) to vote for it.
+- 🐛 **[Report a problem](https://github.com/aman1455/gst-billing-desktop/issues/new?template=bug_report.yml)**: the version, your computer and the steps help us fix it the same week.
+- 💡 **[Ask for a feature](https://github.com/aman1455/gst-billing-desktop/issues/new?template=feature_request.yml)**: we read every request each week, and the ones most people ask for come first. Add a 👍 to an [open request](https://github.com/aman1455/gst-billing-desktop/issues) to vote for it.
 
 You get a reply on the issue when it ships. How the week runs: [docs/WEEKLY_RELEASES.md](./docs/WEEKLY_RELEASES.md).
 
@@ -706,7 +706,7 @@ If the app saves you time, you can help keep it going:
 
 - ⭐ **Star this repo**, so other businesses find it
 - 💬 **Tell another business** about it
-- 🐛 **[Report a bug](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues/new?template=bug_report.yml) or [ask for a feature](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues/new?template=feature_request.yml)**: fixes and features ship every Saturday
+- 🐛 **[Report a bug](https://github.com/aman1455/gst-billing-desktop/issues/new?template=bug_report.yml) or [ask for a feature](https://github.com/aman1455/gst-billing-desktop/issues/new?template=feature_request.yml)**: fixes and features ship every Saturday
 - 💛 **UPI, any amount:** `princeramgarhiaa-1@okaxis` (also as a QR code in the app, under **Support & About**)
 
 **Work with DiceCodes:** custom software and web apps, customising this app for your business, setup and data migration, support plans, AI integration and automation, and mobile apps. [contact@dicecodes.com](mailto:contact@dicecodes.com)
@@ -758,7 +758,7 @@ We welcome contributions from the community. Here's how you can help:
 5. **Open** a Pull Request
 
 You can also contribute by:
-- Reporting bugs via [GitHub Issues](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues)
+- Reporting bugs via [GitHub Issues](https://github.com/aman1455/gst-billing-desktop/issues)
 - Suggesting features
 - Improving documentation
 - Sharing the project with other businesses
@@ -834,7 +834,7 @@ Find the message you see. **None of these touch your invoices**: they stay in th
 | Forgot the app PIN | In the app folder (next to the launcher), create an empty text file named `RESET-PIN` and reload the app. The PIN is removed; invoices aren't touched. |
 | Linux / Mac / NAS: **"Node.js … is too old"** or **"not installed"** | The message lists the command for your system (`apt`, `dnf`, `pacman`, `apk`, `brew` or nvm). Install Node.js 20, then open the launcher again. |
 
-**Still stuck?** [Report a problem](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues/new?template=bug_report.yml) with the message you see and a screenshot (hide your GSTIN and bank details). If the app doesn't start, add what `node -v` and `npm -v` show in Command Prompt. More answers: [troubleshooting guide](https://dicecodes.com/free-gst-software-documentation/troubleshooting.html).
+**Still stuck?** [Report a problem](https://github.com/aman1455/gst-billing-desktop/issues/new?template=bug_report.yml) with the message you see and a screenshot (hide your GSTIN and bank details). If the app doesn't start, add what `node -v` and `npm -v` show in Command Prompt. More answers: [troubleshooting guide](https://dicecodes.com/free-gst-software-documentation/troubleshooting.html).
 
 ---
 
@@ -878,8 +878,8 @@ CSV import is supported today for clients and products. Direct Tally XML import 
 ## Contact & Support
 
 - **Email:** [Contact@dicecodes.com](mailto:Contact@dicecodes.com)
-- **Report a problem:** [bug report form](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues/new?template=bug_report.yml) · **Ask for a feature:** [feature form](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues/new?template=feature_request.yml) (fixes and features ship every Saturday)
-- **Releases:** [GitHub Releases](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases)
+- **Report a problem:** [bug report form](https://github.com/aman1455/gst-billing-desktop/issues/new?template=bug_report.yml) · **Ask for a feature:** [feature form](https://github.com/aman1455/gst-billing-desktop/issues/new?template=feature_request.yml) (fixes and features ship every Saturday)
+- **Releases:** [GitHub Releases](https://github.com/aman1455/gst-billing-desktop/releases)
 - **Discussions:** *(coming soon)*
 
 ---
@@ -894,7 +894,7 @@ This project is licensed under the [MIT License](LICENSE) — free to use, modif
 
 ### Ready to stop paying for billing software?
 
-[**⬇ Download Now**](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest/download/Free-GST-Billing.zip) &nbsp;·&nbsp; [⭐ **Star on GitHub**](https://github.com/IamRamgarhia/Free-GST-Billing-Software) &nbsp;·&nbsp; [📖 **Read the User Guide**](docs/USER_GUIDE.md) &nbsp;·&nbsp; [🐛 **Report an Issue**](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues) &nbsp;·&nbsp; [📧 **Email DiceCodes**](mailto:Contact@dicecodes.com)
+[**⬇ Download Now**](https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip) &nbsp;·&nbsp; [⭐ **Star on GitHub**](https://github.com/aman1455/gst-billing-desktop) &nbsp;·&nbsp; [📖 **Read the User Guide**](docs/USER_GUIDE.md) &nbsp;·&nbsp; [🐛 **Report an Issue**](https://github.com/aman1455/gst-billing-desktop/issues) &nbsp;·&nbsp; [📧 **Email DiceCodes**](mailto:Contact@dicecodes.com)
 
 ---
 

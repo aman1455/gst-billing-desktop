@@ -1,4 +1,4 @@
-// v1.10.75 - Support & About. Who builds the app, how to help (free ways
+﻿// v1.10.75 - Support & About. Who builds the app, how to help (free ways
 // first, then UPI), and what DiceCodes does for businesses. Decided with the
 // maintainer: ask gently, never lock a feature, never print anything on a
 // user's invoice. UPI only for money: it works offline (the QR is drawn here)
@@ -17,7 +17,7 @@ const inr = (n) => `₹${Number(n).toLocaleString('en-IN')}`;
 
 const SUPPORT_UPI_ID = 'princeramgarhiaa-1@okaxis';
 const UPI_NAME = 'DiceCodes';
-const REPO = 'https://github.com/IamRamgarhia/Free-GST-Billing-Software';
+const REPO = 'https://github.com/aman1455/gst-billing-desktop';
 const EMAIL = 'contact@dicecodes.com';
 const SITE = 'https://dicecodes.com';
 const AMOUNTS = [0, 101, 251, 501];

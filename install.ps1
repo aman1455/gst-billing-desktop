@@ -1,6 +1,6 @@
-# Free GST Billing - one-command Windows installer.
+﻿# Free GST Billing - one-command Windows installer.
 #
-#   irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex
 #
 # Does what a user doing it by hand would do: download the latest release
 # ZIP, extract it, run the installer inside it. Nothing else. There is no
@@ -17,7 +17,7 @@
 
 $ErrorActionPreference = 'Stop'
 
-$Repo = 'IamRamgarhia/Free-GST-Billing-Software'
+$Repo = 'aman1455/gst-billing-desktop'
 $Dest = $env:FREEGSTBILL_DIR
 if (-not $Dest) { $Dest = Join-Path $env:LOCALAPPDATA 'Programs\Free GST Billing' }
 

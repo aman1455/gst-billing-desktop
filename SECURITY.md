@@ -1,4 +1,4 @@
-# Security Policy
+﻿# Security Policy
 
 Free GST Billing Software handles invoices, GSTINs and client records for
 real businesses. Reports are taken seriously.
@@ -11,7 +11,7 @@ maintained back-branches, and fixes are not backported.
 
 | Version | Supported |
 | ------- | --------- |
-| Latest release ([see Releases](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest)) | ✅ |
+| Latest release ([see Releases](https://github.com/aman1455/gst-billing-desktop/releases/latest)) | ✅ |
 | Anything older | ❌ — please update first |
 
 If you are reporting against an older build, please confirm it still
@@ -25,7 +25,7 @@ button, or a manual ZIP download.
 Two private options:
 
 1. **GitHub private reporting** (preferred) — the
-   [Report a vulnerability](https://github.com/IamRamgarhia/Free-GST-Billing-Software/security/advisories/new)
+   [Report a vulnerability](https://github.com/aman1455/gst-billing-desktop/security/advisories/new)
    button on the Security tab. Keeps everything in one thread and lets us
    credit you on the published advisory.
 2. **Email** — Contact@dicecodes.com, with `SECURITY` in the subject.
@@ -97,7 +97,7 @@ advisory, unless you would rather stay anonymous.
 ## For users
 
 - Download **only** from
-  [this repository's Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases).
+  [this repository's Releases page](https://github.com/aman1455/gst-billing-desktop/releases).
   Copies hosted anywhere else are not published by us and have not been
   checked.
 - Keep automatic backups on — the updater writes one to
