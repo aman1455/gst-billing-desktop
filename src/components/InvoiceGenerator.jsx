@@ -2567,7 +2567,7 @@ export default function InvoiceGenerator({ onBack, profile: profileProp, editing
     // shrunk to fit, instead of sending the footer to a page of its own: a
     // 4px overflow used to move the terms, bank details and signature to page 2.
     const fitsOnePage = scaledImgHeight <= contentHeightFull + 2
-      || (paperCfg.kind !== 'thermal' && scaledImgHeight <= contentHeightFull * 1.12);
+      || (paperCfg.kind !== 'thermal' && ((items || []).length <= 2 || scaledImgHeight <= contentHeightFull * 1.30));
     if (window.__lastPdfLayout) window.__lastPdfLayout.onePage = fitsOnePage;
     if (fitsOnePage) {
       // Single-page fits — no cropping needed. Page 1 has no header/footer
