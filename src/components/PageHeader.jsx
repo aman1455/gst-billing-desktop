@@ -21,7 +21,8 @@ export default function PageHeader({ icon, title, subtitle, meta, children, comp
       <div className="page-header page-header-compact" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.9rem' }}>
         <h1 className="page-title" style={{ margin: 0, fontSize: '1.3rem' }}>{title}</h1>
         {meta && <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>{meta}</span>}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>{children}</div>
+        {/* v1.10.83 - wraps on a phone; "New Invoice" ran past the right edge at 390px. */}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end', minWidth: 0 }}>{children}</div>
       </div>
     );
   }
@@ -33,7 +34,9 @@ export default function PageHeader({ icon, title, subtitle, meta, children, comp
       borderRadius: 12,
       marginBottom: '1.25rem',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+      {/* v1.10.83 - flex: 1 so the help / action buttons sit at the right edge;
+          the row was only as wide as its text, leaving them mid-header. */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flex: 1, minWidth: 0 }}>
         {icon !== undefined && (
           <div style={{
             width: 44, height: 44,

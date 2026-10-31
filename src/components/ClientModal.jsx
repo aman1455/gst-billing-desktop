@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { getCountryConfig, getStatesForCountry, validateTaxId, detectCountryFromBrowser, getCountriesForRegion, PAPER_SIZES, decodeGstin } from '../utils';
+import { getCountryConfig, getStatesForCountry, validateTaxId, detectCountryFromBrowser, getCountriesForRegion, PAPER_SIZES, decodeGstin, COUNTRIES } from '../utils';
 import { getRegionMode } from '../store';
+import HelpButton from './HelpButton';
 
 export default function ClientModal({ show, onClose, onSave, client, isEditing, defaultCountry }) {
   // Country defaults: explicit prop (active business profile) → browser locale → 'India'.
@@ -41,6 +42,9 @@ export default function ClientModal({ show, onClose, onSave, client, isEditing, 
 
   const cc = getCountryConfig(form.country);
   const stateOptions = getStatesForCountry(form.country);
+  // v1.10.83 - a client in another country than the business.
+  const abroad = !!form.country && form.country !== (defaultCountry || 'India');
+  const currencyCodes = [...new Set(COUNTRIES.map(c => c.currency))];
 
   // v1.10.68 (#68, idea from @deppen12) — a GSTIN already says which state the
   // client is registered in and carries a checksum, so fill the state in and
@@ -73,7 +77,7 @@ export default function ClientModal({ show, onClose, onSave, client, isEditing, 
     <div className="modal-overlay">
       <div className="modal-content" style={{ maxWidth: '520px' }}>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="section-title" style={{ margin: 0 }}>{isEditing ? 'Edit Client' : 'Add New Client'}</h3>
+          <h3 className="section-title" style={{ margin: 0 }}>{isEditing ? 'Edit Client' : 'Add New Client'} <HelpButton title="Adding and editing a client" doc="clients#client-form" size={16} /></h3>
           <button type="button" className="icon-btn" onClick={onClose} title="Close"><X size={18} /></button>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -100,14 +104,14 @@ export default function ClientModal({ show, onClose, onSave, client, isEditing, 
           </div>
           <div className="form-group">
             <label className="form-label">City</label>
-            <input type="text" className="form-input" value={form.city} onChange={e => setForm(prev => ({ ...prev, city: e.target.value }))} placeholder="e.g. Mumbai" />
+            <input type="text" className="form-input" value={form.city} onChange={e => setForm(prev => ({ ...prev, city: e.target.value }))} placeholder={abroad ? 'City' : 'e.g. Mumbai'} />
           </div>
           <div className="form-group">
             <label className="form-label">{cc.postalLabel}</label>
             <input type="text" className="form-input" value={form.pin} onChange={e => setForm(prev => ({ ...prev, pin: e.target.value }))} placeholder={cc.postalLabel} />
           </div>
           <div className="form-group">
-            <label className="form-label">{cc.stateLabel}</label>
+            <label className="form-label">{cc.stateLabel}{abroad ? ' (optional)' : ''}</label>
             {stateOptions.length > 0 ? (
               <select className="form-input" value={form.state} onChange={e => setForm(prev => ({ ...prev, state: e.target.value }))}>
                 <option value="">Select {cc.stateLabel}</option>
@@ -118,7 +122,7 @@ export default function ClientModal({ show, onClose, onSave, client, isEditing, 
             )}
           </div>
           <div className="form-group">
-            <label className="form-label">{cc.taxIdLabel}</label>
+            <label className="form-label">{abroad ? `${cc.taxIdLabel} (optional)` : cc.taxIdLabel}</label>
             <input type="text" className="form-input"
               style={taxIdWarning ? { borderColor: '#f59e0b' } : undefined}
               value={form.gstin}
@@ -133,8 +137,14 @@ export default function ClientModal({ show, onClose, onSave, client, isEditing, 
           </div>
           <div className="form-group">
             <label className="form-label">Phone</label>
-            <input type="tel" className="form-input" value={form.phone} onChange={e => setForm(prev => ({ ...prev, phone: e.target.value }))} placeholder="+91 98765 43210" />
+            <input type="tel" className="form-input" value={form.phone} onChange={e => setForm(prev => ({ ...prev, phone: e.target.value }))} placeholder={abroad ? 'With country code, e.g. +1 415 555 0100' : '+91 98765 43210'} />
           </div>
+          {abroad && (defaultCountry || 'India') === 'India' && (
+            <div className="form-group notice notice-info" style={{ gridColumn: 'span 2', display: 'block', fontSize: '0.78rem', lineHeight: 1.5, padding: '0.5rem 0.75rem', borderRadius: 6 }}>
+              Client outside India: no GSTIN or state is needed. Their tax ID (if they have one) and country print on the invoice, and the place of supply prints as &quot;Outside India&quot;. Invoices to them are exports: with a LUT, no IGST is charged.
+              <HelpButton title="Billing clients abroad (exports)" doc="gst-basics#exports" size={14} />
+            </div>
+          )}
           {form.country === 'India' && (
             <div className="form-group" style={{ gridColumn: 'span 2' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: 'pointer' }}>
@@ -151,7 +161,7 @@ export default function ClientModal({ show, onClose, onSave, client, isEditing, 
               auto-apply the next time an invoice is created for this client. */}
           <div className="form-group" style={{ gridColumn: 'span 2', paddingTop: '0.5rem', borderTop: '1px solid var(--border)', marginTop: '0.5rem' }}>
             <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.35rem' }}>
-              Print preferences (optional)
+              Print preferences (optional) <HelpButton title="Client print preferences" doc="clients#client-print-prefs" size={16} />
             </div>
             <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0 0 0.5rem' }}>
               Auto-applied when you create a new invoice for this client. Leave blank to use app-wide defaults.
@@ -173,14 +183,9 @@ export default function ClientModal({ show, onClose, onSave, client, isEditing, 
                 <select className="form-input" style={{ fontSize: '0.8rem', padding: '0.35rem' }}
                   value={form.preferredCurrency}
                   onChange={e => setForm(prev => ({ ...prev, preferredCurrency: e.target.value }))}>
-                  <option value="">Use invoice default</option>
-                  <option value="INR">INR (₹)</option>
-                  <option value="USD">USD ($)</option>
-                  <option value="EUR">EUR (€)</option>
-                  <option value="GBP">GBP (£)</option>
-                  <option value="AED">AED (د.إ)</option>
-                  <option value="SGD">SGD (S$)</option>
-                  <option value="AUD">AUD (A$)</option>
+                  <option value="">{abroad ? "Their country's currency" : 'Use invoice default'}</option>
+                  {/* v1.10.83 - every currency the app knows (was seven). */}
+                  {currencyCodes.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <label style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', cursor: 'pointer', marginTop: '0.2rem' }}>

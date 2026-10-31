@@ -1,28 +1,63 @@
 <div align="center">
 
-# E-Munim — Fast, Modern & Powerful GST Billing Software
+# E-Munim — Free GST Billing Software — Free Forever, Works Offline, No Tracking
 
-### Complete GST invoicing, inventory, and accounting solution for your business.
+### The only GST invoicing software you'll never have to pay for.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue.svg)](#quick-start--installation)
-[![Latest release](https://img.shields.io/github/v/release/aman1455/gst-billing-desktop?label=Latest&color=orange)](https://github.com/aman1455/gst-billing-desktop/releases/latest)
-[![PWA](https://img.shields.io/badge/PWA-installable-purple.svg)](#install-as-a-desktop-app-pwa)
-[![GitHub Stars](https://img.shields.io/github/stars/aman1455/gst-billing-desktop?style=social)](https://github.com/aman1455/gst-billing-desktop)
+[![Latest release](https://img.shields.io/github/v/release/IamRamgarhia/Free-GST-Billing-Software?label=Latest&color=orange)](https://github.com/aman1455/gst-billing-desktop/releases/latest)
+[![Desktop icon](https://img.shields.io/badge/Desktop-one--click%20icon-purple.svg)](#the-free-gst-billing-icon)
+[![GitHub Stars](https://img.shields.io/github/stars/IamRamgarhia/Free-GST-Billing-Software?style=social)](https://github.com/aman1455/gst-billing-desktop)
 [![Countries](https://img.shields.io/badge/Countries-22-blue.svg)](#key-features)
 [![GST](https://img.shields.io/badge/GST-Compliant-success.svg)](#clipboard-gst-compliance--filing)
 
-**Create GST-compliant invoices, file GSTR-1 / GSTR-3B / GSTR-2B reconciliation, track TDS / TCS, bill international clients in 22 currencies, and manage inventory — fast, reliable, and 100% private.**
+**Create GST-compliant invoices, file GSTR-1 / GSTR-3B / GSTR-2B reconciliation, track TDS / TCS, bill international clients in 22 currencies, manage inventory — all without paying a single rupee. Ever.**
 
-Your data never leaves your computer. No cloud. No signup. No tracking. No limits. Open-source and offline-first.
+**Free forever. Works on your computer, even offline. No tracking. No ads. No signup.**
 
-<a href="https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip"><img src="https://img.shields.io/github/v/release/aman1455/gst-billing-desktop?style=for-the-badge&label=%E2%AC%87%EF%B8%8F%20Download&color=16a34a&labelColor=15803d" alt="Download the latest version" height="48"></a>&nbsp;&nbsp;<a href="https://freeinvoicefast.com/docs/"><img src="https://img.shields.io/badge/%F0%9F%93%96%20Documentation-Read%20the%20guide-2563eb?style=for-the-badge&labelColor=1d4ed8" alt="Read the documentation" height="48"></a>
+Your data never leaves your computer. No cloud and no limits. Open source, so you can [check every claim yourself](#dont-trust-us-check-it-in-2-minutes).
+
+**A free invoice builder and invoice maker** for shop owners, freelancers, consultants, traders and small businesses in India: make a GST invoice, quotation (proforma / estimate), bill of supply, credit note or delivery challan in minutes and save it as a PDF. Free billing software and a free, open-source alternative to Tally, Vyapar, Zoho and myBillBook.
+
+<a href="https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip"><img src="https://img.shields.io/github/v/release/IamRamgarhia/Free-GST-Billing-Software?style=for-the-badge&label=%E2%AC%87%EF%B8%8F%20Download&color=16a34a&labelColor=15803d" alt="Download the latest version" height="48"></a>&nbsp;&nbsp;<a href="https://freeinvoicefast.com/docs/"><img src="https://img.shields.io/badge/%F0%9F%93%96%20Documentation-Read%20the%20guide-2563eb?style=for-the-badge&labelColor=1d4ed8" alt="Read the documentation" height="48"></a>
 
 <sub>Always the newest version · about 16 MB · Windows, macOS and Linux in one ZIP · <a href="https://github.com/aman1455/gst-billing-desktop/releases/latest">release notes</a></sub>
 
-[⬇ Download ZIP](https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip) &nbsp;|&nbsp; [📦 Releases](https://github.com/aman1455/gst-billing-desktop/releases) &nbsp;|&nbsp; [📖 Documentation](https://freeinvoicefast.com/docs/) &nbsp;|&nbsp; [⚡ 3-Step Install](#quick-start--installation) &nbsp;|&nbsp; [☁ Run Online (Vercel / Supabase / Railway)](./docs/DEPLOY_ONLINE.md) &nbsp;|&nbsp; [🧾 First Invoice in 5 Minutes](#your-first-invoice-in-5-minutes) &nbsp;|&nbsp; [📸 Screenshots](#screenshots) &nbsp;|&nbsp; [🐛 Report Bug](https://github.com/aman1455/gst-billing-desktop/issues)
+[⬇ Download ZIP](https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip) &nbsp;|&nbsp; [📦 Releases](https://github.com/aman1455/gst-billing-desktop/releases) &nbsp;|&nbsp; [📖 Documentation](https://freeinvoicefast.com/docs/) &nbsp;|&nbsp; [⚡ 3-Step Install](#quick-start--installation) &nbsp;|&nbsp; [🧾 First Invoice in 5 Minutes](#your-first-invoice-in-5-minutes) &nbsp;|&nbsp; [📸 Screenshots](#screenshots) &nbsp;|&nbsp; [🐛 Report Bug](https://github.com/aman1455/gst-billing-desktop/issues)
 
 </div>
+
+---
+
+## 🔒 Is it safe? Yes — here is why
+
+- **Your data never leaves your computer.** Invoices, clients and settings are plain files in the app's own folder. No cloud server of ours, nothing to leak.
+- **No account, no login, no ads, no tracking.** No analytics, and none of your business data is ever sent to us.
+- **Other computers cannot open it.** The app's server listens only on `127.0.0.1`, this computer itself, and refuses requests from other websites.
+- **Open source — check every line.** The full code is right here under the MIT licence; the release ZIP is built from it with `npm run release:zip`.
+- **No admin rights needed.** It installs into your own user folder, and your data is backed up automatically every day.
+- **Works offline, and says what it connects to.** On its own it contacts only GitHub (the update check and the public supporters list) — plus your own Google Drive, only if you connect it. Even its font is built in.
+
+### Don't trust us. Check it in 2 minutes.
+
+1. **Switch your internet off** (Wi-Fi off, or unplug the cable) and open the app. Make an invoice, download the PDF, print it, open Reports. **Everything works.** Nothing the app does with your books needs the internet.
+2. **Turn on Offline mode** in **Settings → Privacy & internet**. From then on the app **never goes online by itself**: no update check, no supporters list, no automatic copy to Google Drive. You can still update whenever you choose.
+3. **Watch it, or block it.** Windows Resource Monitor (`resmon` → Network) shows the app's `node.exe` making no outside connections with Offline mode on. You can even block it in the firewall: the app keeps working, only the update check stops.
+
+### When does it use the internet?
+
+| What | When | Offline mode |
+|---|---|---|
+| Check for a new version (asks GitHub for the version number; nothing about you is sent) | By itself, a few seconds after opening, then every 6 hours | **Stopped** |
+| The public supporters list (read from GitHub; nothing is sent) | By itself, when Support & About shows | **Stopped** |
+| Your own Google Drive | Only if you set it up | Automatic copies **stopped** |
+| Installing and updating | When you click Install / Update | Only when you click |
+| Help pages, Report a problem, WhatsApp, GST portal links | When you click them | Only when you click |
+
+**That is the complete list.** No analytics, no ads, no error-tracking service, and no server of ours that receives your data.
+
+**[Read the full answer: every address the app connects to, and more ways to check →](https://freeinvoicefast.com/docs/security.html)**
 
 ---
 
@@ -32,9 +67,9 @@ The download ZIP holds a **launcher for each system**, a plain-English **`READ M
 
 ```
 Free-GST-Billing/
-├── E-Munim - WINDOWS.hta    ← Windows: double-click this
-├── E-Munim - MAC.command    ← macOS
-├── E-Munim - LINUX.sh       ← Linux / NAS
+├── Free GST Billing - WINDOWS.hta    ← Windows: double-click this
+├── Free GST Billing - MAC.command    ← macOS
+├── Free GST Billing - LINUX.sh       ← Linux / NAS
 ├── READ ME FIRST.txt                 ← step-by-step, in plain English
 └── _system/                          ← the app (hidden after install)
 ```
@@ -51,9 +86,9 @@ Free-GST-Billing/
 2. Right-click the ZIP → Extract All → pick a folder you'll remember
 3. Open the EXTRACTED folder. Each launcher is named after the system it is for
    — double-click yours:
-       E-Munim - WINDOWS.hta     (opens a window with buttons)
-       E-Munim - MAC.command     (opens Terminal)
-       E-Munim - LINUX.sh        (opens Terminal — chmod +x first if needed)
+       Free GST Billing - WINDOWS.hta     (opens a window with buttons)
+       Free GST Billing - MAC.command     (opens Terminal)
+       Free GST Billing - LINUX.sh        (opens Terminal — chmod +x first if needed)
 ```
 
 > ⚠ **Extract the ZIP first.** Windows lets you double-click the launcher
@@ -64,11 +99,11 @@ Free-GST-Billing/
 **Prefer one command?** Paste this into PowerShell — no admin rights needed:
 
 ```powershell
-irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex
+[Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex
 ```
 
 It fetches the latest release, installs it to
-`%LOCALAPPDATA%\Programs\E-Munim`, installs Node.js if you do not have
+`%LOCALAPPDATA%\Programs\Free GST Billing`, installs Node.js if you do not have
 it, and creates the Desktop shortcut. See [Option 1b](#option-1b-windows--one-powershell-command)
 for how to choose a different folder.
 
@@ -78,31 +113,39 @@ The launcher:
 - Creates a **Desktop shortcut** + **Start-Menu entry** so you never open the folder again
 - Starts the server and opens your browser at **http://localhost:47371**
 
-From then on, click the Desktop shortcut. To update / backup / restore / move to another PC / stop the server — use the buttons in that same launcher, or the in-app **⚙ Control Panel** in the sidebar. No batch files, no CMD windows.
+From then on, click the **Free GST Billing** icon on your Desktop: it starts the app and opens it in its own window. To update / backup / restore / move to another PC / stop the server, use the in-app **⚙ Control Panel** in the sidebar (or the launcher in the app folder). No batch files, no CMD windows.
 
-> **☁ Want to run it online instead (access from multiple devices)?** See the full **[Online Deployment Guide → docs/DEPLOY_ONLINE.md](./docs/DEPLOY_ONLINE.md)** — four paths compared (Railway lift-and-shift, Vercel + Supabase serverless, own VPS, free Cloudflare Tunnel) with costs, trade-offs, SQL schema, and code snippets. Read the trade-offs first — the local install is still the right answer for ~95% of users.
+> **☁ Can I host it online (Railway, Render, Supabase)?** Not yet. The app has no login on its server, so anyone who found the address could read or delete your books, and it keeps its data as files, not in a database. [Why, and what to do instead](https://freeinvoicefast.com/docs/security.html#host-online). Using it from a phone or tablet on the same Wi-Fi is planned for the update on Saturday 7 November 2026.
 
 ---
 
 ## Screenshots
 
-<div align="center">
+Real screens from the app, with a made-up demo business (DiceCodes, fake GSTIN and bank details).
 
-![E-Munim Software dashboard — invoices list with overdue tracking, multi-currency totals, and per-status badges](docs/screenshots/dashboard.png)
+<table>
+  <tr>
+    <td width="50%"><img src="docs-site/assets/img/app-dashboard.png" alt="The Dashboard: overdue banner, totals in rupees and dollars, low stock and the invoice list"><br><sub><b>Dashboard</b>: overdue invoices, totals, low stock and every invoice in one list.</sub></td>
+    <td width="50%"><img src="docs-site/assets/img/app-invoice-editor.png" alt="The invoice screen: the form on the left and the live preview on the right"><br><sub><b>New invoice</b>: fill in the form, the preview updates as you type.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs-site/assets/img/invoice-lut-export.png" alt="An export invoice in US dollars under a LUT, with the Rule 46 declaration and ARN"><br><sub><b>Exports under LUT</b>: bill in dollars, no IGST, the declaration printed for you.</sub></td>
+    <td width="50%"><img src="docs-site/assets/img/app-gstr1.png" alt="The GSTR-1 tab: B2B sales and the Exports Table 6A for one month"><br><sub><b>GST returns</b>: GSTR-1 and GSTR-3B built from your invoices.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs-site/assets/img/cash-book.png" alt="The Cash book: cash in hand, a new entry form and the month's entries with a running balance"><br><sub><b>Cash book</b>: cash in and out, with the cash in hand.</sub></td>
+    <td width="50%"><img src="docs-site/assets/img/invoice-editor-dark.png" alt="The invoice screen in dark mode"><br><sub><b>Dark mode</b>: one click at the top right. Invoices still print in normal colours.</sub></td>
+  </tr>
+</table>
 
-*Dashboard view — recent invoices, currency-aware revenue cards, overdue alerts, low-stock indicators, and one-click actions.*
-
-</div>
-
-> 📸 **Want more screenshots?** Open an issue and we'll add captures of the New Invoice form, GSTR-2B Reconciliation tab, Multi-Account Payments manager, PRs welcome too.
+More screenshots, next to the steps they show, in the [documentation](https://freeinvoicefast.com/docs/).
 
 ---
 
 ## 📑 Table of Contents
 
 - [Install in 60 Seconds](#-install-in-60-seconds-windows-one-click) — *Windows one-click*
-- [☁ Run Online (Vercel + Supabase, Railway, VPS, Cloudflare Tunnel)](./docs/DEPLOY_ONLINE.md) — *for multi-device / team access*
-- [Why Choose E-Munim Software?](#why-choose-free-gst-billing-software)
+- [Why Choose Free GST Billing Software?](#why-choose-free-gst-billing-software)
 - [Your First Invoice in 5 Minutes](#your-first-invoice-in-5-minutes) — *start here if you're new*
 - [Key Features](#key-features)
   - [Invoicing & Billing](#receipt-invoicing--billing)
@@ -112,9 +155,9 @@ From then on, click the Desktop shortcut. To update / backup / restore / move to
   - [Sharing & Export](#outbox_tray-sharing--export)
   - [Customization](#gear-customization)
 - [Quick Start / Installation](#quick-start--installation)
-- [Install as a Desktop App (PWA)](#install-as-a-desktop-app-pwa)
+- [The Free GST Billing icon](#the-free-gst-billing-icon)
 - [How to Self-File GST Returns](#how-to-self-file-gst-returns)
-- [E-Munim Software vs Paid Alternatives](#-comparison-free-gst-billing-software-vs-paid-alternatives)
+- [Free GST Billing Software vs Paid Alternatives](#-comparison-free-gst-billing-software-vs-paid-alternatives)
 - [Tech Stack](#tech-stack)
 - [Roadmap](#roadmap)
 - [Documentation](#books-documentation)
@@ -140,12 +183,13 @@ You need: Windows 10/11 PC, ~50 MB free disk, your business name + bank details 
 1. **[Download the ZIP](https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip)** — always the latest version.
    (Do **not** use the green *Code -> Download ZIP* button — that gives the source code without the built app.)
 2. Right-click the downloaded ZIP → **Extract All** → pick a folder you'll remember (e.g. `Documents\FreeGSTBill`)
-3. Open the **extracted** folder → double-click **`E-Munim - WINDOWS`** (each launcher is named after the system it is for)
-4. Click **Install Node & App**. It installs Node.js for you if you do not have it, then sets everything up. Takes 1–2 minutes the first time
-5. Click **Open App** — the app opens in your browser at `http://localhost:47371`, and a Desktop shortcut is waiting for you next time
+3. Open the **extracted** folder → double-click **`Free GST Billing - WINDOWS`** (each launcher is named after the system it is for)
+4. Click **Install**. It installs Node.js for you if you do not have it, then sets everything up. Takes 1–2 minutes the first time
+5. The app opens by itself at `http://localhost:47371`, and a **Free GST Billing** icon is on your Desktop for next time
 
-> **In a hurry?** One PowerShell command does steps 1–4 for you:
-> `irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex`
+> **Easier: one line, no ZIP, no warnings.** Press **Windows + R**, paste this, press **Enter**:
+> `powershell -ExecutionPolicy Bypass -c "[Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex"`
+> It installs the app, adds Desktop and Start-menu icons and opens it in its own window. Run it again any time to update or repair.
 
 > 💡 **Tip:** Click the small **Install App** icon in your browser's address bar to make the app open in its own window like Tally or Word — no browser chrome, looks and feels native.
 
@@ -172,7 +216,7 @@ The Welcome Wizard appears automatically on first launch.
    - **Qty** — how much
    - **Unit** — pick from the dropdown (Nos/Kg/Ltr for goods; Hrs/Day/Session for services). Click **＋ Add custom…** for things like *Carat* / *Bundle*
    - **Rate** — price per unit
-   - **Tax %** — picks from your country's standard rates (5/12/18/28% for India; 5% for UAE; etc.)
+   - **Tax %** — picks from your country's standard rates (0/5/18/40% for India since 22 Sep 2025, plus 12/28% for older bills; 5% for UAE; etc.)
 6. Click **Download PDF** in the top-right
 
 That's it. The PDF saves to `Saved Invoices/<Client Name>/<Month>/` and the invoice is logged in your bills list with a unique number.
@@ -208,9 +252,9 @@ Once you're comfortable with the basics, explore:
 
 ---
 
-## Why Choose E-Munim Software?
+## Why Choose Free GST Billing Software?
 
-Most billing software in India — Zoho Invoice, Vyapar, Tally, myBillBook — charges you monthly, stores your financial data on their servers, and locks you in. **E-Munim Software is the open-source alternative that changes everything.**
+Most billing software in India — Zoho Invoice, Vyapar, Tally, myBillBook — charges you monthly, stores your financial data on their servers, and locks you in. **Free GST Billing Software is the open-source alternative that changes everything.**
 
 - **Completely free** — no subscription, no premium tier, no hidden charges, no "free trial" that expires
 - **100% offline** — runs on localhost, works without internet after installation
@@ -221,11 +265,11 @@ Most billing software in India — Zoho Invoice, Vyapar, Tally, myBillBook — c
 
 > **If you're paying for billing software, you can stop now.**
 
-### 📊 Comparison: E-Munim Software vs Paid Alternatives
+### 📊 Comparison: Free GST Billing Software vs Paid Alternatives
 
 Every 🆕 row below is a feature we shipped in v1.10 that competitors either paywall, cripple in the free tier, or don't offer at all.
 
-| Feature | **E-Munim Software** | Tally Prime | Vyapar | Zoho Books | ClearTax GST |
+| Feature | **Free GST Billing Software** | Tally Prime | Vyapar | Zoho Books | ClearTax GST |
 |---|---|---|---|---|---|
 | **Price** | ✅ **Free forever** | ₹22,500–₹67,500 one-time | ₹2,599+/year | ₹899–₹2,999/month | ~₹3,599/year+ |
 | **GST invoices (CGST/SGST/IGST)** | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -240,7 +284,6 @@ Every 🆕 row below is a feature we shipped in v1.10 that competitors either pa
 | **Multi-account payments per business** | ✅ Unlimited | ✅ | ⚠ Paid | ✅ | ✅ |
 | **Custom per-line units (kg, ltr, Hrs + custom)** | ✅ | ⚠ Limited | ⚠ Paid | ✅ | ⚠ Limited |
 | **22-country multi-currency** | ✅ | ⚠ Paid | ❌ | ✅ (Premium) | ❌ |
-| **PWA installable (own window, no browser)** | ✅ | ❌ Desktop only | ❌ Android-first | ❌ Web only | ❌ Web only |
 | **Offline-first (works without internet)** | ✅ | ✅ | ⚠ Limited | ❌ Cloud | ❌ Cloud |
 | **Your data on YOUR computer (no cloud)** | ✅ | ✅ | ⚠ Cloud sync | ❌ Cloud | ❌ Cloud |
 | **Open-source (MIT licensed)** | ✅ | ❌ Proprietary | ❌ Proprietary | ❌ Proprietary | ❌ Proprietary |
@@ -402,7 +445,7 @@ If we priced every 🆕 feature at the going rate on the paid alternatives:
 | **Granular Backup / Restore** | Pick exactly what to back up via checkboxes — profile, profiles, invoices, clients, products, expenses, purchases, recurring, receipts, terms templates, settings, local prefs (custom units, theme, region, modules). Import previews counts before restoring |
 | 🆕 **Automatic Daily Backup + Trash Bin** | Every day the server snapshots your entire `data/` folder into `data/backups/YYYY-MM-DD/`. 30-day retention with auto-purge. Deleted invoices move to a Trash bin (30-day retention) with one-click Restore |
 | 🆕 **Transactional Restore** | Restoring a backup snapshots your live data FIRST — if the restore errors partway through, it rolls back automatically. No more losing everything on a bad restore |
-| 🆕 **Bulk PDF Export with Progress + Cancel** | Combine any selection of invoices into one multi-page PDF. Progress toast every 5 invoices, event-loop yield between renders, Cancel button. Works on 50+ invoices without freezing the tab |
+| 🆕 **Bulk PDF Export with Progress + Cancel** | Combine any selection of invoices into one multi-page PDF, or download them as separate PDFs (one per invoice) in a ZIP. Pick any date range with From / To. Progress toast every 5 invoices, event-loop yield between renders, Cancel button. Works on 50+ invoices without freezing the tab |
 | **CSV Import** | Bulk import clients and products from CSV files |
 | **Mobile Web Share** | Web Share API attaches PDF to WhatsApp or any app on mobile |
 
@@ -417,7 +460,7 @@ If we priced every 🆕 feature at the going rate on the paid alternatives:
 | **Terms & Conditions** | Rich-text editor (B/I/U, lists, headings, links) + 13 India business-type starter templates + reusable saved-template library |
 | **Multi-Business Profiles** | Separate profiles with different GSTIN, bank details, logo, signature, country, currency. Switcher in the header for one-click context change — the dashboard and every report re-filter immediately, with no reload. Records saved before you began separating businesses stay visible under all of them and are never hidden; a one-click **Assign to ‹business›** prompt lets you attach them when you are ready |
 | **Dark Mode** | Full dark theme with automatic persistence and theme-aware utility classes everywhere |
-| **PWA Installable** | Install as a standalone desktop app via Chrome or Edge — opens instantly, no browser needed |
+| **Own Desktop icon** | One click starts the app and opens it in its own window, no browser tabs |
 | **Online documentation** | Every screen explained, with search; the **User Guide** button and each screen's **?** help open it |
 
 ---
@@ -428,18 +471,34 @@ If we priced every 🆕 feature at the going rate on the paid alternatives:
 
 ### Prerequisites
 
-- **Windows 10/11** for the one-click installer, **OR** **Node.js 18+** for macOS / Linux
-- ~50 MB free disk space
+- **Windows 10/11**, **macOS 11+** or **Linux** (Node.js 18+ is used if present, otherwise the installer fetches it into the app folder)
+- ~600 MB free disk space for the install
 - No internet after install (except for optional Google Drive backup / update check)
 
-### Option 1: Windows — extract, then double-click the launcher (recommended — no terminal)
+### Option 0: one line (recommended — no ZIP, no SmartScreen / Gatekeeper warning, no npm)
+
+**Windows:** press **Windows + R**, paste, press **Enter**:
+
+```
+powershell -ExecutionPolicy Bypass -c "[Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex"
+```
+
+**Mac / Linux:** open Terminal, paste, press **Return**:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.sh | bash
+```
+
+It checks the computer, downloads the release (packages included), installs to `%LOCALAPPDATA%\Programs\Free GST Billing` / `~/Applications/Free GST Billing` / `~/.local/share/free-gst-billing`, adds an icon (Desktop + Start menu, a Mac app, a Linux menu entry) and opens the app in its own window. **The same line updates or repairs** an existing install in place: `_system/data` is backed up first and never touched. Remove with `-Uninstall` (Windows: `& ([scriptblock]::Create((irm <url>/install.ps1))) -Uninstall`) or `| bash -s -- --uninstall`; data is only deleted if you type `DELETE`.
+
+### Option 1: Windows — extract, then double-click the launcher (no terminal)
 
 1. **Download the ZIP** → [click here](https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip) or grab the latest from [Releases](https://github.com/aman1455/gst-billing-desktop/releases)
 2. **Extract** it anywhere (e.g. `Documents\FreeGSTBill`) — right-click the ZIP → *Extract All*
-3. Open the extracted folder and **double-click** `E-Munim - WINDOWS.hta`
-4. Click **Install Node & App** once. When it finishes, click **Open App** — the app opens at **http://localhost:47371**, and a **Desktop shortcut** and **Start-Menu entry** are created for you
+3. Open the extracted folder and **double-click** `Free GST Billing - WINDOWS.hta`
+4. Click **Install** once. When it finishes, the app opens by itself at **http://localhost:47371**, and a **Free GST Billing** icon is put on your Desktop and in the Start menu
 
-That's it. The launcher installs Node.js if you don't have it. From then on, click the Desktop shortcut. Update, Backup, Restore, Move to another PC and Stop Server are buttons in that same launcher — and in the app's in-built **⚙ Control Panel**.
+That's it. The launcher installs Node.js if you don't have it. From then on, click the Desktop icon: it starts the app and opens it. Update, Backup, Restore, Move to another PC and Stop Server are in the app's **⚙ Control Panel**, and in the launcher in the app folder.
 
 > **Do not run the launcher from inside the ZIP.** Windows will let you
 > double-click it while you are still browsing the compressed folder, but it
@@ -448,24 +507,16 @@ That's it. The launcher installs Node.js if you don't have it. From then on, cli
 > copied into. Extract the ZIP, then open the launcher from the extracted
 > folder.
 
-### Option 1b: Windows — one PowerShell command
+### Option 1b: install into another folder
 
-For anyone comfortable with a terminal. No admin rights, nothing written outside your own user profile:
-
-```powershell
-irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex
-```
-
-It finds the latest release, downloads and extracts it to `%LOCALAPPDATA%\Programs\E-Munim`, installs Node.js if missing, runs `npm install`, and creates the Desktop and Start-Menu shortcuts.
-
-To install somewhere else, set the folder first:
+The one-line install (Option 0) takes the folder from `FREEGSTBILL_DIR`. In PowerShell:
 
 ```powershell
-$env:FREEGSTBILL_DIR = 'D:\Apps\E-Munim'
-irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex
+$env:FREEGSTBILL_DIR = 'D:\Apps\Free GST Billing'
+[Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex
 ```
 
-If the app is already installed in that folder with data in it, the command stops and points you at **Control Panel → Update Now** rather than writing over your books.
+On Mac / Linux: `curl -fsSL .../install.sh | FREEGSTBILL_DIR=/srv/free-gst-billing bash`. If the app is already in that folder it is updated in place; the data folder is never touched.
 
 > **Why port 47371?** IANA-unassigned range, well above the 3000-range that every dev server fights over. If it's ever busy, the server auto-scans upward and writes the chosen port to `data/port.txt` — the Start launcher always opens the right URL. Always use the Desktop shortcut.
 
@@ -484,48 +535,19 @@ For live-reload development:
 npm run dev              # dev server on http://localhost:5173 · API on http://localhost:47371
 ```
 
-### Option 3: Install as a Desktop App (any OS)
+### The Free GST Billing icon
 
-Once the server is running, open the URL in Chrome / Edge / Brave and click **Install** in the address bar. The app gets its own window, icon, and jump-list — see [Install as a Desktop App (PWA)](#install-as-a-desktop-app-pwa) below.
+Every install (the launcher, the one-line command, Mac and Linux) puts a **Free GST Billing** icon on your computer: the blue **B**, on the Desktop and in the Start menu on Windows. Click it every day: it starts the app if it is not running and opens it in its own window. Update, backup, restart and stop are in the app's **⚙ Control Panel**.
 
-### Option 4: Deploy online (advanced — Vercel + Supabase, Railway, VPS, Cloudflare Tunnel)
+> Use only this icon. Don't use the browser's own **Install app** button (in Chrome or Edge's address bar): that icon opens a window but cannot start the app, so after a restart it only shows "Needs a Quick Start". If you already have one, right-click it and choose **Uninstall**.
 
-For solo users who want access from multiple devices, or small teams sharing invoices across a shop and an accountant's laptop — **[docs/DEPLOY_ONLINE.md](./docs/DEPLOY_ONLINE.md)** walks through four honest paths (Railway lift-and-shift, Vercel + Supabase serverless, own VPS, free Cloudflare Tunnel) with costs, trade-offs, and code snippets.
+### Online hosting (Railway, Render, Supabase): not yet
 
-> **Read the trade-offs first.** Going online means your business data lives on someone else's server — the local install exists precisely to avoid that. For most users the local install is still the right answer.
-
-## Install as a Desktop App (PWA)
-
-E-Munim Software is a **Progressive Web App** — once installed, it gets its own icon, its own window, and behaves exactly like a regular Windows / macOS / Linux app. No browser chrome, no localhost URL visible to the user.
-
-### How to install as a PWA
-
-1. Open **http://localhost:47371** in Chrome / Edge / Brave (any Chromium browser)
-2. Click the orange **Install as Desktop App** banner at the top — or the **➕ install icon** in the address bar
-3. The app opens in its own window with the GST Billing Software icon in your Start Menu / taskbar
-
-### After installation — manifest shortcuts
-
-Right-click the pinned PWA icon (Windows taskbar / Start Menu / Edge's app launcher) and you get a jump-list:
-
-- 🆕 **New Invoice** → straight to the invoice form
-- 📊 **Dashboard** → recent invoices and stats
-- 📋 **GST Returns** → GSTR-1 / 3B / 2B reconciliation
-- ⚙ **Settings** → business profile, accounts, modules
-
-No need to land on the Dashboard first — jump directly to the most-used flow.
-
-### Offline-first
-
-The PWA caches its full app shell + fonts + icons on first install. Even if your localhost server isn't running for some reason, the app still loads (and tells you the server is offline rather than just showing a blank page). Service worker auto-updates the cache when you upgrade.
-
-> 🪟 **Coming in v2.0:** Native `.exe` installer (Tauri repackage) with code-signed binary, Add/Remove Programs entry, system tray icon, and native auto-update. The PWA flow stays as the developer / power-user fallback.
-
----
+The app has no login on its server yet, so it must not be put on the internet. See [Can I put it online?](https://freeinvoicefast.com/docs/security.html#host-online).
 
 ## How to Self-File GST Returns
 
-E-Munim Software auto-generates all the data you need for GSTR-1 and GSTR-3B filing. Here's the workflow:
+Free GST Billing Software auto-generates all the data you need for GSTR-1 and GSTR-3B filing. Here's the workflow:
 
 ```
 Step 1 ──► Enter invoices throughout the month as you normally would
@@ -668,7 +690,6 @@ See **[CHANGELOG.md](./CHANGELOG.md)** for a detailed history of every release. 
 The deep-dive material lives in **[docs/](./docs/)**:
 
 - **[docs/USER_GUIDE.md](./docs/USER_GUIDE.md)** — plain-language handbook for end users (Quick Start → Daily Use → Backup → Migration → FAQ → Troubleshooting). Also available **inside the app** as a searchable view with one-click PDF export.
-- **[docs/DEPLOY_ONLINE.md](./docs/DEPLOY_ONLINE.md)** — deploy the app online (Vercel + Supabase, Railway lift-and-shift, own VPS, free Cloudflare Tunnel). Four paths with honest trade-offs, costs, and code snippets. Read this only if you have a specific reason to move off the local install.
 - **[docs/COMPETITOR_GAPS.md](./docs/COMPETITOR_GAPS.md)** — gap analysis vs ERPNext / Akaunting / Invoice Ninja / Crater + Tally / Vyapar / Zoho Books / ClearTax / Marg, with the prioritised post-1.4 roadmap.
 - **[docs/TAX_HELPER_PLAN.md](./docs/TAX_HELPER_PLAN.md)** — three-tier proposal for the v1.5.x Income Tax Helper (bank-statement CSV import + ITR Filing Summary PDF + optional ITR-4 JSON).
 
@@ -691,7 +712,7 @@ The deep-dive material lives in **[docs/](./docs/)**:
 
 ## Why Is This Free?
 
-E-Munim Software is built and maintained by [DiceCodes](mailto:Contact@dicecodes.com). It is:
+Free GST Billing Software is built and maintained by [DiceCodes](mailto:Contact@dicecodes.com). It is:
 
 - **Open-source** under the MIT license — fork it, modify it, use it commercially
 - **Community-driven** — features are built based on what users actually need
@@ -700,6 +721,13 @@ E-Munim Software is built and maintained by [DiceCodes](mailto:Contact@dicecodes
 
 We believe every business in India deserves professional billing software without paying monthly fees.
 
+**So what's the catch? There isn't one, and your data is not the product.**
+
+- **It stays free, forever.** No paid version, no locked features, no ads, no tracking. And because it is MIT-licensed open source, the app you have today can always be used, copied and kept by anyone, even if we stopped working on it. Nobody can take it away or start charging for it.
+- **It costs very little to keep going.** The app runs on your computer: there are no servers or cloud bills for us to pay.
+- **How we earn:** paid work for businesses that want it (custom features, setup and moving data in, support plans) and people who choose to support the project.
+- **Tracking you would gain us nothing.** We sell no ads and no data, so there is nothing to collect. And the code is public, so you can check this instead of believing it.
+
 ### Support the project
 
 If the app saves you time, you can help keep it going:
@@ -707,7 +735,7 @@ If the app saves you time, you can help keep it going:
 - ⭐ **Star this repo**, so other businesses find it
 - 💬 **Tell another business** about it
 - 🐛 **[Report a bug](https://github.com/aman1455/gst-billing-desktop/issues/new?template=bug_report.yml) or [ask for a feature](https://github.com/aman1455/gst-billing-desktop/issues/new?template=feature_request.yml)**: fixes and features ship every Saturday
-- 💛 **UPI, any amount:** `7455899201-3@ybl` (also as a QR code in the app, under **Support & About**)
+- 💛 **UPI, any amount:** `princeramgarhiaa-1@okaxis` (also as a QR code in the app, under **Support & About**)
 
 **Work with DiceCodes:** custom software and web apps, customising this app for your business, setup and data migration, support plans, AI integration and automation, and mobile apps. [contact@dicecodes.com](mailto:contact@dicecodes.com)
 
@@ -719,8 +747,8 @@ If the app saves you time, you can help keep it going:
 |----------|--------|
 | **Where is my data stored?** | In a `data/` folder on your computer as plain JSON files. No server, no cloud, no database. |
 | **Can anyone access my invoices?** | No. The app runs on `localhost` — not accessible from the internet or other computers. |
-| **What if I uninstall?** | Your `data/` folder stays untouched. Reinstall anytime and everything is still there. |
-| **Do I need internet?** | Only for the first install (`npm install`). After that, everything works offline. |
+| **What if I uninstall?** | **Control Panel → Remove…** removes the app and its icons in one click. Tick boxes choose whether your data, PDFs and backups go too; by default your `data/` folder stays, and reinstalling brings everything back. |
+| **Do I need internet?** | Only to download the app and its updates. Everything else works offline. Turn on **Offline mode** (Settings → Privacy & internet) and it never goes online by itself. |
 | **How do I backup?** | Settings → Export Data → save JSON file. Import on any machine. |
 
 ### Running on a shop LAN (POS tablets)
@@ -817,19 +845,19 @@ Find the message you see. **None of these touch your invoices**: they stay in th
 
 | You see | What to do |
 |---|---|
-| **"Some files are missing"** or **"extract the ZIP first"** | The app can't run from inside the ZIP. Right-click the ZIP → **Extract All**, open the new folder, then double-click **E-Munim - WINDOWS**. |
+| **"Some files are missing"** or **"extract the ZIP first"** | The app can't run from inside the ZIP. Right-click the ZIP → **Extract All**, open the new folder, then double-click **Free GST Billing - WINDOWS**. |
 | **"Windows protected your PC"** | The app isn't code-signed (a certificate costs about $300 a year). Click **More info → Run anyway**. |
-| Mac: **"could not be executed because you do not have appropriate access privileges"** | Open **Terminal**, type `chmod +x ` (with a space), drag **E-Munim - MAC** into the window, press Enter, and open it again. Downloads from v1.10.82 don't need this. |
+| Mac: **"could not be executed because you do not have appropriate access privileges"** | Open **Terminal**, type `chmod +x ` (with a space), drag **Free GST Billing - MAC** into the window, press Enter, and open it again. Downloads from v1.10.82 don't need this. |
 | Mac: **"cannot be opened because Apple cannot check it"** / **"unidentified developer"** | The app isn't signed by Apple. **Control-click** the file → **Open** → **Open**, once. Or **System Settings → Privacy & Security → Open Anyway**. |
 | **"Node.js … is too old"**, **`npm ERR!`**, or a file named **`npm-debug.log`** in `_system` | The PC has an old Node.js. **v1.10.81 and later fix this themselves**: click **Install** or **Open App** again. On an older version: install **Node.js LTS** from [nodejs.org](https://nodejs.org), delete **only** `_system\node_modules`, then click **Install**. Never delete `_system\data`. |
 | **"could not install the app's dependencies"** / **"cannot reach the internet"** | The first install needs the internet. Check the connection; in an office, a proxy or firewall may block `registry.npmjs.org`. Click **Install** again: it carries on where it stopped. |
-| **"Still starting…"** / **"The server has not answered in 90 seconds"** | The first start after an install or update is slow while antivirus checks the new files. Wait a minute and open <http://localhost:47371>. Still nothing? Close the black window and click **Open App** again. |
-| **"E-Munim is already installed on this computer, in: …"** | You extracted a new ZIP into a new folder. Your invoices are in the folder it names: open that copy from your Desktop shortcut and use **More options → Update to the latest version**. Delete the new folder. |
+| **"Still starting…"** / **"The server has not answered in 90 seconds"** | The first start after an install or update is slow while antivirus checks the new files. Wait a minute and open <http://localhost:47371>. Still nothing? Close the black window and open the app again from its icon. |
+| **"Free GST Billing is already installed on this computer, in: …"** | You extracted a new ZIP into a new folder. Your invoices are in the folder it names: click **Update the installed copy** in the launcher, then delete the new folder. |
 | **"The app cannot write to its own folder"** | Don't keep it in `C:\Program Files`. Move the whole Free-GST-Billing folder to Documents or `D:\` and open it from there. |
 | **"Drive … is almost full"** | The install needs about 400 MB free. Empty the Recycle Bin or delete old downloads. |
 | **"Node.js was downloaded but will not run"** | Antivirus removed it. Add the app folder to its exclusions and click **Install** again. |
 | **"Install Node.js LTS now?"** (winget) | The app couldn't download Node.js itself and offers Windows' own installer. Type **Y** to accept (Windows may ask permission), or install it yourself from the page it opens. |
-| **"Cannot connect to server"**, **"This site can't be reached"**, or a blank page | The app isn't running. Open the Desktop shortcut and click **Open App**. |
+| **"Cannot connect to server"**, **"This site can't be reached"**, or a blank page | The app isn't running. Click the **Free GST Billing** icon on your Desktop. |
 | The update finished but nothing changed | Reload the page with **Ctrl + F5**. |
 | Forgot the app PIN | In the app folder (next to the launcher), create an empty text file named `RESET-PIN` and reload the app. The PIN is removed; invoices aren't touched. |
 | Linux / Mac / NAS: **"Node.js … is too old"** or **"not installed"** | The message lists the command for your system (`apt`, `dnf`, `pacman`, `apk`, `brew` or nvm). Install Node.js 20, then open the launcher again. |
@@ -840,8 +868,11 @@ Find the message you see. **None of these touch your invoices**: they stay in th
 
 ## Frequently Asked Questions
 
-### Is E-Munim Software really free?
+### Is Free GST Billing Software really free?
 Yes — MIT licensed open-source software. No subscription, no premium tier, no "free trial" that expires, no usage limits. The full feature set is available to every user forever. We make zero rupees from this directly.
+
+### Can I use it as a simple free invoice maker?
+Yes. It works as a free invoice builder even if you only need a clean invoice: add your business once, pick a client and items, and save the invoice as a PDF or print it. Not GST-registered? Use **Bill of Supply** (no GST on the invoice). Billing clients abroad? Choose **Outside India** or **Both** in the first-run setup and bill in their currency. Quotations are the **Proforma / Estimate** type and turn into an invoice in one click.
 
 ### Will my data be sent to the cloud?
 No. All your invoices, clients, products, and settings are stored as plain JSON files in a `data/` folder next to the app on your computer. Nothing leaves your machine unless you explicitly turn on the optional Google Drive backup feature (in which case it goes to *your own* Google Drive, not ours).
@@ -853,7 +884,7 @@ The software generates **GSTR-1**, **GSTR-3B**, and **GSTR-2B reconciliation** d
 Yes, completely. After installation everything runs on `localhost:47371` on your computer. The only optional internet-using features are Google Drive backup, the in-app update notifier (checks GitHub for new versions), and WhatsApp sharing.
 
 ### Can I bill international clients?
-Yes. E-Munim Software supports **22 countries** with locale-correct currency formatting, country-aware tax labels (GST / VAT / SST / MwSt / TVA / PPN / Sales Tax), and amount-in-words in the right currency name (Dollars, Dirhams, Pounds, Rand, Naira, Pesos, etc.). Set your Region Preference in Settings to *International* or *Both*.
+Yes. Free GST Billing Software supports **22 countries** with locale-correct currency formatting, country-aware tax labels (GST / VAT / SST / MwSt / TVA / PPN / Sales Tax), and amount-in-words in the right currency name (Dollars, Dirhams, Pounds, Rand, Naira, Pesos, etc.). Set your Region Preference in Settings to *International* or *Both*.
 
 ### What invoice formats are supported?
 **Tax Invoice**, **Proforma / Estimate**, **Bill of Supply** (for exempt goods or non-GST sellers), **Composition scheme invoice** (with Rule 46A declaration), **Credit Note**, **Delivery Challan**.
@@ -862,13 +893,13 @@ Yes. E-Munim Software supports **22 countries** with locale-correct currency for
 Yes. You can add unlimited business profiles (each with its own GSTIN, bank accounts, logo, signature, and country setting) under **Settings → Business Profile → Add New Profile**, and switch between them from the business name at the top of the sidebar. Each one can have its own invoice numbering.
 
 ### Does it run on Mac or Linux?
-The `.hta` launcher is Windows-only, but the app itself works on macOS and Linux — a NAS included — from the release ZIP (`E-Munim - LINUX.sh`) or via `npm install` + `npm start`. See the [Quick Start](#quick-start--installation) section. From v1.10.66, **Control Panel → Update Now** also works on Linux / NAS installs made from the release ZIP (it needs `unzip` or python3); restart the app, or its container, afterwards.
+The `.hta` launcher is Windows-only, but the app itself works on macOS and Linux — a NAS included — from the release ZIP (`Free GST Billing - LINUX.sh`) or via `npm install` + `npm start`. See the [Quick Start](#quick-start--installation) section. From v1.10.66, **Control Panel → Update Now** also works on Linux / NAS installs made from the release ZIP (it needs `unzip` or python3); restart the app, or its container, afterwards.
 
 ### What happens to my data when the app updates?
 Updates only refresh the app code and dependencies. Your `data/` folder (invoices, clients, products, settings) and `Saved Invoices/` PDF archive are **never touched**. The updater also saves a backup ZIP to `Documents\FreeGSTBill Backups` before it changes anything.
 
 ### Is there a mobile app?
-Not yet — the PWA installs as a desktop app today. A native Android app is on the v2.x roadmap.
+No, and no Android app is planned. Using the app from a phone or tablet on the same Wi-Fi as your computer is planned for the update on Saturday 7 November 2026.
 
 ### Can I import data from Tally / Vyapar / Excel?
 CSV import is supported today for clients and products. Direct Tally XML import is on the Coming Soon roadmap. Free-form Excel import requires manual mapping today.
@@ -898,9 +929,9 @@ This project is licensed under the [MIT License](LICENSE) — free to use, modif
 
 ---
 
-**E-Munim Software** by [DiceCodes](mailto:Contact@dicecodes.com) · MIT Licensed · v1.10.42
+**Free GST Billing Software** by [DiceCodes](mailto:Contact@dicecodes.com) · MIT Licensed · v1.10.42
 
-<sub>E-Munim software India · Free GST invoice software for small business · Open source GST billing software · Free alternative to Tally Prime Vyapar Zoho Books ClearTax myBillBook Marg ERP · No subscription invoice software · Offline billing software India · GSTR-1 GSTR-3B filing software free · GSTR-2B reconciliation tool free · TDS Form 26Q TCS Form 27EQ software · Section 194Q 206C(1H) TCS calculator with ₹50 lakh threshold · UTGST invoice software · CGST SGST IGST auto calculator · E-way bill JSON generator free · HSN SAC code invoice generator · Bill of Supply generator · Delivery Challan software · Credit Note Debit Note software · Proforma invoice estimate software · Composition scheme invoice · UPI QR invoice maker · Thermal receipt printer software 58mm 80mm · Direct vector thermal print software · POS billing software free India · Retail shop kirana billing software · Restaurant cafe billing software · Freelancer consultant invoice software India · Multi-currency invoice generator (USD EUR GBP AED SGD AUD JPY) 22 countries · Country-aware VAT SST MwSt TVA PPN tax labels · Recurring invoice software · Payment receipt voucher software · Bulk PDF invoice export · Google Drive backup billing software · Automatic daily backup + Trash bin · Multi-business multi-GSTIN switcher · Multi-language invoice Hindi Tamil Marathi Bengali · Dark mode PWA billing app · Rich-text Terms & Conditions with 13 India presets · OCR bill scan tesseract · Ctrl+K command palette · Split-view live PDF preview · Income Tax (ITR) computation old vs new regime 234B 234C · Client credit balance carry-forward · Watermark DUPLICATE DRAFT PDF · Rule 48 multi-copy (Original Duplicate Triplicate) · WhatsApp share invoice PDF · Self-file GST return software · GST invoice software without subscription · No signup no login billing software · Vyapar alternative open source · Tally alternative free · Zoho Books alternative · ClearTax alternative · myBillBook alternative · Marg ERP alternative · Made in India</sub>
+<sub>Free GST billing software India · Free GST invoice software for small business · Open source GST billing software · Free alternative to Tally Prime Vyapar Zoho Books ClearTax myBillBook Marg ERP · No subscription invoice software · Offline billing software India · GSTR-1 GSTR-3B filing software free · GSTR-2B reconciliation tool free · TDS Form 26Q TCS Form 27EQ software · Section 194Q 206C(1H) TCS calculator with ₹50 lakh threshold · UTGST invoice software · CGST SGST IGST auto calculator · E-way bill JSON generator free · HSN SAC code invoice generator · Bill of Supply generator · Delivery Challan software · Credit Note Debit Note software · Proforma invoice estimate software · Composition scheme invoice · UPI QR invoice maker · Thermal receipt printer software 58mm 80mm · Direct vector thermal print software · POS billing software free India · Retail shop kirana billing software · Restaurant cafe billing software · Freelancer consultant invoice software India · Multi-currency invoice generator (USD EUR GBP AED SGD AUD JPY) 22 countries · Country-aware VAT SST MwSt TVA PPN tax labels · Recurring invoice software · Payment receipt voucher software · Bulk PDF invoice export · Google Drive backup billing software · Automatic daily backup + Trash bin · Multi-business multi-GSTIN switcher · Multi-language invoice Hindi Tamil Marathi Bengali · Dark mode PWA billing app · Rich-text Terms & Conditions with 13 India presets · OCR bill scan tesseract · Ctrl+K command palette · Split-view live PDF preview · Income Tax (ITR) computation old vs new regime 234B 234C · Client credit balance carry-forward · Watermark DUPLICATE DRAFT PDF · Rule 48 multi-copy (Original Duplicate Triplicate) · WhatsApp share invoice PDF · Self-file GST return software · GST invoice software without subscription · No signup no login billing software · Vyapar alternative open source · Tally alternative free · Zoho Books alternative · ClearTax alternative · myBillBook alternative · Marg ERP alternative · Made in India</sub>
 
 Made in India 🇮🇳 · [DiceCodes](https://dicecodes.com)
 

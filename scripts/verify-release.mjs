@@ -17,7 +17,7 @@
  *
  * So this script refuses to take the repo's word for anything. It:
  *   1. extracts the built ZIP the way a user would,
- *   2. installs only production dependencies, as the installer does,
+ *   2. checks the production packages shipped inside it (no npm install),
  *   3. starts the packaged server and waits for it to bind,
  *   4. exercises the real HTTP surface,
  *   5. runs the full smoke suite against THAT server,
@@ -26,7 +26,7 @@
  * Run automatically as the last step of `npm run release:zip`.
  * Standalone: `npm run verify:release`
  */
-import { existsSync, readdirSync, rmSync, mkdirSync, statSync } from 'fs';
+import { existsSync, readdirSync, rmSync, mkdirSync, statSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { spawn, spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
@@ -142,14 +142,18 @@ try {
     fail('_system/dist/index.html is missing — the built app was not packaged.');
   }
 
-  log('  2/5  installing production dependencies (as the installer does)…');
-  const install = spawnSync('npm', ['install', '--omit=dev', '--no-audit', '--no-fund', '--loglevel=error'], {
-    cwd: systemDir, stdio: 'pipe', shell: true, encoding: 'utf8',
-  });
-  if (install.status !== 0) {
-    fail('npm install --omit=dev failed inside the package.', install.stderr || install.stdout);
+  // v1.10.83 - the packages ship inside the ZIP and no installer runs npm any
+  // more, so the server is started WITHOUT an npm install: that is what proves
+  // the package is complete.
+  log('  2/5  checking the shipped packages (no npm install, as on a user\'s PC)…');
+  if (!existsSync(join(systemDir, 'node_modules', 'express', 'package.json'))) {
+    fail('_system/node_modules/express is missing: the ZIP does not carry its packages.');
   }
 
+  // FGSB_VERIFY_PORT: start on this port, away from a copy of the app that is
+  // already running on this machine.
+  mkdirSync(join(systemDir, 'data'), { recursive: true });
+  if (process.env.FGSB_VERIFY_PORT) writeFileSync(join(systemDir, 'data', 'port.txt'), process.env.FGSB_VERIFY_PORT);
   log('  3/5  starting the packaged server…');
   server = await startServer(systemDir);
   log(`       bound at ${server.url}`);

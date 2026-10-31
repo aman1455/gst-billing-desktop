@@ -313,10 +313,18 @@
   // node_modules can only exist because npm ran, which means Node was
   // there - so it is checked first and a stale PATH cannot make a working
   // install look broken.
+  // v1.10.83 - the ZIP now ships node_modules, so a folder only counts as
+  // installed once the app has also run in it (the server writes
+  // data\port.txt on every start). Otherwise a freshly extracted ZIP would
+  // show Open App: no shortcuts made, and next to an existing install a
+  // second, empty copy (ERR-038).
+  function isInstalled() {
+    return folderExists('_system\\node_modules') && fileExists('_system\\data\\port.txt');
+  }
   function installState() {
     if (!fso.FolderExists(SYSTEM)) return 'no-system';
     if (!fileExists('_system\\package.json')) return 'no-system';
-    if (folderExists('_system\\node_modules')) return 'ready';
+    if (isInstalled()) return 'ready';
     if (!nodePresent()) return 'no-node';
     return 'no-app';
   }
@@ -341,9 +349,16 @@
       var lnk = places[i] + '\\E-Munim.lnk';
       if (!fso.FileExists(lnk)) continue;
       try {
-        var target = String(shell.CreateShortcut(lnk).Arguments).replace(/^\s*"|"\s*$/g, '');
+        // v1.10.83 - the one-line install's shortcut runs
+        // "...\_system\start-windows.ps1" -AppWindow, the launcher's runs
+        // "...\Free GST Billing - WINDOWS.hta": the first quoted path either way.
+        var args = String(shell.CreateShortcut(lnk).Arguments);
+        var q = /"([^"]+)"/.exec(args);
+        var target = q ? q[1] : args.replace(/^\s+|\s+$/g, '');
         var cut = target.lastIndexOf('\\');
-        if (cut > 0) roots.push(target.substring(0, cut));
+        var root = cut > 0 ? target.substring(0, cut) : '';
+        if (/\\_system$/i.test(root)) root = root.substring(0, root.length - 8);
+        if (root) roots.push(root);
       } catch (e) { }
     }
     roots.push(shell.ExpandEnvironmentStrings('%LOCALAPPDATA%\\Programs\\E-Munim'));
@@ -464,7 +479,7 @@
     watchTicks = 0;
     watchTimer = window.setInterval(function () {
       watchTicks++;
-      if (folderExists('_system\\node_modules')) {
+      if (isInstalled()) {
         stopWatching();
         render();
         return;
@@ -494,6 +509,63 @@
     setMore(null);
     watchForInstall();
     fitWindow();
+  }
+
+  // v1.10.83 (#128) - Remove the app, as Control Panel -> Remove the App
+  // does: the same script, run from a temp copy (it deletes _system, itself
+  // included), told to wait for this window to close first.
+  function showRemove() {
+    setState('Remove Free GST Billing?',
+      'The app, its Desktop and Start-menu icons and its start-up entry are removed. ' +
+      'Tick what else should go. Anything not ticked stays in <b>' + esc(SYSTEM) + '</b>.', 'warn');
+    setSteps(
+      '<label style="display:block;margin:4px 0"><input type="checkbox" id="rmData"> My invoices, clients, products and settings</label>' +
+      '<label style="display:block;margin:4px 0"><input type="checkbox" id="rmPdfs"> Saved invoice PDFs</label>' +
+      '<label style="display:block;margin:4px 0"><input type="checkbox" id="rmBackups"> All backup files in Documents\\FreeGSTBill Backups</label>' +
+      '<p style="margin:8px 0 0">If you delete your data but keep the backups, a last copy of it is saved in the backups folder first.</p>');
+    setPrimary('Remove the app', 'Closes the app first', doRemove, false);
+    setMore([{ label: 'Cancel, keep the app', run: render }]);
+    moreOpen = true;
+    document.getElementById('more').style.display = 'block';
+    document.getElementById('moreToggle').style.display = 'none';
+    fitWindow();
+  }
+
+  function myPid() {
+    try {
+      var list = new Enumerator(GetObject('winmgmts:').ExecQuery(
+        "SELECT ProcessId, CommandLine FROM Win32_Process WHERE Name = 'mshta.exe'"));
+      for (; !list.atEnd(); list.moveNext()) {
+        var cmd = String(list.item().CommandLine || '').toLowerCase();
+        if (cmd.indexOf(ROOT.toLowerCase()) !== -1) return list.item().ProcessId;
+      }
+    } catch (e) { }
+    return 0;
+  }
+
+  function doRemove() {
+    var data = document.getElementById('rmData').checked;
+    var pdfs = document.getElementById('rmPdfs').checked;
+    var backups = document.getElementById('rmBackups').checked;
+    if (data && !confirm(backups
+      ? 'Delete all your invoices, clients, products and settings and every backup? Nothing will be left, and this cannot be undone.'
+      : 'Delete your invoices, clients, products and settings from this computer? A last copy is saved in the backups folder first.')) return;
+    var script = SYSTEM + '\\uninstall-windows.ps1';
+    if (!fso.FileExists(script)) { alert('Missing file: uninstall-windows.ps1\n\nUse Control Panel -> Remove the App in the app instead.'); return; }
+    var tmp;
+    try {
+      tmp = shell.ExpandEnvironmentStrings('%TEMP%') + '\\fgsb-remove-' + new Date().getTime();
+      fso.CreateFolder(tmp);
+      fso.CopyFile(script, tmp + '\\uninstall-windows.ps1');
+    } catch (e) { alert('Could not prepare the removal:\n' + e.message); return; }
+    var cmd = 'powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "' + tmp + '\\uninstall-windows.ps1"' +
+      ' -Sys "' + SYSTEM + '" -ServerPid ' + myPid() + (data ? ' -Data' : '') + (pdfs ? ' -Pdfs' : '') + (backups ? ' -Backups' : '');
+    var code;
+    try { code = shell.Run(cmd, 0, true); }
+    catch (e) { alert('Could not start the removal:\n' + e.message); return; }
+    if (code !== 0) { alert('The removal could not start, so nothing was removed. Use Control Panel -> Remove the App in the app instead.'); return; }
+    // The script waits for this window to close, then removes the app.
+    window.close();
   }
 
   function render() {
@@ -561,14 +633,15 @@
 
     setState('Ready',
       'Your app is installed. It opens in your browser.', 'ok');
-    setPrimary('Open App', 'Starts the app', function () { runScript('start-windows.ps1'); }, false);
+    setPrimary('Open App', 'Starts the app', function () { runScript('start-windows.ps1', '-AppWindow'); }, false);
     setSteps('');
     setMore([
       { label: 'Update to the latest version', run: function () { runScript('update-windows.ps1'); } },
       { label: 'Back up my data', run: function () { runScript('backup-windows.ps1'); } },
       { label: 'Restore a backup', run: function () { runScript('restore-windows.ps1'); } },
       { label: 'Move to another PC', run: function () { runScript('move-windows.ps1'); } },
-      { label: 'Stop the app', run: function () { runScript('stop-windows.ps1'); } }
+      { label: 'Stop the app', run: function () { runScript('stop-windows.ps1'); } },
+      { label: 'Remove the app...', run: showRemove }
     ]);
   }
 

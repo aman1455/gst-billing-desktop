@@ -45,7 +45,7 @@ const norm = (h) => String(h || '').toLowerCase().replace(/[\s_\-.%()/#]+/g, '')
 
 // Rows as objects keyed by canonical field name. `fields` maps each canonical
 // name to the accepted header spellings.
-function rowsToRecords(text, fields) {
+export function rowsToRecords(text, fields) {
   const table = parseCsv(text);
   if (table.length < 2) return { records: [], missing: [], unknown: [] };
   const header = table[0].map(norm);
@@ -186,6 +186,8 @@ export function salesCsvToBills(text, { profile = {}, products = [], adjustStock
   }
   const productByName = new Map((products || []).map((p) => [String(p.name || '').trim().toLowerCase(), p]));
   const knownClients = new Map((clients || []).map((c) => [String(c.name || '').trim().toLowerCase(), c]));
+  const clientByGstin = new Map((clients || []).filter((c) => String(c.gstin || '').trim()).map((c) => [String(c.gstin).trim().toUpperCase(), c]));
+  const newClientByGstin = new Map();
   const bills = [];
   const skipped = [];
   const newClients = new Map();
@@ -234,17 +236,23 @@ export function salesCsvToBills(text, { profile = {}, products = [], adjustStock
     const typeCfg = INVOICE_TYPES[invoiceType];
     const showGST = typeCfg.showGST;
     const taxInclusive = showGST && yes(head.taxInclusive);
-    const saved = knownClients.get(head.clientName.trim().toLowerCase());
+    // #132: a GSTIN already known is that client, even under a mistyped name;
+    // the invoice takes the saved (or first) name, so no duplicate is made.
+    const rowGstin = String(head.clientGstin || '').trim().toUpperCase();
+    const byGstin = rowGstin ? (clientByGstin.get(rowGstin) || newClientByGstin.get(rowGstin)) : null;
+    const saved = byGstin || knownClients.get(head.clientName.trim().toLowerCase());
     const client = {
       ...(saved || {}),
-      name: head.clientName,
+      name: byGstin ? byGstin.name : head.clientName,
       gstin: (head.clientGstin || saved?.gstin || '').toUpperCase(),
       state: stateName(head.clientState) || saved?.state || stateName((head.clientGstin || '').slice(0, 2)),
       address: head.clientAddress || saved?.address || '',
       country: head.clientCountry || saved?.country || '',
     };
     if (!saved && !newClients.has(client.name.toLowerCase())) {
-      newClients.set(client.name.toLowerCase(), { name: client.name, gstin: client.gstin, state: client.state, address: client.address, country: client.country });
+      const added = { name: client.name, gstin: client.gstin, state: client.state, address: client.address, country: client.country };
+      newClients.set(client.name.toLowerCase(), added);
+      if (rowGstin) newClientByGstin.set(rowGstin, added);
     }
     const details = { invoiceNumber, invoiceDate, dueDate, placeOfSupply: stateName(head.placeOfSupply) };
     const billDiscount = toNum(head.billDiscount, 0);

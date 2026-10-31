@@ -7,284 +7,561 @@ export default [
   slug: 'invoices',
   title: 'Making an invoice',
   nav: 'Making an invoice',
-  lead: 'Every part of the New Invoice screen, from top to bottom: the toolbar, the document type, the client, the items, terms, extra pages, and what happens when you save, print or share.',
+  lead: 'Every card of the New Invoice screen, from top to bottom: the toolbar, the document type, the client, invoice details, ship-to and order details, the items, discounts, GST, TDS and TCS, terms, extra pages, and what happens when you save, print or share.',
   body: `
 <section id="screen-layout">
 <h2>How the screen is laid out</h2>
-<p>Open it with ${ui('New Invoice')} in the sidebar, or <kbd>Ctrl</kbd> + <kbd>N</kbd>. The form is on the left and a live preview of the printed invoice is on the right. From top to bottom, the form has these cards:</p>
+<p>Open it with ${ui('New Invoice')} in the sidebar, or <kbd>Ctrl</kbd> + <kbd>N</kbd>. The same screen opens when you edit, duplicate or convert an invoice from the Dashboard. The form is on the left and a live preview of the printed invoice is on the right. From top to bottom, the form has these cards:</p>
 <ol>
-  <li><b>Invoice Type</b>, with the ${ui('Customize')} panel when it is open</li>
-  <li><b>Billed To</b>: the client</li>
-  <li><b>Invoice Details</b>: number, dates, place of supply and delivery address</li>
-  <li><b>Line Items</b></li>
-  <li><b>Terms &amp; Conditions</b>, notes and a private note</li>
-  <li><b>Additional Pages / Sections</b></li>
+  <li><a href="#invoice-types"><b>Invoice Type</b></a>: the kind of document, and whether it is for goods or services. The ${ui('Customize')} panel opens inside this card.</li>
+  <li><a href="#billed-to"><b>Billed To</b></a>: the client's name, address, state and GSTIN.</li>
+  <li><a href="#details"><b>Invoice Details</b></a>: number, dates, place of supply, the <a href="#ship-to">Ship to</a> address and the optional <a href="#order-details">order, dispatch and reference details</a>.</li>
+  <li><a href="#items"><b>Line Items</b></a>: what you are selling, with the <a href="#discounts">whole-bill discount</a> under them.</li>
+  <li><a href="#terms-notes"><b>Terms &amp; Conditions</b></a>: terms, notes for the client and a private note for you.</li>
+  <li><a href="#extra-pages"><b>Additional Pages / Sections</b></a>: extra pages printed after the invoice.</li>
 </ol>
-<p>The totals are not in the form. They are worked out as you type and shown in the preview.</p>
+<p>The totals are not typed anywhere. They are worked out as you type and shown in the <a href="#preview">live preview</a>.</p>
+<p>Every card title has a small ${ui('?')} next to it. It opens this guide at the part about that card.</p>
 <figure><img src="assets/img/app-invoice-editor.png" alt="The invoice screen: the form on the left, the live preview on the right." loading="lazy"><figcaption>The invoice screen: the form on the left, the live preview on the right.</figcaption></figure>
 </section>
 
 <section id="toolbar">
 <h2>The toolbar</h2>
-<p>The toolbar stays at the top of the screen as you scroll.</p>
+<p>The toolbar stays at the top of the screen as you scroll, so Save, Print and the rest are always in reach on a long invoice.</p>
 <figure><img src="${img('toolbar.png')}" alt="The invoice toolbar: Save, Save and Download, Print, WhatsApp, E-Way Bill, Customize, Hide Preview"></figure>
 <div class="table-wrap"><table>
   <tr><th>Button</th><th>What it does</th></tr>
-  <tr><td>${ui('←')} Back</td><td>Leaves the invoice. If you have changed something that is not saved, you are asked first (see <a href="#leaving">Leaving with unsaved changes</a>).</td></tr>
-  <tr><td>${ui('?')}</td><td>A short how-to for this screen.</td></tr>
-  <tr><td>Save status</td><td>Shows <b>Draft - click to complete</b> until the invoice has a client and an item (click it to jump to what is missing), then <b>Not saved yet</b> until you first save it, then <b>Saving…</b>, <b>All changes saved</b> or <b>Ready</b>.</td></tr>
+  <tr><td>${ui('←')} ${ui('Back')}</td><td>Leaves the invoice. If you have changed something that is not saved, you are asked first (see <a href="#leaving">Leaving with unsaved changes</a>).</td></tr>
+  <tr><td>${ui('?')}</td><td>Opens this guide.</td></tr>
+  <tr><td>Save status</td><td>A small coloured badge that tells you whether the invoice is saved. See <a href="#autosave">Saving as you go</a>.</td></tr>
   <tr><td>${ui('Save')}</td><td>Saves the invoice without making a PDF. <kbd>Ctrl</kbd> + <kbd>S</kbd> does the same.</td></tr>
   <tr><td>${ui('Save &amp; Download')}</td><td>Saves the invoice and downloads the PDF. See <a href="#save-download">Save &amp; Download</a>.</td></tr>
   <tr><td>${ui('Print')}</td><td>Saves the invoice, then prints it. See <a href="#print">Printing</a>.</td></tr>
   <tr><td>${ui('WhatsApp')}</td><td>Opens WhatsApp with the invoice details typed in. See <a href="#whatsapp">Sending on WhatsApp</a>.</td></tr>
-  <tr><td>${ui('E-Way Bill')}</td><td>Tax invoices and delivery challans only. Downloads the e-way bill file. See <a href="#eway-bill">E-way bill</a>.</td></tr>
-  <tr><td>${ui('Customize')}</td><td>Opens the panel that controls what prints, the paper size, currency and more. See <a href="invoice-options.html">Customize: what prints and how</a>.</td></tr>
-  <tr><td>${ui('Hide Preview')}</td><td>Hides the preview so the form uses the whole width, handy for long invoices. ${ui('Show Preview')} brings it back, and the app remembers your choice.</td></tr>
+  <tr><td>${ui('E-Way Bill')}</td><td>Only on tax invoices and delivery challans, and only while <b>E-way bill</b> is on in <a href="settings.html#features">Settings, Features</a>. Downloads the e-way bill file. See <a href="#eway-bill">E-way bill</a>.</td></tr>
+  <tr><td>${ui('E-invoice')}</td><td>Only when <b>E-invoicing (IRN)</b> is on in Settings, Features, and only on tax invoices and credit notes. Downloads the e-invoice file and takes back the IRN. A ✓ after the name means this invoice already has an IRN. See <a href="gst-returns.html#e-invoice">E-invoicing</a>.</td></tr>
+  <tr><td>${ui('Customize')}</td><td>Opens the panel that controls what prints, the paper size, currency and more. While it is open the button reads ${ui('Hide Options')}. See <a href="invoice-options.html">Customize: what prints and how</a>.</td></tr>
+  <tr><td>${ui('Hide Preview')}</td><td>Hides the preview so the form uses the whole width, handy for long invoices. ${ui('Show Preview')} brings it back. The app remembers your choice in this browser. Save &amp; Download and Print still work while it is hidden.</td></tr>
 </table></div>
+<p>While a save, download or print is running, the buttons are greyed out and Save &amp; Download reads <b>Generating...</b>. Wait for it to finish.</p>
 </section>
 
 <section id="invoice-types">
-<h2>Choosing the document type</h2>
-<p>The six chips at the top decide the printed title, whether GST is charged, and whether the document counts as a sale in your totals and returns.</p>
+<h2>Invoice Type: choosing the document</h2>
+<p>The chips at the top of the first card decide the printed title, the number series, whether GST is charged, and whether the document counts as a sale in your totals and GST returns. Hover over a chip to see a one-line description; the same line shows under the chips for the one you picked.</p>
 <div class="table-wrap"><table>
-  <tr><th>Type</th><th>Prints as</th><th>Use it for</th><th>GST</th><th>Counts as a sale?</th></tr>
-  <tr><td>Tax Invoice</td><td>TAX INVOICE</td><td>A normal sale by a GST-registered business</td><td>Yes</td><td>Yes</td></tr>
-  <tr><td>Quotation</td><td>QUOTATION</td><td>A priced offer for work or supply, numbered QUO/…. Convert it to a tax invoice when the client accepts.</td><td>Shown</td><td>No</td></tr>
-  <tr><td>Proforma / Estimate</td><td>PROFORMA INVOICE</td><td>A quote before the sale. Prints "This is not a tax invoice" and a faint ESTIMATE watermark.</td><td>Shown</td><td>No</td></tr>
-  <tr><td>Bill of Supply (No GST)</td><td>BILL OF SUPPLY</td><td>Exempt goods or services</td><td>No</td><td>Yes</td></tr>
-  <tr><td>Composition (Bill of Supply)</td><td>BILL OF SUPPLY</td><td>Sales under the composition scheme. The declaration required by Rule 46A prints automatically.</td><td>No</td><td>Yes</td></tr>
-  <tr><td>Credit Note</td><td>CREDIT NOTE</td><td>Returns, a price cut after the sale, or a correction. Its total is subtracted from your sales.</td><td>Yes</td><td>Subtracted</td></tr>
-  <tr><td>Delivery Challan</td><td>DELIVERY CHALLAN</td><td>Moving goods without a sale, such as to a job worker or on approval</td><td>No</td><td>No</td></tr>
+  <tr><th>Chip</th><th>Prints as</th><th>Numbered</th><th>Use it for</th><th>GST</th><th>Counts as a sale?</th></tr>
+  <tr><td>Tax Invoice</td><td>TAX INVOICE</td><td>INV…</td><td>A normal sale by a GST-registered business</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Quotation</td><td>QUOTATION</td><td>QUO…</td><td>A priced offer for work or supply. Convert it to a tax invoice when the client accepts.</td><td>Shown</td><td>No</td></tr>
+  <tr><td>Proforma / Estimate</td><td>PROFORMA INVOICE</td><td>EST…</td><td>A quote before the sale. Prints "This is not a tax invoice" and a faint ESTIMATE watermark.</td><td>Shown</td><td>No</td></tr>
+  <tr><td>Bill of Supply (No GST)</td><td>BILL OF SUPPLY</td><td>BOS…</td><td>Exempt goods or services, where no GST is charged</td><td>No</td><td>Yes</td></tr>
+  <tr><td>Composition (Bill of Supply)</td><td>BILL OF SUPPLY</td><td>COMP…</td><td>Sales under the composition scheme (section 10). The declaration required by Rule 46A prints automatically.</td><td>No</td><td>Yes</td></tr>
+  <tr><td>Credit Note</td><td>CREDIT NOTE</td><td>CN…</td><td>Returns, a price cut after the sale, or a correction. Its total is subtracted from your sales. See <a href="#credit-note">How to make a credit note</a>.</td><td>Yes</td><td>Subtracted</td></tr>
+  <tr><td>Delivery Challan</td><td>DELIVERY CHALLAN</td><td>DC…</td><td>Moving goods without a sale, such as to a job worker or on approval</td><td>No</td><td>No</td></tr>
 </table></div>
-<p>There are seven types. Changing the type also changes the invoice number to that type's series, replacing any number you typed.</p>
-<p><strong>Once an invoice is saved, its type is locked.</strong> The other chips are greyed out, because the number and the tax already issued to your client must not change. To make a different document from it, use ${ui('Duplicate')} on the Dashboard.</p>
+<p>The prefixes above are the defaults. You can change each one in <a href="settings.html#invoice-numbers">Settings, Invoice number format</a> or <a href="print-settings.html#prefixes">Print Settings</a>.</p>
+<h3>What changes when you click a chip</h3>
+<ul>
+  <li><strong>The number</strong> moves to that type's own series. Any number you typed is replaced.</li>
+  <li><strong>The Tax % column</strong> is turned on for types with GST and off for the others (bill of supply, composition, delivery challan). <b>Place of Supply</b> is shown or hidden the same way.</li>
+  <li><strong>The title</strong> printed at the top changes, unless you typed your own <a href="invoice-options.html#title-currency">Invoice Title</a>.</li>
+</ul>
+<p><strong>Once an invoice is saved, its type is locked.</strong> The other chips are greyed out and a note under them says why: the number and the tax already issued to your client must not change. To make a different document from it, use ${ui('Duplicate')} on the <a href="dashboard.html#row-actions">Dashboard</a>. A quotation, proforma or challan is turned into an invoice with ${ui('Convert to Tax Invoice')} (see <a href="#proforma-to-invoice">Turning a quote into an invoice</a>).</p>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>No GST box on the items, or no tax on a new tax invoice?</b> The Tax % column is remembered for the next invoice. After making a bill of supply or a challan, the next new invoice can start without it. Click the ${ui('Tax Invoice')} chip again, or tick <b>Tax % column</b> under ${ui('Customize')}. See <a href="troubleshooting.html#no-tax">No GST is charged at all</a>.</p>
+<p><b>The chips are greyed out.</b> The invoice is already saved. Use Duplicate to make a new document of another type.</p></div>
 </section>
 
 <section id="goods-services">
 <h2>Goods, services or both</h2>
-<p>Under the type chips, <b>This invoice is for</b> sets which units you are offered:</p>
-<table>
-  <tr><td>📦 Goods</td><td>Units such as Nos, Kg and Pcs. The default.</td></tr>
-  <tr><td>⏱ Services</td><td>Hours, sessions, visits and months. It also reminds you to put a SAC code in the HSN field.</td></tr>
-  <tr><td>🔀 Mixed</td><td>Every unit, unfiltered.</td></tr>
-</table>
+<p>Under the type chips, <b>This invoice is for:</b> sets which units the Unit list offers and which unit a new row starts with. It does not change the tax.</p>
+<div class="table-wrap"><table>
+  <tr><th>Chip</th><th>Units offered</th><th>Good for</th></tr>
+  <tr><td>📦 Goods</td><td>Pcs, Nos, Kg, g, Tonne, Ltr, ml, Mtr, cm, Ft, In, Sq.ft, Sq.m, Box, Dozen, Pair, Set, Bag, Roll, Bottle and the like. The default.</td><td>Shops, traders, manufacturers</td></tr>
+  <tr><td>⏱ Services</td><td>Hrs, Day, Week, Month, Year, Visit, Session, Project, Word, Page, plus Nos, Sq.ft and Sq.m. A reminder appears to use a <b>SAC code</b> (the services version of HSN) in the HSN/SAC box. Terms print in the <b>Formatted</b> layout unless you choose otherwise.</td><td>Freelancers, consultants, repair and service businesses</td></tr>
+  <tr><td>🔀 Mixed</td><td>Every unit, unfiltered.</td><td>Selling goods and doing the work, such as supply and installation</td></tr>
+</table></div>
+<p>Your own custom units show in every mode. The choice is remembered for your next invoice.</p>
+<p><b>A service with no quantity (a fixed fee).</b> Keep the line's quantity at 1 and type the fee as the rate. Then click ${ui('Customize')} and untick <b>Qty column</b> (see <a href="invoice-options.html#show-items">Items table</a>): the invoice prints the item and its amount with no Qty column. Untick <b>Rate column</b> too if you want only the amount. Totals and GST do not change. The choice carries on to your next new invoices, so tick it again for an invoice that needs quantities; invoices already saved keep their own setting.</p>
+<p>In <b>Services</b> mode the unit list starts with the units services use most: Hrs, Day, Month, Project and Nos. The HSN/SAC box of each line is labelled <b>SAC</b>, and the unit is not printed next to the quantity unless you turn it on (see <a href="invoice-options.html#show-items">Unit next to Qty</a>).</p>
+<p><b>A Services invoice shows only what services need.</b> The <b>Freelancer / consultant</b> business type starts every invoice in Services mode. There, the screen leaves out:</p>
+<ul>
+  <li>the <b>Unit</b> column, while the unit is not printed;</li>
+  <li>the ${ui('Delivery charges')} button;</li>
+  <li>the <b>Ship to</b> box;</li>
+  <li>the goods boxes under <b>Order, dispatch &amp; reference details</b> (vehicle no, delivery note, dispatch, destination, terms of delivery). The PO number, service period and work details stay.</li>
+</ul>
+<p>The <b>Discount</b> on a line is just an amount or a percent, and the discount on the whole bill is behind ${ui('+ Discount on the whole bill')}. Anything already filled in still shows. Click <b>📦 Goods</b> or <b>🔀 Mixed</b> to get every box back.</p>
+<p><b>Long item names.</b> The item box grows as you type, so a long name stays readable. Drag its bottom corner to make it taller. Press <kbd>Enter</kbd> to add the next row; a name stays on one line. Use ${ui('+ Add description')} for more detail under the item.</p>
+</section>
+
+<section id="billed-to">
+<h2>Billed To: the client</h2>
+<p>This card says who the invoice is for. Their name, address, state and GSTIN print in the <b>BILL TO</b> block. The <b>state</b> matters most: it decides whether GST is charged as CGST + SGST or as IGST (see <a href="#gst">How GST is worked out</a>).</p>
+<div class="table-wrap"><table>
+  <tr><th>Field</th><th>What to enter</th></tr>
+  <tr><td>Client Name</td><td>Click it to see your saved clients, or type to search. Pick one to fill in everything below. You can also bill a name that is not saved.</td></tr>
+  <tr><td>Pencil button</td><td>Appears beside the name once a saved client is picked. Opens their full details for editing (see <a href="clients.html#client-form">Adding and editing a client</a>). Typing a different name unlinks the saved client and the pencil goes.</td></tr>
+  <tr><td>Billing Address</td><td>Street address and locality.</td></tr>
+  <tr><td>Country</td><td>India to start (your own country). Changing it clears the state, since each country has its own list. A client outside India makes the sale an export: see <a href="#gst">How GST is worked out</a>.</td></tr>
+  <tr><td>City</td><td>For example Mumbai.</td></tr>
+  <tr><td>PIN Code</td><td>The 6-digit PIN. For other countries the label changes, such as ZIP Code or Postcode.</td></tr>
+  <tr><td>State</td><td>Pick from the list. Leave it blank if you enter a GSTIN: the app fills it in from the GSTIN (see <a href="#gstin-check">What the GSTIN check tells you</a>). Hidden when <b>Business state</b> is turned off under Customize.</td></tr>
+  <tr><td>GSTIN</td><td>The client's 15-character GST number, if they are registered. Optional: leave it blank for a consumer or an unregistered business (a B2C sale). Letters are made capitals for you. Hidden when <b>Tax ID</b> is turned off under Customize.</td></tr>
+</table></div>
+<p>The client's email, phone and <b>SEZ</b> setting are not on this card. They are kept with the saved client and edited with the pencil. A client marked SEZ is always charged IGST.</p>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>CGST + SGST where it should be IGST, or the other way round?</b> Check the client's State and the <a href="#details">Place of Supply</a>, and your own state in <a href="settings.html#company-details">Settings</a>. See <a href="troubleshooting.html#wrong-tax">The invoice has the wrong tax split</a>.</p>
+<p><b>The client list does not open.</b> You have no saved clients yet. Type the name and use <b>Save "name" as new client</b>, or add clients on the <a href="clients.html#client-list">Clients</a> screen.</p></div>
 </section>
 
 <section id="client">
-<h2>Billed To: the client</h2>
+<h3>Picking a saved client, or saving a new one</h3>
 <ol class="steps">
-  <li><strong>Type the name</strong>Clicking <b>Client Name</b> lists your saved clients. As you type, the list narrows. Use <kbd>↓</kbd> <kbd>↑</kbd> and <kbd>Enter</kbd>, or click one. Picking a saved client fills in all their details.</li>
-  <li><strong>Or save a new one</strong>For someone new, type their name and fill in the fields, then click <b>Save "name" as new client</b> to keep them for next time. You do not have to: an invoice can go to a name that is not saved.</li>
-  <li><strong>Check the address and GSTIN</strong>Address, country, city, PIN, state and GSTIN print on the invoice.</li>
+  <li><strong>Click Client Name</strong>Your saved clients drop down, each with their city and state, and their GSTIN when they have one.</li>
+  <li><strong>Type to narrow the list</strong>Any part of the name works. Use <kbd>↓</kbd> <kbd>↑</kbd> to move and <kbd>Enter</kbd> to pick, or click one. <kbd>Esc</kbd> closes the list. Each row has its own pencil to edit that client straight away.</li>
+  <li><strong>Check what was filled in</strong>Picking a client fills in their address, country, city, PIN, state and GSTIN, and a message says <i>Loaded client: name</i>.</li>
+  <li><strong>Or save someone new</strong>Type their name; at the bottom of the list click <b>Save "name" as new client</b>. The client form opens with what you have typed so far. Save it and the client is picked on this invoice and kept for next time. You do not have to: an invoice can go to a name that is not saved.</li>
 </ol>
-<p>A saved client's pencil icon opens their details for editing. Their email, phone and <b>SEZ</b> setting are only edited there, not on the invoice: see <a href="clients.html#client-form">Adding and editing a client</a>. A client can also have a preferred paper size, currency and auto-print setting, which are applied when you pick them on a new invoice.</p>
-<p>Changing the <b>country</b> clears the state, since each country has its own list.</p>
+<p><strong>Client preferences.</strong> A saved client can carry their own paper size (a custom size too), currency and auto-print setting. When you pick them on a <em>new</em> invoice, those are applied. When you save an invoice for a saved client, the paper size and currency it used become that client's preference, so their next invoice starts the same way.</p>
 </section>
 
 <section id="gstin-check">
-<h2>What the GSTIN check tells you</h2>
-<p>When you leave the GSTIN box, the app reads the number. This works offline, with no GST portal lookup.</p>
-<table>
-  <tr><th>Message</th><th>Meaning</th></tr>
-  <tr><td>✓ Registered in <i>state</i>. State filled in.</td><td>The state was blank, so it has been filled in from the first two digits.</td></tr>
-  <tr><td>✓ Registered in <i>state</i>.</td><td>The GSTIN and the state agree.</td></tr>
-  <tr><td>⚠ This GSTIN is registered in <i>state</i>, but the state says <i>other state</i>.</td><td>Check which is right. The tax split follows the state and place of supply.</td></tr>
-  <tr><td>⚠ This GSTIN fails its own checksum. Check for a typo.</td><td>Every GSTIN ends with a check character. This one does not add up, so a character is almost certainly mistyped.</td></tr>
-</table>
-<p>These are warnings only. They never stop you saving.</p>
+<h3>What the GSTIN check tells you</h3>
+<p>When you leave the GSTIN box, the app reads the number. The first two digits are the state code, and the last character is a check character. This works offline, with no GST portal lookup.</p>
+<div class="table-wrap"><table>
+  <tr><th>Message under the box</th><th>Meaning</th><th>What to do</th></tr>
+  <tr><td>✓ Registered in <i>state</i> — state filled in.</td><td>The State was blank, so it has been filled in from the GSTIN.</td><td>Nothing.</td></tr>
+  <tr><td>✓ Registered in <i>state</i>.</td><td>The GSTIN and the State agree.</td><td>Nothing.</td></tr>
+  <tr><td>⚠ This GSTIN is registered in <i>state</i>, but the state says <i>other state</i>.</td><td>The two disagree.</td><td>Check which is right. The tax split follows the State and Place of Supply, not the GSTIN.</td></tr>
+  <tr><td>⚠ This GSTIN fails its own checksum — check for a typo.</td><td>The check character does not add up, so a character is almost certainly mistyped (0 for O, 1 for I and so on).</td><td>Compare it with the client's GST certificate or their last invoice.</td></tr>
+</table></div>
+<p>These are warnings only. They never stop you saving. The message clears as soon as you type in the box again.</p>
 </section>
 
 <section id="client-credit">
-<h2>Using a client's credit</h2>
-<p>If the client overpaid on earlier invoices, a banner shows how much credit they have and where it came from. On a new invoice you can:</p>
+<h3>Using a client's credit</h3>
+<p>If the client paid more than they owed on earlier invoices, a blue banner appears at the top of Billed To on a <em>new</em> invoice: <b>💳 Client has ₹… credit</b>, with the invoices the overpayment came from.</p>
+<ol class="steps">
+  <li><strong>Choose how much to use</strong>Type an amount in the box, or click ${ui('Apply full')} to use as much as this invoice needs. It can never be more than the credit or the invoice total.</li>
+  <li><strong>Check the line under it</strong>It says how much will be applied and how much credit will remain.</li>
+  <li><strong>Save</strong>The credit is recorded as a payment on this invoice, and taken off the invoices it came from. A message says which ones.</li>
+</ol>
 <ul>
-  <li>type an amount to use, or click ${ui('Apply full')} to use as much as this invoice needs;</li>
-  <li>click ${ui('Skip')} to use none;</li>
-  <li>tick <b>Auto-apply available client credit on future invoices</b> to have it used automatically.</li>
+  <li>${ui('Skip')} (shown once an amount is entered) sets it back to nothing.</li>
+  <li>Tick <b>Auto-apply available client credit on future invoices</b> to have the credit used automatically whenever you pick a client who has some.</li>
 </ul>
-<p>When you save, the credit is recorded as a payment on this invoice.</p>
+<p>The banner does not show when editing a saved invoice. To see a client's credit and payments, open <a href="clients.html#ledger">their account</a>.</p>
 </section>
 
 <section id="details">
 <h2>Invoice Details</h2>
+<p>The number, the dates and where the supply happens. Under them are the <a href="#ship-to">Ship to</a> box and the <a href="#order-details">order, dispatch and reference details</a>.</p>
 <div class="table-wrap"><table>
   <tr><th>Field</th><th>What to know</th></tr>
-  <tr><td>Invoice Number</td><td>Filled in with the next number for this type. It is only taken when you first save, so an invoice you abandon does not use up a number. If someone else's invoice took it meanwhile, yours gets the next free number and you are told. See <a href="settings.html#invoice-numbers">Invoice number format</a>.</td></tr>
-  <tr><td>Invoice Date</td><td>Today, unless you change it.</td></tr>
-  <tr><td>Due Date</td><td>Blank unless you set it. Once it passes, an unpaid invoice becomes <b>Overdue</b>.</td></tr>
-  <tr><td>Place of Supply</td><td>Where the goods or services are supplied. Leave it on <b>Defaults to Client State</b> unless the delivery is in a different state from the client's address. The tax split follows it. Not shown for bills of supply, composition bills or delivery challans.</td></tr>
-  <tr><td>Original Invoice Reference</td><td>Credit notes only: the invoice it is against, such as INV/2026-27/0001. It prints as "Against Invoice".</td></tr>
-  <tr><td>Ship to same as bill-to address</td><td>Ticked by default. Untick it to enter a delivery address, city, PIN and state. The invoice then prints a separate <b>SHIP TO</b> block.</td></tr>
+  <tr><td>Invoice Number</td><td>Filled in with the next number for this type. It is only taken when you first save, so an invoice you abandon does not use up a number. If another invoice took it meanwhile, yours gets the next free number and you are told. You can also type your own number, such as the next page of a paper bill book: a number you type is kept. See <a href="settings.html#invoice-numbers">Invoice number format</a>.</td></tr>
+  <tr><td>Invoice Date</td><td>Today, unless you change it. A duplicated or converted invoice starts on today's date too.</td></tr>
+  <tr><td>Due Date</td><td>Blank unless you set it. Once it passes, an unpaid invoice shows as <b>Overdue</b> on the Dashboard.</td></tr>
+  <tr><td>Cost centre</td><td>Only when cost centres are turned on. Tags the sale to a branch, project or department for the <a href="reports.html#cost-centres">By cost centre</a> report. It is not printed.</td></tr>
+  <tr><td>Place of Supply</td><td>The state where the goods are delivered or the service is supplied. Leave it on <b>Defaults to Client State</b> unless that is a different state from the client's address. The tax split follows it. Not shown for bills of supply, composition bills or delivery challans, or when <b>Place of Supply</b> is turned off under Customize.</td></tr>
+  <tr><td>Original Invoice Reference</td><td>Credit notes only: the invoice it is against, such as INV/2025-26/0001. It prints as "Against Invoice".</td></tr>
 </table></div>
+<h3>Changing the number of a saved invoice</h3>
+<p>You can edit the number of an invoice that is already saved. On the next save it moves to the new number, which must not be used by another invoice, and the copy under the old number goes to the <a href="backup.html#trash">Trash</a>. An invoice whose overpayment was used as credit on another invoice cannot be renumbered; the app says so.</p>
+<div class="note warn"><strong>Keep GST invoice numbers to 16 characters</strong>
+<p>GSTR-1 accepts at most 16 characters (letters, digits, - and /) for tax invoice and credit note numbers. If yours is longer, a warning appears when you save. Shorten the format in <a href="settings.html#invoice-numbers">Settings, Invoice Number Format</a>.</p></div>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>"Invoice number ... already exists"</b> or <b>"was already used — saved as ... instead"</b>: see <a href="troubleshooting.html#duplicate-number">Invoice number already exists</a>.</p>
+<p><b>The number jumped</b>, for example from 0007 to 0009: another invoice, a quotation of the same series or a restored backup used it. Numbers are only taken on save, never by opening the screen.</p></div>
+<p id="due-in">Under <b>Due Date</b>, the buttons ${ui('7 days')}, ${ui('15 days')} and ${ui('30 days')} set the due date that many days after the invoice date. If your business type is Freelancer, new invoices start due in 15 days.</p>
+<p>The <b>Currency</b> box appears here when you bill abroad; see <a href="#currency">Billing in another currency</a>.</p>
+</section>
+
+<section id="lut">
+<h3>Exports and SEZ supplies under a LUT</h3>
+<p>When the client is <b>abroad</b> (its country is not India) or is an <b>SEZ unit or developer</b> (the SEZ tick on the client), a box appears in Invoice Details: <b>Export under LUT (no IGST)</b>, or <b>SEZ supply under LUT (no IGST)</b>.</p>
+<ul>
+  <li><strong>Ticked</strong>: the supply is zero-rated. No IGST (and no cess) is charged, the items keep their GST rate for the returns, and the total is the taxable value. The invoice prints, word for word, the declaration Rule 46 requires: <i>SUPPLY MEANT FOR EXPORT/SUPPLY TO SEZ UNIT OR SEZ DEVELOPER FOR AUTHORISED OPERATIONS UNDER BOND OR LETTER OF UNDERTAKING WITHOUT PAYMENT OF INTEGRATED TAX - LUT ARN AD290426123456X (FY 2026-27)</i>. Every invoice design prints it, the thermal receipt too.</li>
+  <li><strong>Not ticked</strong>: IGST is charged ("with payment of IGST"), which you claim back later as a refund. The invoice prints the matching declaration <i>…ON PAYMENT OF INTEGRATED TAX</i>.</li>
+</ul>
+<figure><img src="assets/img/invoice-lut-export.png" alt="An export invoice to a client in the United States, billed in US dollars: Export under LUT under the place of supply, IGST 0%, and the LUT declaration with the ARN under the total." loading="lazy" style="max-width:min(600px,100%)"><figcaption>An export under a LUT: no IGST, and the Rule 46 declaration with the ARN printed under the total.</figcaption></figure>
+<p>On a new invoice the box is ticked for you when your business has a LUT saved in <a href="settings.html#lut">Settings, Company</a> for the financial year of the invoice date. Untick it to charge IGST instead. An invoice saved earlier keeps its own choice. The ARN and year are copied onto the invoice when you tick it, so a new LUT next year never changes an old invoice.</p>
+<p>Under the box:</p>
+<ul>
+  <li><b>Have a LUT?</b> appears when no LUT is saved. It explains why to file one (no tax to pay and wait for), and links to <a href="gst-basics.html#lut">how to file it</a> (form GST RFD-11, free, once a financial year). You can still tick the box if you have a LUT and have not added it yet; the declaration then prints without the ARN.</li>
+  <li><b>⚠ Your saved LUT is for FY …</b> appears when the saved LUT is for another year than the invoice date. File the new year's LUT and update Settings.</li>
+</ul>
+<p><b>No LUT box?</b> Then the app does not see this invoice as an export. A note says why, with a button to fix it:</p>
+<ul>
+  <li><b>Export under LUT? First set the client's country.</b> You are billing in a foreign currency, but the client is saved in India (the client form starts on India). Click ${ui("Set the client's country")} and choose their country.</li>
+  <li><b>Export under LUT? Place of supply is …</b> The client is abroad, but Place of supply is an Indian state. Click ${ui('Make it an export')} to set it back to <b>Outside India (export)</b>.</li>
+  <li><b>Export under LUT? GST is turned off on this invoice.</b> The <b>Tax % column</b> tick in ${ui('Customize')} switches GST off for the whole invoice, which hides the LUT too. Click ${ui('Turn GST on')}; under the LUT the tax is still 0.</li>
+</ul>
+<p>The tick also decides the GST returns and the e-invoice: SEZ invoices go in GSTR-1 as <b>SEZ without payment</b> (SEWOP) or <b>with payment</b> (SEWP), and the e-invoice file uses EXPWOP / SEZWOP or EXPWP / SEZWP. Exports abroad still go in Table 6A on the portal by hand, see <a href="gst-returns.html#top-bar">the warnings above the tabs</a>. The E-Way Bill file uses 0% rates under a LUT. More on export invoices: <a href="gst-basics.html#export-invoice">What to print on an export or SEZ invoice</a>.</p>
+</section>
+
+<section id="ship-to">
+<h3>Ship to: a different delivery address</h3>
+<p><b>Ship to same as bill-to address</b> is ticked to start, so the invoice has only a BILL TO block. When the goods go somewhere else, such as a site, a warehouse or the client's customer, untick it and fill in:</p>
+<div class="table-wrap"><table>
+  <tr><th>Field</th><th>What to enter</th></tr>
+  <tr><td>Shipping Address</td><td>The delivery address, warehouse or consignee location. Can run to two lines.</td></tr>
+  <tr><td>Shipping City</td><td>The delivery city.</td></tr>
+  <tr><td>Shipping PIN</td><td>The 6-digit delivery PIN.</td></tr>
+  <tr><td>Shipping State</td><td>The delivery state. <b>Same as billing state</b> leaves it as the client's state.</td></tr>
+</table></div>
+<p>The invoice then prints a separate <b>SHIP TO</b> block beside BILL TO.</p>
+<div class="note info"><strong>The ship-to state does not change the tax</strong>
+<p>CGST + SGST or IGST follows <b>Place of Supply</b>, not the shipping state. If the delivery is in another state, set Place of Supply too. For "bill to one party, ship to another" sales, ask your CA which state is the place of supply.</p></div>
 </section>
 
 <section id="order-details">
-<h2>Order, dispatch and reference details</h2>
-<p>Under Invoice Details, <b>Order, dispatch &amp; reference details</b> opens a set of optional fields, the boxes a Tally invoice carries:</p>
-<p>work details, revision no, vehicle no, service period from and to, buyer's order no and order date, reference no &amp; date, other references, delivery note and its date, dispatch doc no, dispatched through, destination, mode or terms of payment, and terms of delivery.</p>
-<p>Only what you fill in prints. The <a href="invoice-options.html#style">Tally style</a> design shows them in its reference boxes; the other designs list them under Bill To. The section stays open on an invoice that has any of them.</p>
+<h3>Order, dispatch and reference details</h3>
+<p>At the bottom of Invoice Details, click <b>Order, dispatch &amp; reference details</b> to open a set of optional boxes, the ones a Tally invoice carries. It shows how many are filled, and stays open on an invoice that has any of them.</p>
+<div class="table-wrap"><table>
+  <tr><th>Box</th><th>For example</th></tr>
+  <tr><td>Work details</td><td>Supply and installation of high mast lights, scope as per annexure</td></tr>
+  <tr><td>Revision No</td><td>Rev-1, when you reissue a corrected quotation</td></tr>
+  <tr><td>Vehicle No</td><td>TS09AB1234</td></tr>
+  <tr><td>Service period from / to</td><td>The period a service bill covers, such as a monthly AMC. A warning appears if the end is before the start.</td></tr>
+  <tr><td>Buyer's Order No and Order date</td><td>The client's purchase order (PO) or work order</td></tr>
+  <tr><td>Reference No &amp; Date, Other references</td><td>Any other number your client wants quoted</td></tr>
+  <tr><td>Delivery Note and Delivery note date</td><td>The delivery challan or note that went with the goods</td></tr>
+  <tr><td>Dispatch Doc No, Dispatched through, Destination</td><td>LR or docket number, transporter such as VRL Logistics by road, and the destination town</td></tr>
+  <tr><td>Mode / Terms of payment</td><td>30 days, NEFT</td></tr>
+  <tr><td>Terms of delivery</td><td>Ex-works, door delivery, FOR destination</td></tr>
+</table></div>
+<p>Only what you fill in prints. The <a href="invoice-options.html#style">Tally style</a> design shows them in its reference boxes, Boxed grid prints Work details on its own line, and the other designs list them under Bill To.</p>
 </section>
 
 <section id="items">
-<h2>Line items</h2>
-<p>Each row has these fields:</p>
+<h2>Line Items</h2>
+<p>One row for each thing you are selling. The amount for each row and the totals are worked out for you and shown in the preview.</p>
 <div class="table-wrap"><table>
   <tr><th>Field</th><th>What to know</th></tr>
-  <tr><td>Description</td><td>The item name. Typing searches your <a href="products.html">products</a> by name or HSN; picking one fills in the HSN, rate, unit and GST rate, and links the row to the product so its stock is counted.</td></tr>
-  <tr><td>HSN/SAC</td><td>For common codes the app knows the usual GST rate, and shows it in green under the box. If the row's rate is still 18% or 0%, it is changed to match.</td></tr>
-  <tr><td>Qty</td><td>1 to start. Clicking the box selects the number, so typing replaces it.</td></tr>
-  <tr><td>Unit</td><td>From the list for Goods, Services or Mixed. ${ui('＋ Add custom…')} adds your own unit (up to 20 characters), marked ★, and ${ui('− Remove')} takes it away again. Invoices already made keep the unit they used.</td></tr>
-  <tr><td>Rate</td><td>Price for one unit.</td></tr>
-  <tr><td>Discount</td><td>An amount (₹) or a percentage (%) of the line. For an amount, a second box chooses what it comes off: <b>Net</b>, the line total (the default); <b>Unit</b>, that much off each unit; or <b>W/Tax</b>, off the total including tax.</td></tr>
-  <tr><td>GST %</td><td>0, 0.1, 0.25, 3, 5, 12, 18, 28 or 40%, plus any rates you added in <a href="print-settings.html#tax-rates">Print Settings</a>. ${ui('Custom…')} takes any rate from 0 to 100. New rows start at 18%. Since 22 September 2025 most goods are at 5%, 18% or 40%; 12% and 28% stay for older invoices and the items still taxed at them.</td></tr>
+  <tr><td>Item</td><td>The item name. Typing searches your <a href="products.html">products</a> by name or HSN and shows up to five, with their HSN and price. Pick one with the mouse, or with <kbd>↓</kbd> <kbd>↑</kbd> and <kbd>Enter</kbd>. Picking fills in the HSN, selling price, unit and GST rate, and links the row to the product so its stock is counted. You can also type any name that is not a product.</td></tr>
+  <tr><td>HSN/SAC</td><td>The goods (HSN) or services (SAC) code. GST returns need it. For common codes the app knows the usual GST rate since 22 September 2025: from the fourth digit it shows the rate and the item type in green under the box, and if the row's GST is still 18% or 0% it is changed to match. Where the rate depends on the price, size or packing (clothes and shoes up to or above ₹2,500, cars and bikes by engine size, loose or packed food) it shows every possible rate and leaves your GST % alone. Always check it: see <a href="gst-basics.html#which-rate">GST basics: what rate do I charge?</a> Finding your code: see <a href="gst-basics.html#hsn-search">GST basics: HSN and SAC</a>.</td></tr>
+  <tr><td>Qty</td><td>1 to start. Clicking the box selects the number, so typing replaces it. Decimals are fine, such as 2.5 kg.</td></tr>
+  <tr><td>Unit</td><td>From the list for Goods, Services or Mixed. A new row starts with the unit of the row above. ${ui('＋ Add custom…')} adds your own unit (up to 20 characters), marked ★ and kept in this browser for later invoices; ${ui('− Remove "unit"')} takes one away again. Invoices already made keep the unit they used.</td></tr>
+  <tr><td>Rate</td><td>Price for one unit. Without GST, unless <a href="#tax-inclusive">Prices include tax</a> is ticked.</td></tr>
+  <tr><td>Discount</td><td>A discount on this row, as an amount or a percentage. See <a href="#discounts">Discounts</a>. Hidden when <b>Discount column</b> is off under Customize.</td></tr>
+  <tr><td>GST %</td><td>0, 0.1, 0.25, 3, 5, 12, 18, 28 or 40%, plus any rates you added in <a href="print-settings.html#tax-rates">Print Settings</a>. ${ui('Custom…')} takes any rate from 0 to 100, up to two decimals. New rows start at 18%. Since 22 September 2025 most goods are at 5%, 18% or 40%; 12% and 28% stay for older invoices and the items still taxed at them. Which rate applies to your item: see <a href="gst-basics.html#which-rate">GST basics: what rate do I charge?</a> Hidden when there is no GST on the invoice. Outside India the label is your country's tax, such as VAT %.</td></tr>
   <tr><td>Cess %</td><td>Compensation cess, for tobacco, cars, coal and the like. Hidden until you turn on <b>GST Cess % column</b> under Customize.</td></tr>
+  <tr><td>Bin</td><td>Removes the row. The last remaining row cannot be removed.</td></tr>
 </table></div>
+<h3>Buttons under the rows</h3>
 <ul>
-  <li>${ui('+ Add description')} under a row adds a longer note that prints under the item name.</li>
-  <li>${ui('Add Item')} adds a row. So does pressing <kbd>Enter</kbd> in the last row once it has something in it.</li>
-  <li>${ui('Delivery charges')} adds the charge as its own line, SAC 996812, taxed at the highest GST rate among the goods on the invoice (delivery that comes with goods is taxed like them). Type the amount in its Rate. It is in the total and GST returns and never touches stock. Change its GST % if your delivery is a separate service.</li>
-  <li>The bin removes a row. The last remaining row cannot be removed.</li>
-  <li>Hiding a column under Customize, such as HSN or Discount, also hides it here.</li>
+  <li>${ui('+ Add description')} under a row opens a box for a longer note, such as a model number, size or what the work covered. It prints under the item name.</li>
+  <li>${ui('Add Item')} adds a row and puts the cursor in it. So does pressing <kbd>Enter</kbd> in the last row once it has something in it, or <kbd>Ctrl</kbd> + <kbd>Enter</kbd> anywhere.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> copies the last row as a new row.</li>
+  <li>${ui('Delivery charges')} adds a delivery line: see <a href="#delivery-charges">Delivery charges</a>.</li>
+</ul>
+<ol class="steps">
+  <li><strong>Type the item</strong>Start typing in <b>Item</b> and pick your product from the list.</li>
+  <li><strong>Set the quantity</strong>Click <b>Qty</b> and type the number. Check the unit.</li>
+  <li><strong>Check the rate and GST</strong>They come from the product. Change them for this invoice if needed; the product itself is not changed.</li>
+  <li><strong>Next row</strong>Press <kbd>Enter</kbd> to add the next row, and repeat.</li>
+</ol>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>No product list appears while typing.</b> The product is not saved yet, or its name is spelt differently. Add it on the <a href="products.html#add-product">Products</a> screen, or just type the row by hand.</p>
+<p><b>The GST rate changed by itself.</b> You typed an HSN/SAC code the app knows, and the row was still on 18% or 0%. Pick the right rate from the list.</p>
+<p><b>The green hint shows two or three rates.</b> That item's rate depends on its price, size or packing, so the app does not pick one. Choose the rate that fits your item.</p>
+<p><b>A column such as HSN or Discount is missing.</b> It is turned off under ${ui('Customize')}, in <a href="invoice-options.html#show-items">Items table</a>.</p></div>
+</section>
+
+<section id="delivery-charges">
+<h3>Delivery charges</h3>
+<p>${ui('Delivery charges')} adds one <b>Delivery charges</b> line with SAC 996812. Type the amount in its <b>Rate</b>. The button goes away once the line is there; remove the line with its bin to add it again.</p>
+<ul>
+  <li>Delivery that comes with the goods is a <i>composite supply</i>, taxed like the goods, so the line starts at the highest GST rate among the goods on the invoice (18% if there are none). A note under the buttons says so. Change its GST % if your delivery is a separate service.</li>
+  <li>It counts in the total and in GST returns, and never touches stock.</li>
+  <li>Picking a product in its Item box turns it into an ordinary product line.</li>
 </ul>
 </section>
 
 <section id="tax-inclusive">
-<h2>Prices that already include GST</h2>
-<p>If your rates already include GST, tick <b>Prices include tax</b> at the top of the Line Items card. The printed Subtotal is then the value before tax, so Subtotal + tax = Total. The GST is then worked out backwards from each rate, and the invoice shows the taxable value and the tax separately.</p>
+<h3>Prices that already include GST</h3>
+<p>If your rates already include GST, such as an MRP or a counter price, tick <b>Prices include tax</b> at the top right of the Line Items card. The box only shows when the invoice charges GST.</p>
+<p>The GST is then worked out backwards from each rate: a ₹1,180 item at 18% is ₹1,000 taxable value plus ₹180 GST. The printed Subtotal is the value before tax, so Subtotal + tax = Total, and the client pays exactly the price you typed.</p>
 </section>
 
 <section id="discounts">
 <h2>Discounts</h2>
-<ul>
-  <li><strong>On a line</strong>: in the row's Discount box, as described above. This is the GST-correct way, because the discount comes off before tax.</li>
-  <li><strong>On the whole bill</strong>: <b>Discount on total</b>, under the items, as an amount or a percentage. It is taken off <em>after</em> tax, so it does not reduce the GST.</li>
-</ul>
+<p>There are two kinds, and they do different things to the GST.</p>
+<h3>On a line (before tax)</h3>
+<p>In the row's <b>Discount</b> box, type the amount and choose ₹ or % in the small list beside it. For a ₹ amount, a second list chooses what it comes off:</p>
+<div class="table-wrap"><table>
+  <tr><th>Choice</th><th>Means</th><th>Example: 10 pcs at ₹100, 18% GST, discount 50</th></tr>
+  <tr><td>Net</td><td>₹ off the row's total (quantity × rate). The default.</td><td>₹50 off ₹1,000: taxable ₹950</td></tr>
+  <tr><td>Unit</td><td>₹ off each unit.</td><td>₹50 × 10 = ₹500 off: taxable ₹500</td></tr>
+  <tr><td>W/Tax</td><td>₹ off the total including tax, so the client's total drops by exactly that much.</td><td>₹50 off ₹1,180: taxable about ₹957.63</td></tr>
+</table></div>
+<p>A % discount is a percentage of the row (at most 100%). A discount can never be more than the row itself. This is the GST-correct way to give a discount, because it comes off before tax and lowers the GST too.</p>
+<h3>On the whole bill (after tax)</h3>
+<p>Under the items, <b>Discount on total (whole bill)</b> takes an amount (fixed) or a <b>% of total</b>. It is taken off <em>after</em> tax, as a cash discount: the GST stays the same and the GST returns are not changed. It prints as its own line above the total. Leave it at 0 for none.</p>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>The GST did not go down after a discount.</b> You used the whole-bill discount, which is after tax. Use a line discount instead.</p></div>
 </section>
 
 <section id="gst">
 <h2>How GST is worked out</h2>
-<p>You never choose between CGST, SGST and IGST. The app decides from your state and the place of supply:</p>
-<table>
+<p>You never choose between CGST, SGST and IGST. The app decides from your state and the place of supply (the client's state, unless you set Place of Supply):</p>
+<div class="table-wrap"><table>
   <tr><th>Situation</th><th>Charged as</th></tr>
   <tr><td>Client in your state</td><td>CGST + SGST, half each</td></tr>
   <tr><td>Client in another state</td><td>IGST</td></tr>
   <tr><td>Within a Union Territory without a legislature (Chandigarh, Ladakh, Lakshadweep, Andaman and Nicobar, Dadra and Nagar Haveli and Daman and Diu)</td><td>CGST + UTGST</td></tr>
-  <tr><td>SEZ client, or a client outside India</td><td>IGST</td></tr>
-</table>
-<p>The preview shows <b>Intrastate (CGST + SGST)</b> or <b>Interstate (IGST)</b> next to the place of supply, so you can check it before saving.</p>
+  <tr><td>SEZ client</td><td>IGST</td></tr>
+  <tr><td>Client outside India (an export)</td><td>IGST, unless you set an Indian state as Place of Supply (goods delivered in India for a foreign buyer)</td></tr>
+</table></div>
+<p>If a state is blank, the first two digits of the GSTIN stand in for it. The preview shows <b>Intrastate (CGST + SGST)</b> or <b>Interstate (IGST)</b> next to the place of supply, so you can check it before saving. See also <a href="glossary.html#terms">the glossary</a> for these terms.</p>
 <div class="note warn"><strong>Your own state must be set</strong>
-<p>If your business state is blank in <a href="settings.html#company-details">Settings</a>, the app warns you once and does not guess, because a wrong guess would charge the wrong tax on every invoice.</p></div>
+<p>If your business state is blank in <a href="settings.html#company-details">Settings</a>, the app warns you once (<i>Set your business State in Settings</i>) and does not guess, because a wrong guess would charge the wrong tax on every invoice. See <a href="troubleshooting.html#state-missing">this fix</a>.</p></div>
 </section>
 
 <section id="reverse-charge">
 <h2>Reverse charge</h2>
-<p>When the buyer pays the GST instead of you, under section 9(3) or 9(4), open ${ui('Customize')} and tick <b>Reverse Charge applies</b> under Compliance flags. The invoice then says <i>Reverse Charge: Yes</i> and prints a notice that the recipient pays the GST. Every tax invoice and credit note prints Reverse Charge Yes or No, as the rules require.</p>
+<p>Under reverse charge (RCM), the <em>buyer</em> pays the GST to the government instead of you, under section 9(3) or 9(4). Common cases are goods transport (GTA) services, legal services from an advocate, and supplies from an unregistered person to a registered one. Ask your CA whether it applies.</p>
+<ol class="steps">
+  <li><strong>Open Customize</strong>Click ${ui('Customize')} in the toolbar.</li>
+  <li><strong>Tick reverse charge</strong>Under <b>Compliance flags (India)</b>, tick <b>Reverse Charge applies (Section 9(3)/9(4)) — recipient pays GST</b>.</li>
+  <li><strong>Check the preview</strong>The invoice now says <i>Reverse Charge: Yes</i> and prints a notice that the recipient pays the GST.</li>
+</ol>
+<p>The GST is still shown, so the buyer knows how much to pay, but it is <strong>not added to the total</strong>: the total is the taxable value only, and cess is not collected either. Every tax invoice and credit note prints Reverse Charge Yes or No, as the rules require.</p>
+<div class="note warn"><strong>It is remembered</strong>
+<p>Like every Customize option, the tick carries over to your next new invoice. Untick it when you are done.</p></div>
 </section>
 
 <section id="tds-tcs">
 <h2>TDS and TCS</h2>
-<p>Both are under ${ui('Customize')}, for Indian businesses. Turn on <b>TDS / TCS on invoices</b> in <a href="settings.html#modules">Settings, Modules</a> first; it is off to begin with.</p>
+<p>Both are in the ${ui('Customize')} panel, for Indian businesses. They show unless your <a href="settings.html#business-type">business type</a> hides them; the switch is <b>TDS / TCS</b> in <a href="settings.html#features">Settings, Features</a>. An invoice that already has TDS or TCS keeps its box, so it can still be changed.</p>
 <ul>
-  <li><strong>TCS</strong>, tax you collect: tick it and pick the section: CGST section 52 (1%, e-commerce operators), 206C(1), or a custom rate. TCS is added to the invoice total. Section 206C(1H), TCS on sale of goods, was removed from 1 April 2025, so new invoices cannot choose it; invoices already made with it keep it.</li>
-  <li><strong>TDS</strong>, tax your client deducts: tick it and pick the section, such as 194Q, 194C, 194J, 194I, 194H, 194O or 195. It is for information: the invoice shows <b>Less: TDS</b> and the <b>Net Receivable</b>, and the total does not change.</li>
+  <li><strong>TCS</strong>, tax <em>you collect</em> from the client, is added to the invoice total. See <a href="#tcs">TCS</a>.</li>
+  <li><strong>TDS</strong>, tax <em>your client deducts</em> when paying you, is for information: the total does not change. See <a href="#tds">TDS</a>.</li>
 </ul>
-<p>Both are worked out on the amount including GST.</p>
+<p>Each has a section list and a <b>Rate %</b> box beside it. Picking a section fills in its usual rate; you can type another rate.</p>
+<p>TDS is worked out on the value before GST, as CBDT Circular 23/2017 says when GST is shown separately. TCS under CGST section 52 is worked out on the net taxable value, and TCS under 206C(1) on the amount including GST. Who deducts what, and how to check it reached your PAN: see <a href="gst-basics.html#income-tax-tds">GST basics: TDS and TCS</a>.</p>
 <ul>
   <li><strong>194Q</strong> (and 206C(1H) on invoices before April 2025) only applies above ₹50 lakh a year with that client. The app adds up what you have already billed the client this financial year, and charges only the part above ₹50 lakh.</li>
   <li><strong>Every other section</strong>, such as 194C, 194J or CGST section 52, applies from the first rupee. Tick it only when the rules say it applies to this client.</li>
 </ul>
-<p>Invoices with TDS or TCS are summed in <a href="gst-returns.html#tds-tcs">the TDS / TCS report</a>. Have your CA confirm which sections apply to you.</p>
+<p>Invoices with TDS or TCS are listed in <a href="reports.html#tds-tcs">Reports, TDS &amp; TCS</a>, where you also tick off each TDS certificate, and summed in <a href="gst-returns.html#tds-tcs">the GST Returns TDS / TCS tab</a>. A client deducted TDS you did not put on the invoice? Record it with the payment: see <a href="dashboard.html#payment-tds">TDS when recording a payment</a>. Have your CA confirm which sections and rates apply to you.</p>
+</section>
+
+<section id="tcs">
+<h3>TCS: tax collected at source</h3>
+<p>Tick <b>TCS — Tax Collected at Source</b> (marked <i>Adds to invoice total</i>), then pick the section:</p>
+<div class="table-wrap"><table>
+  <tr><th>Section</th><th>Starting rate</th><th>Worked out on</th></tr>
+  <tr><td>CGST 52 — E-commerce operator</td><td>0.5% (since 10 July 2024; it was 1%. Invoices made earlier keep their rate)</td><td>The taxable value, without GST</td></tr>
+  <tr><td>206C(1) — Tendu leaves / scrap / minerals (varies)</td><td>1% (type the right rate for your goods)</td><td>The amount including GST</td></tr>
+  <tr><td>Custom rate</td><td>Type it</td><td>The amount including GST</td></tr>
+</table></div>
+<p>The TCS prints as its own line and is added to the total. Section 206C(1H), TCS on sale of goods, was removed from 1 April 2025, so new invoices cannot choose it; invoices already made with it keep it, and it shows greyed out in the list.</p>
+</section>
+
+<section id="tds">
+<h3>TDS: tax deducted at source</h3>
+<p>Tick <b>TDS — Tax Deducted at Source</b> (marked <i>Buyer deducts; informational</i>), then pick the section your client deducts under:</p>
+<div class="table-wrap"><table>
+  <tr><th>Section</th><th>Starting rate</th></tr>
+  <tr><td>194Q — Purchase of goods (buyer turnover &gt; ₹10cr)</td><td>0.1%, only above ₹50 lakh a year</td></tr>
+  <tr><td>194C — Contractor / sub-contractor</td><td>1%</td></tr>
+  <tr><td>194C — Contractor (company)</td><td>2%</td></tr>
+  <tr><td>194J — Professional / technical services</td><td>10%</td></tr>
+  <tr><td>194J — Technical services (lower rate)</td><td>2%</td></tr>
+  <tr><td>194I — Rent (land / building)</td><td>10%</td></tr>
+  <tr><td>194I — Rent (plant / machinery)</td><td>2%</td></tr>
+  <tr><td>194H — Commission / brokerage</td><td>5%</td></tr>
+  <tr><td>194O — E-commerce participant</td><td>1%</td></tr>
+  <tr><td>195 — Payments to non-residents (varies)</td><td>Type it</td></tr>
+  <tr><td>Custom section / rate</td><td>Type it</td></tr>
+</table></div>
+<p>TDS is worked out on the value <em>without</em> GST, as the CBDT circulars require when the invoice shows GST separately. The invoice shows <b>Less: TDS</b> and the <b>Net Receivable</b>, the amount you should actually receive. The invoice counts as paid once payments cover the total less the TDS.</p>
 </section>
 
 <section id="currency">
 <h2>Billing in another currency</h2>
-<p>Under ${ui('Customize')}, <b>Currency</b> offers 20 currencies, each with its own symbol and amount in words. For anything other than rupees you can enter the <b>exchange rate</b> for the day. It is kept with the invoice, so later reports stay right even when rates change, and it prints as an EXCHANGE RATE line.</p>
-<p>The UPI QR code only prints on rupee invoices.</p>
-</section>
-
-<section id="terms-notes">
-<h2>Terms, notes and a private note</h2>
+<p>If you bill clients abroad, you can make the invoice in their currency: US dollars, euros, pounds, dirhams and the other currencies of the countries the app supports.</p>
+<h3>Where the currency box is</h3>
+<p>A <b>Currency</b> box (for example <b>$ USD</b>) sits in the <a href="#details">Invoice Details</a> card, next to the dates, when any of these is true:</p>
 <ul>
-  <li><strong>Terms &amp; Conditions</strong>: a text box with <b>B</b>, <i>I</i>, <u>U</u>, bulleted and numbered lists, headings, links and ${ui('✕')} to clear formatting.
-    <ul>
-      <li><b>Insert preset</b> fills in starter wording for your kind of business: generic trader, freelancer, manufacturer or wholesaler, retail shop, restaurant, IT services, construction, medical, education and coaching, transport, real estate and rental, e-commerce seller, or export under LUT. If you already have terms, you are asked once before they are replaced.</li>
-      <li><b>Load saved template</b> uses one of <a href="settings.html#terms">your saved templates</a>. On a new invoice, your first template is loaded automatically.</li>
-    </ul>
-  </li>
-  <li><strong>PDF layout</strong>: <b>Compact</b> prints the terms and notes small, to save paper; <b>Formatted</b> prints them as readable paragraphs.</li>
-  <li><strong>Notes / Remarks</strong> print on the invoice, for the client.</li>
-  <li><strong>Private Note</strong> is only for you, such as "follow up on the 20th". It never prints. On the Dashboard, a yellow note icon next to the client shows it.</li>
+  <li><a href="settings.html#region">Settings, Region</a> is <b>International</b> or <b>Both / Auto</b>.</li>
+  <li>The client's country is not India.</li>
+  <li>The invoice is already in a currency other than rupees.</li>
+</ul>
+<p>If your Region is <b>India only</b> and you bill an Indian client in rupees, the box stays out of the way. It is always in ${ui('Customize')} at the top of the panel.</p>
+<p>Changing the currency changes every money symbol on the screen and in the preview at once. The Rate box of each line shows the symbol too, such as <b>Rate ($)</b>.</p>
+<h3>Which currency a new invoice starts in</h3>
+<ul>
+  <li>A client you saved with a <b>Preferred currency</b> gets that currency.</li>
+  <li>A client abroad without one gets their country's currency (a UK client gets pounds). For the country <b>Other</b>, the last foreign currency you used is picked.</li>
+  <li>An Indian client gets rupees. Before, the app kept whatever the last invoice used, so after a dollar invoice the next Indian client was billed in dollars too.</li>
+  <li>When you save, the currency is remembered on the client, so the next invoice for them starts the same way.</li>
+</ul>
+<h3>The exchange rate</h3>
+<p>For any currency other than rupees, a second box asks <b>1 USD = ? INR</b>. Type how many rupees one unit was worth on the invoice date, such as 84.10. Use your bank's rate for that day or the RBI reference rate. The app does not fetch rates from the internet.</p>
+<figure><img src="assets/img/invoice-currency.png" alt="The Currency box set to $ USD, the rate box 1 USD = ? INR filled in with 84.2, and the total in rupees shown below." loading="lazy" style="max-width:min(480px,100%)"><figcaption>A US dollar invoice: the currency, the rate for the invoice date, and the total in rupees under them.</figcaption></figure>
+<ul>
+  <li>Under the boxes the app shows the invoice total in rupees, for example <b>≈ ₹84,100.00 in all</b>.</li>
+  <li>The rate is saved with the invoice. GST returns, reports, the Dashboard and income tax turn the invoice into rupees with this rate, never with today's, so a return you filed last month gives the same figures today.</li>
+  <li>The rate you last typed for a currency shows in grey in the box as a reminder. It is not filled in for you, because rates change every day.</li>
+  <li>If you leave the rate empty, a warning says so. The GST returns screen then lists the invoice as an error and will not make the GSTR-1 file until you add the rate.</li>
+</ul>
+<h3>What prints on the invoice</h3>
+<ul>
+  <li>An <b>EXCHANGE RATE</b> line, such as <i>1 USD = 84.1000 INR</i>. Turn on <a href="print-settings.html#dual-currency">Print Settings, Dual currency display</a> to add the rupee total to that line: <i>1 USD = 84.1000 INR · Total ₹84,100.00</i>.</li>
+  <li>The UPI QR code is left off: UPI only takes rupees. If your payment account has an <a href="settings.html#paid-from-abroad">online payment link</a> (PayPal, Wise, Payoneer), it prints instead as <b>PAY ONLINE</b>.</li>
+  <li>The currency decides the money symbol, not the tax. A client outside India is an export whatever currency you bill in; see <a href="gst-basics.html#exports">Exports</a> and <a href="gst-basics.html#lut">LUT</a>.</li>
 </ul>
 </section>
 
+<section id="terms-notes">
+<h2>Terms &amp; Conditions, notes and a private note</h2>
+<p>The fourth card holds three boxes: the <b>Terms</b> that print at the foot of the invoice, <b>Notes / Remarks</b> for the client, and a <b>Private Note</b> only you see.</p>
+<h3>Terms</h3>
+<p>A text box with a small toolbar: <b>B</b>, <i>I</i>, <u>U</u>, ${ui('• List')}, ${ui('1. List')}, ${ui('H')} for a heading, ${ui('¶')} for a normal paragraph, ${ui('🔗')} to turn the selected words into a link, and ${ui('✕')} to clear formatting. You can paste from Word or Google Docs.</p>
+<ul>
+  <li><b>Insert preset (by business type)</b> fills in India-specific starter wording: Generic SME / Trader, Freelancer / Consultant, Manufacturer / Wholesale, Retail Shop, Restaurant / Café, IT / Software Services, Construction / Contractor, Medical / Healthcare, Educational Services / Coaching, Transport / Logistics, Real Estate / Rental Invoice, E-commerce Seller, or Export / International (LUT). <b>— Start from blank —</b> empties the box. If you already have terms, you are asked once (<i>Replace current Terms?</i>); later swaps in the same browser session happen without asking. Edit the wording freely afterwards.</li>
+  <li><b>Load saved template</b> uses one of <a href="settings.html#terms">your saved templates</a>. It only shows when you have saved one. On a brand-new invoice, your first template is loaded for you. Once you edit the text the list shows <b>— Custom —</b>.</li>
+</ul>
+<h3>Notes / Remarks (optional)</h3>
+<p>Prints on the invoice under the terms, for the client: project details, special instructions, a thank-you. It has the same toolbar as Terms.</p>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>Terms or notes do not print.</b> Check <b>Terms &amp; Conditions</b> and <b>Notes / Remarks</b> are ticked under ${ui('Customize')}, in <a href="invoice-options.html#show-footer">Footer</a>. Thermal receipts never print terms.</p>
+<p><b>A saved invoice got my new terms.</b> It does not: the first template only fills a brand-new blank invoice. A saved invoice keeps its own terms.</p></div>
+</section>
+
+<section id="terms-layout">
+<h3>PDF layout: Compact or Formatted</h3>
+<p>On the right of the Terms &amp; Conditions title, <b>PDF layout</b> chooses how the terms and notes print:</p>
+<div class="table-wrap"><table>
+  <tr><th>Choice</th><th>Prints</th><th>Good for</th></tr>
+  <tr><td>Compact</td><td>Small footer text, to save paper</td><td>Standard boilerplate terms on goods invoices</td></tr>
+  <tr><td>Formatted</td><td>Larger, readable paragraphs with lists kept</td><td>Long service terms, scope and payment schedules</td></tr>
+</table></div>
+<p>Until you choose, the layout follows <a href="print-settings.html#terms-page">Print Settings</a>, and a <b>Services</b> invoice starts as Formatted.</p>
+</section>
+
+<section id="private-note">
+<h3>Private Note (not shown on invoice)</h3>
+<p>The yellow box at the bottom of the card is only for you, such as <i>Client asked for 15-day credit, follow up on 20th, referred by Ravi</i>. It is saved with the invoice but never prints or goes to the client. On the Dashboard, a yellow note icon next to the client shows it.</p>
+</section>
+
 <section id="extra-pages">
-<h2>Extra pages</h2>
-<p>Under <b>Additional Pages / Sections</b>, ${ui('+ Add Section')} adds a titled section, such as a scope of work or delivery timeline. Each one prints as its own page after the invoice. You can paste formatted text, lists and tables from Word or Google Docs, and use the arrows to change the order.</p>
+<h2>Additional Pages / Sections</h2>
+<p>Extra pages printed <em>after</em> the invoice, such as a scope of work, a delivery timeline, a warranty card or a price breakup. Each section prints as its own page in the PDF.</p>
+<ol class="steps">
+  <li><strong>Add a section</strong>Click ${ui('Add Section')} at the top right of the card.</li>
+  <li><strong>Give it a title</strong>For example <i>Scope of Work</i> or <i>Delivery Timeline</i>. It prints as the page heading.</li>
+  <li><strong>Write or paste the content</strong>Type, or paste formatted text, lists and tables from Word or Google Docs; the formatting is kept.</li>
+  <li><strong>Order them</strong>The up and down arrows move a section. The red bin removes it.</li>
+</ol>
+<div class="note warn"><strong>Removing a section is immediate</strong>
+<p>The bin does not ask first and there is no undo. Copy the text somewhere before you remove a section you may need again.</p></div>
+<p>Extra pages do not print on thermal receipts. Each section is fitted onto one page, so very long content comes out squeezed: split a long annexure into two or more sections.</p>
 </section>
 
 <section id="preview">
 <h2>The live preview</h2>
-<p>The preview shows the invoice exactly as it will print, with the paper size, style and options you chose. ${ui('−')} and ${ui('+')} zoom out and in from 50% to 200%, and ${ui('Fit')} fits it to the space. A saved invoice that has been cancelled shows CANCELLED across it.</p>
+<p>The <b>Live preview</b> on the right shows the invoice exactly as it will print, with the paper size, style and options you chose, and updates as you type. ${ui('−')} and ${ui('+')} zoom out and in from 50% to 200%, and ${ui('Fit')} fits it to the width of the space. The zoom is remembered.</p>
+<ul>
+  <li>A cancelled invoice shows CANCELLED across it; a proforma shows a faint ESTIMATE.</li>
+  <li>On a thermal paper size the preview is a narrow receipt.</li>
+  <li>${ui('Full view')} opens the whole page in the <a href="dashboard.html#print-preview">print preview</a> window, with ${ui('Print')} and ${ui('Download PDF')}.</li>
+  <li>To give the form more room, click ${ui('Hide Preview')} in the toolbar.</li>
+</ul>
+<p>If something prints differently from the preview, see <a href="troubleshooting.html#missing-on-pdf">Something is missing from the PDF</a>.</p>
 </section>
 
 <section id="before-saving">
 <h2>What must be filled in</h2>
-<p>A new invoice needs a <b>client name</b> and <b>at least one item</b> with a description, quantity and rate. Otherwise ${ui('Save')}, ${ui('Save &amp; Download')} and ${ui('Print')} tell you what is missing.</p>
+<p>A new invoice needs a <b>client name</b> and <b>at least one item</b> with a name, a quantity and a rate. Otherwise ${ui('Save')}, ${ui('Save &amp; Download')} and ${ui('Print')} stop with <i>Add a client name before saving.</i> or <i>Add at least one item with a quantity and rate before saving.</i> Click the amber <b>Draft — click to complete</b> badge in the toolbar to jump to what is missing.</p>
+<p>This is so a blank invoice never takes an invoice number: GST expects numbers without gaps.</p>
 </section>
 
 <section id="save-download">
 <h2>Save &amp; Download</h2>
-<p>${ui('Save &amp; Download')} does all of this in one go:</p>
+<p>${ui('Save &amp; Download')} (or <kbd>Ctrl</kbd> + <kbd>P</kbd>) does all of this in one go:</p>
 <ol>
   <li>Saves the invoice, giving a new invoice its number, and counts it as printed once more.</li>
   <li>Downloads the PDF, showing that saved number, named after the type and number, such as <code>INV_INV-2026-27-0001.pdf</code>.</li>
-  <li>Keeps a copy of the PDF in the app's <code>Saved Invoices</code> folder, in a folder for that client.</li>
+  <li>Keeps a copy of the PDF in the app's <code>Saved Invoices</code> folder, in a folder for that client and month.</li>
   <li>Uploads it to Google Drive, if you have connected Drive in <a href="settings.html#google-drive">Settings</a>.</li>
   <li>Prints it, if auto-print is on in <a href="print-settings.html#auto-print">Print Settings</a> or for this client.</li>
 </ol>
-<p>Saving takes the items out of stock, for rows picked from your products; saving again after changing a quantity moves only the difference, and a quotation or proforma moves none (see <a href="products.html#stock">How stock is counted</a>). If stock runs low or out, you are told.</p>
+<p>Saving takes the items out of stock, for rows picked from your products; saving again after changing a quantity moves only the difference, a credit note puts stock back, and a quotation or proforma moves none (see <a href="products.html#stock">How stock is counted</a>). If stock runs low (5 or fewer) or out, you are told.</p>
 <p>If you change an invoice you have already downloaded or printed, a plain ${ui('Save')} also updates its PDF in the <code>Saved Invoices</code> folder, without downloading it again.</p>
 <p>Long invoices are split between rows, never through a row, and the signature and stamp are never cut across a page break: if they would be, the whole footer moves to the next page.</p>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>"Failed to generate PDF."</b> See <a href="troubleshooting.html#print-blocked">Print does nothing, or "Print failed"</a>. <b>"Its PDF in Saved Invoices could not be updated"</b>: close that PDF if it is open, see <a href="troubleshooting.html#pdf-file-in-use">this fix</a>.</p></div>
 </section>
 
 <section id="print">
 <h2>Printing</h2>
 <ul>
-  <li><strong>On A4, A5 and other sheet sizes</strong>, ${ui('Print')} opens your browser's print window.</li>
-  <li><strong>On a thermal paper size</strong>, it first shows a <b>Print preview</b> of the receipt, with ${ui('Print')}, ${ui('Download PDF')} and ${ui('Cancel')}. See <a href="thermal-printing.html">Thermal receipt printing</a>.</li>
+  <li><strong>On A4, A5 and other sheet sizes</strong>, ${ui('Print')} saves the invoice, makes a sharp print copy and opens your browser's print window, which has its own page preview.</li>
+  <li><strong>On a thermal paper size</strong>, it first shows a <b>Print preview</b> of the receipt, with ${ui('Print')}, ${ui('Download PDF')} and ${ui('Cancel')}. See <a href="thermal-printing.html#print-preview">Thermal receipt printing</a>.</li>
 </ul>
 <p>Printing saves the invoice first, like ${ui('Save &amp; Download')}, so what you hand the client is always in your records with the same number.</p>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>Nothing happens, or "Print failed — try Download PDF instead".</b> Allow pop-ups for the app, or download the PDF and print that. See <a href="troubleshooting.html#print-blocked">Print does nothing</a>.</p></div>
 </section>
 
 <section id="whatsapp">
 <h2>Sending on WhatsApp</h2>
-<p>${ui('WhatsApp')} opens WhatsApp with the invoice number, date, client, subtotal and total typed in, and your business name. If the client is saved with a phone number, the chat opens with them; otherwise you choose the contact.</p>
+<p>${ui('WhatsApp')} opens WhatsApp with this message typed in: the invoice number, date, client, subtotal and total, and your business name. If the client is saved with a phone number, the chat opens with them; otherwise you choose the contact. It does not save the invoice.</p>
 <p>From the invoice screen the PDF is not attached. Download it with ${ui('Save &amp; Download')} and drag it into the chat. The WhatsApp button on the <a href="dashboard.html#row-actions">Dashboard</a> can attach the PDF on phones.</p>
 </section>
 
 <section id="eway-bill">
 <h2>E-way bill</h2>
-<p>For tax invoices and delivery challans, ${ui('E-Way Bill')} downloads a file, such as <code>EWB-INV-2026-27-0001.json</code>, in the format the NIC e-way bill portal accepts. Upload it there instead of typing everything again. Your own GSTIN must be set in Settings first. An e-way bill is generally needed when goods worth more than ₹50,000 are moved.</p>
+<p>An e-way bill is generally needed when goods worth more than ₹50,000 are moved. For tax invoices and delivery challans, ${ui('E-Way Bill')} downloads a file, such as <code>EWB-INV-2026-27-0001.json</code>, in the format the NIC e-way bill portal accepts. Upload it there with its JSON upload option instead of typing everything again. The app makes the file; the e-way bill number itself comes from the portal (see <a href="limitations.html#eway-generation">what the app does not do</a>).</p>
+<ol class="steps">
+  <li><strong>Turn it on</strong>The button shows only while <b>E-way bill</b> is on in <a href="settings.html#features">Settings, Features</a>.</li>
+  <li><strong>Save the invoice first</strong>The file uses the number on screen, so save first to be sure it is the final number.</li>
+  <li><strong>Click E-Way Bill</strong>The file downloads, and a message says <i>E-Way Bill JSON downloaded</i>.</li>
+  <li><strong>Upload it on the portal</strong>Add the vehicle and transporter details there if the portal asks.</li>
+</ol>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>"Set your GSTIN in Settings first"</b>: your own GSTIN is missing in <a href="settings.html#company-details">Settings</a>. <b>"Add at least one item with a quantity and rate first."</b>: the invoice has no real item yet.</p>
+<p><b>"Your business PIN code is missing"</b> or <b>"The client's PIN code is missing"</b>: the file needs both 6-digit PIN codes. Yours is in <a href="settings.html#company-details">Settings, Company Details</a>; the client's is <b>PIN Code</b> under Billed To on the invoice (or on the client in Clients). Fill it in and click again. The file uses the client's billing address, not the Ship to address, so check the delivery details on the portal.</p></div>
 </section>
 
 <section id="autosave">
 <h2>Saving as you go</h2>
 <ul>
   <li>What you type is kept while the browser tab stays open. If you leave the screen by mistake and come back, the invoice is still there.</li>
-  <li>A <strong>new</strong> invoice is not stored in your records until you first click ${ui('Save')}, ${ui('Save &amp; Download')} or ${ui('Print')}. Until then the badge says <b>Not saved yet</b>.</li>
+  <li>A <strong>new</strong> invoice (or a duplicate or conversion) is not stored in your records until you first click ${ui('Save')}, ${ui('Save &amp; Download')} or ${ui('Print')}. It takes its number only then.</li>
   <li>After that, changes are saved automatically about two seconds after you stop typing.</li>
 </ul>
+<p>The badge beside ${ui('Back')} tells you where you are:</p>
+<div class="table-wrap"><table>
+  <tr><th>Badge</th><th>Means</th></tr>
+  <tr><td><b>Draft — click to complete</b> (amber)</td><td>A new invoice still missing a client name or an item. Click it to jump to the first missing box.</td></tr>
+  <tr><td><b>Not saved yet</b></td><td>Ready to save, but not saved even once. Click ${ui('Save')}.</td></tr>
+  <tr><td><b>Saving…</b> (blue)</td><td>An automatic save is running.</td></tr>
+  <tr><td><b>All changes saved</b> (green)</td><td>The last change is stored. Shows for a moment after each save.</td></tr>
+  <tr><td><b>Ready</b></td><td>Saved; nothing waiting.</td></tr>
+</table></div>
 </section>
 
 <section id="leaving">
 <h2>Leaving with unsaved changes</h2>
-<p>If you click Back with unsaved changes, you choose ${ui('Keep editing')}, ${ui('Discard &amp; leave')} or ${ui('Save &amp; leave')}. Closing or reloading the browser tab asks too.</p>
+<p>If you click ${ui('Back')} after changing an invoice that has a client and an item, an <b>Unsaved changes</b> window asks what to do:</p>
+<div class="table-wrap"><table>
+  <tr><th>Button</th><th>What it does</th></tr>
+  <tr><td>${ui('Keep editing')}</td><td>Closes the window and stays on the invoice. <kbd>Esc</kbd> does the same.</td></tr>
+  <tr><td>${ui('Discard &amp; leave')}</td><td>Leaves without saving. A new invoice that was never saved is gone, and its number is not used. On a saved invoice, only the changes since the last automatic save are lost.</td></tr>
+  <tr><td>${ui('Save &amp; leave')}</td><td>Saves, then goes back. A new invoice takes its number now. If the save fails, you stay on the page so you can try again.</td></tr>
+</table></div>
+<p>Closing or reloading the browser tab asks too, with the browser's own message. Opening an invoice and leaving without changing anything does not ask.</p>
 </section>
 
 <section id="keyboard">
 <h2>Keyboard shortcuts on this screen</h2>
 <table>
-  <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td>Save</td></tr>
+  <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td>Save (once the invoice has a client and an item; before that the browser's own save window may open, just close it)</td></tr>
   <tr><td><kbd>Ctrl</kbd> + <kbd>P</kbd></td><td>Save and download the PDF (not print)</td></tr>
   <tr><td><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td><td>Add an item row</td></tr>
   <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd></td><td>Duplicate the last row</td></tr>
@@ -295,13 +572,24 @@ export default [
 <p>On a Mac, use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>. More shortcuts: <a href="shortcuts.html">Shortcuts, search and notifications</a>.</p>
 </section>
 
+<section id="read-only">
+<h2>When an invoice cannot be changed</h2>
+<p>Two kinds of document open read-only, with a blue note at the top:</p>
+<ul>
+  <li><strong>A cancelled invoice</strong>: <i>This invoice is cancelled and read-only</i>. Undo the cancel on the <a href="dashboard.html#cancel">Dashboard</a> to change it.</li>
+  <li><strong>A quotation, proforma or challan already converted</strong>: <i>Converted to INV/…. This copy is read-only</i>.</li>
+</ul>
+<p>You can still download or print them. Nothing is saved automatically, and ${ui('Save')} explains why. To make a new document from one, use ${ui('Duplicate')} on the Dashboard.</p>
+<p>An invoice with an <b>IRN</b> (e-invoice) shows an amber note instead: changes made here are not sent to the e-invoice portal. To correct an e-invoice, cancel it on the portal within 24 hours and issue a new one, or issue a <a href="#credit-note">credit note</a>. See <a href="gst-returns.html#e-invoice">E-invoicing</a>.</p>
+</section>
+
 <section id="credit-note">
 <h2>How to make a credit note</h2>
 <ol class="steps">
   <li><strong>Start a new invoice</strong>Choose <b>Credit Note</b> as the type.</li>
   <li><strong>Point it at the original</strong>In <b>Original Invoice Reference</b>, enter the number of the invoice it corrects.</li>
   <li><strong>Enter what is being credited</strong>Add the returned items, or the price difference, with the same GST rates as the original.</li>
-  <li><strong>Save</strong>Its total is subtracted from your sales on the Dashboard, and it goes into GSTR-1 as a credit note.</li>
+  <li><strong>Save</strong>Its total is subtracted from your sales on the Dashboard, returned goods go back into stock, and it goes into GSTR-1 as a credit note.</li>
 </ol>
 </section>
 
@@ -335,35 +623,55 @@ export default [
 
 <section id="title-currency">
 <h2>Title, currency and exchange rate</h2>
-<table>
-  <tr><td>Invoice Title</td><td>Replaces the printed title, such as TAX INVOICE. Leave it blank to use the type's own title. Thermal receipts ignore it.</td></tr>
-  <tr><td>Currency</td><td>Rupees to start. See <a href="invoices.html#currency">Billing in another currency</a>.</td></tr>
-  <tr><td>Exchange Rate</td><td>Only for currencies other than rupees. Kept with the invoice.</td></tr>
-</table>
+<p>The first three boxes at the top of the Customize panel.</p>
+<div class="table-wrap"><table>
+  <tr><th>Box</th><th>What it does</th></tr>
+  <tr><td>Invoice Title</td><td>Replaces the printed title, such as TAX INVOICE. The box shows the type's own title in grey; leave it blank to use that. Useful for wording such as <i>INVOICE CUM CHALLAN</i>. Thermal receipts ignore it.</td></tr>
+  <tr><td>Currency</td><td>The same box as in Invoice Details. See <a href="invoices.html#currency">Billing in another currency</a>.</td></tr>
+  <tr><td>1 USD = ? INR</td><td>Only for currencies other than rupees: how many rupees one unit was worth on the invoice date, such as 84.10. Kept with the invoice; returns and reports use it.</td></tr>
+</table></div>
+<p>A custom title is remembered for your next invoice too (see <a href="#remembered">Your choices become the default</a>). Clear the box when you go back to normal invoices.</p>
 </section>
 
 <section id="recurring">
 <h2>Make this a recurring invoice</h2>
-<p>Tick <b>🔁 Make this a recurring invoice</b> to have the app create this invoice again on a schedule, with the same client, items and amounts, a new number and that day's date.</p>
-<table>
+<p>Tick <b>🔁 Make this a recurring invoice</b> to have the app create this invoice again on a schedule, with the same client, items and amounts, a fresh number and that day's date. Good for rent, retainers, AMCs and subscriptions.</p>
+<div class="table-wrap"><table>
+  <tr><th>Box</th><th>What to enter</th></tr>
   <tr><td>Frequency</td><td>Weekly, Monthly (the default), Quarterly or Yearly</td></tr>
-  <tr><td>Every N</td><td>1 to 12. Monthly with 3 means every three months.</td></tr>
-  <tr><td>Next invoice date</td><td>One month after this invoice, to start</td></tr>
-  <tr><td>End condition</td><td><b>Never (until I stop it)</b>, <b>On a specific date</b>, or <b>After N invoices</b>, for example 12 for a one-year monthly contract</td></tr>
-</table>
-<p>The schedule is saved when you save the invoice, and can be paused or changed from <a href="recurring.html">Recurring</a>.</p>
+  <tr><td>Every N (interval)</td><td>1 to 12. Monthly with 3 means every three months.</td></tr>
+  <tr><td>Next invoice date</td><td>When the first copy is made. Starts one month after this invoice's date (31 January becomes 28 February, not 3 March).</td></tr>
+  <tr><td>End condition</td><td><b>Never (until I stop it)</b>; <b>On a specific date</b>, which adds a <b>Stop generating after this date</b> box; or <b>After N invoices</b>, which adds a box for how many, for example 12 for a one-year monthly contract</td></tr>
+</table></div>
+<ol class="steps">
+  <li><strong>Make the first invoice as usual</strong>Client, items, terms.</li>
+  <li><strong>Tick the box and set the schedule</strong>In ${ui('Customize')}, tick <b>🔁 Make this a recurring invoice</b> and fill in the boxes.</li>
+  <li><strong>Save the invoice</strong>The schedule is saved with it. Saving the invoice again later keeps the schedule running where it is, unless you change the Next invoice date.</li>
+</ol>
+<p>New copies are made whenever you open the app on or after the due date (or once a day if it stays running). If this invoice has a due date, each copy gets one the same number of days after its own date. Pause, change or stop the schedule from <a href="recurring.html">Recurring</a> in the sidebar.</p>
 </section>
 
 <section id="tds-tcs-account">
 <h2>TCS, TDS and the payment account</h2>
 <ul>
-  <li><b>TCS</b> and <b>TDS</b>: see <a href="invoices.html#tds-tcs">TDS and TCS</a>.</li>
-  <li><b>Payment account on this invoice</b>: if you have more than one bank account, choose which one prints. New invoices start with your ⭐ default account. The bank details and UPI QR are copied onto the invoice when you save it, so changing the account in Settings later never changes an invoice you have already sent.</li>
+  <li><b>TCS — Tax Collected at Source</b> and <b>TDS — Tax Deducted at Source</b>: see <a href="invoices.html#tcs">TCS</a> and <a href="invoices.html#tds">TDS</a>.</li>
+  <li><b>Payment account on this invoice</b>: which bank account and UPI ID print. See <a href="#payment-account">below</a>.</li>
+</ul>
+</section>
+
+<section id="payment-account">
+<h3>Payment account on this invoice</h3>
+<p>If you have saved bank accounts in <a href="settings.html#payment-accounts">Settings, Bank accounts and UPI</a>, this list chooses which one prints in the bank block and the UPI QR. Each is shown by its label and bank, with ⭐ before your default. With no accounts saved, the list is not shown.</p>
+<ul>
+  <li>New invoices start with your ⭐ default account (or, with no default, the one you used last).</li>
+  <li>The preview changes as soon as you pick another account.</li>
+  <li>The bank details and UPI ID are copied onto the invoice when you save it, so editing or removing the account in Settings later never changes an invoice you have already sent.</li>
 </ul>
 </section>
 
 <section id="style">
 <h2>PDF style and accent colour</h2>
+<p><b>PDF Style</b> picks the design. Hover over a chip for a one-line description. The preview changes straight away.</p>
 <table>
   <tr><th>Style</th><th>Look</th></tr>
   <tr><td>Classic</td><td>Clean, with a coloured bar across the top. The default.</td></tr>
@@ -377,33 +685,104 @@ export default [
   <img src="assets/img/design-boxed.png" alt="A quotation in the Boxed grid design" loading="lazy">
   <figcaption>Tally style (left) and Boxed grid (right), with a made-up business.</figcaption>
 </figure>
-<p><b>Accent Color</b>: <b>Auto</b> gives each type its own colour, such as blue for tax invoices, purple for proformas, teal for bills of supply and red for credit notes. You can also choose one of eight fixed colours: blue, purple, teal, red, orange, green, sky or dark.</p>
+<p>Boxed grid and Tally style pad the item table to fill the page. If that padding alone would push the invoice onto a second page, the PDF trims it so the terms, bank details and signature stay on page 1. The boxes for <a href="invoices.html#order-details">order, dispatch and reference details</a> are filled from Invoice Details.</p>
+</section>
+
+<section id="accent-colour">
+<h3>Accent Color</h3>
+<p>The row of round swatches sets the colour of headings, bars and lines on the invoice.</p>
+<ul>
+  <li><b>Auto</b>, the multicoloured swatch, gives each type its own colour, such as blue for tax invoices, purple for proformas, teal for bills of supply and red for credit notes, so you can tell them apart at a glance. The default.</li>
+  <li>The other eight are fixed colours: blue, purple, teal, red, orange, green, sky and dark. Hover over one to see its name. Pick one to use it on every type, for example to match your logo.</li>
+</ul>
+<p>The chosen swatch has a white ring inside it. The colour is remembered for your next invoice. For black-and-white printers, <b>dark</b> prints most clearly.</p>
 </section>
 
 <section id="show-hide">
 <h2>Showing and hiding parts of the invoice</h2>
-<p>Each tick box shows or hides one part of the printed invoice. Hiding something never deletes it.</p>
+<p>Below the style, the panel lists tick boxes in groups. Each one shows or hides one part of the printed invoice. Hiding something never deletes it: tick it again and it comes back. Each group title has its own ${ui('?')} that opens the part below about it.</p>
 <div class="table-wrap"><table>
   <tr><th>Group</th><th>Options</th><th>Off to start</th></tr>
-  <tr><td>Header &amp; branding</td><td>Logo, business name, address, phone, email, state, Tax ID (GSTIN)</td><td></td></tr>
-  <tr><td>Client / Bill-to</td><td>Client address, phone, email, Place of Supply</td><td></td></tr>
-  <tr><td>Invoice meta</td><td>Invoice number, invoice date, due date</td><td></td></tr>
-  <tr><td>Items table</td><td>HSN/SAC column, Qty column, unit next to the quantity, Rate column, Discount column, Tax % column, GST Cess % column</td><td>GST Cess</td></tr>
-  <tr><td>Totals</td><td>Subtotal row, amount in words, round-off line, HSN/SAC tax summary table, tax amount in words</td><td>The HSN summary and tax in words are on only in Tally style. Round-off follows <a href="print-settings.html#round-off">Print &amp; PDF</a> (on for new installs).</td></tr>
-  <tr><td>Compliance flags</td><td>Reverse Charge applies</td><td>Reverse Charge</td></tr>
-  <tr><td>Footer</td><td>Bank details, "Pay via" account label, UPI QR, signature block, "Authorized Signatory" caption, Terms &amp; Conditions, Notes, system-generated note, Declaration, "Customer's Seal and Signature" box</td><td>"Pay via" label, system-generated note. Declaration and the seal box are on only in Tally style.</td></tr>
+  <tr><td><a href="#show-header">Header &amp; branding</a></td><td>Logo, Business name, Business address, Business phone, Business email, Business state, Tax ID (GSTIN/VAT/etc.)</td><td></td></tr>
+  <tr><td><a href="#show-client">Client / Bill-to</a></td><td>Client address, Client phone, Client email, Place of Supply</td><td></td></tr>
+  <tr><td><a href="#show-meta">Invoice meta</a></td><td>Invoice number, Invoice date, Due date</td><td></td></tr>
+  <tr><td><a href="#show-items">Items table</a></td><td>HSN/SAC column, Qty column, Unit suffix (next to Qty), Rate column, Discount column, Tax % column (GST/VAT/etc.), GST Cess % column</td><td>GST Cess</td></tr>
+  <tr><td><a href="#show-totals">Totals</a></td><td>Subtotal row, Amount in words, Round-off line, HSN/SAC tax summary table, Tax amount in words</td><td>The HSN summary and tax in words are on only in Tally style. Round-off follows <a href="print-settings.html#round-off">Print &amp; PDF</a> (on for new installs).</td></tr>
+  <tr><td><a href="invoices.html#reverse-charge">Compliance flags (India)</a></td><td>Reverse Charge applies (Section 9(3)/9(4)) — recipient pays GST</td><td>Reverse Charge</td></tr>
+  <tr><td><a href="#show-footer">Footer</a></td><td>Bank details, "Pay via" account label, UPI QR (rupee invoices), Signature block, "Authorized Signatory" caption, Terms &amp; Conditions, Notes / Remarks, system-generated note, Declaration, "Customer's Seal and Signature" box</td><td>"Pay via" label, system-generated note. Declaration and the seal box are on only in Tally style.</td></tr>
 </table></div>
-<p>A few options do more than show or hide:</p>
+<p>Between Compliance flags and Footer sits the <a href="#paper-size">Paper / print size</a> list.</p>
+<h3>Hide all and Reset to default</h3>
 <ul>
-  <li><strong>Tax % column</strong> off means no GST is charged at all, and the tax rows disappear from the totals. Bill of Supply and Delivery Challan turn it off for you.</li>
-  <li><strong>Round-off line</strong> rounds the grand total to the nearest rupee, and shows the difference. The default for new invoices is set in <a href="print-settings.html#round-off">Print &amp; PDF</a>.</li>
-  <li><strong>Business state</strong> also hides the client's state, and <strong>Tax ID</strong> also hides the client's GSTIN.</li>
-  <li><strong>Bank details</strong> also hides your PAN, which prints in the bank block.</li>
-  <li><strong>GST Cess % column</strong> adds a Cess box to each row of the form. The printed invoice shows cess as one line in the totals.</li>
-  <li>Hiding HSN, Discount, Place of Supply, state or Tax ID also hides the matching box in the form.</li>
+  <li>${ui('Hide all')} turns off, in one click, everything in Header &amp; branding, Client / Bill-to and Invoice meta; in Items table everything but GST Cess; in Totals the subtotal, amount in words and round-off; and in Footer the bank details, "Pay via" label, UPI QR, signature, caption, terms and notes. Then tick back only what you want. It leaves the HSN summary, tax in words, reverse charge, system-generated note, declaration and seal box as they were.</li>
+  <li>${ui('Reset to default')} puts <em>every</em> option back as it was on a fresh install, including the title, currency, style, colour, paper size, Goods/Services choice, whole-bill discount, recurring, TDS, TCS and reverse charge. The payment account you picked for this invoice stays.</li>
 </ul>
-<p>When <b>Declaration</b> is on, a box appears to change its wording. It starts as the standard "We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct."</p>
-<p>${ui('Hide all')} turns off everything in the header, client, invoice, items, totals and footer groups at once. ${ui('Reset to default')} puts <em>every</em> option back as it was on a fresh install, including currency, paper size, recurring, TDS, TCS and reverse charge.</p>
+<div class="note warn"><strong>Hide all also stops GST and rounding</strong>
+<p>It turns off the <b>Tax % column</b>, which removes GST from the invoice, and the <b>Round-off line</b>, which can change the total. Tick both back on a tax invoice.</p></div>
+</section>
+
+<section id="show-header">
+<h3>Header &amp; branding</h3>
+<p>Your side of the top of the invoice: <b>Logo</b>, <b>Business name</b>, <b>Business address</b>, <b>Business phone</b>, <b>Business email</b>, <b>Business state</b> and <b>Tax ID (GSTIN/VAT/etc.)</b>. All on to start. The logo, name and address come from <a href="settings.html#company-details">Settings</a>.</p>
+<ul>
+  <li><b>Business state</b> off also hides the client's state, on the invoice and in the Billed To card.</li>
+  <li><b>Tax ID</b> off also hides the client's GSTIN, on the invoice and in the Billed To card. A GST tax invoice must show both GSTINs, so keep it on for tax invoices.</li>
+  <li>Using a printed letterhead? Turn the header items off, or set a letterhead in <a href="print-settings.html#letterhead">Print Settings</a>.</li>
+</ul>
+</section>
+
+<section id="show-client">
+<h3>Client / Bill-to</h3>
+<p><b>Client address</b>, <b>Client phone</b>, <b>Client email</b> and <b>Place of Supply</b>, in the BILL TO block. All on to start. The client's name always prints.</p>
+<p><b>Place of Supply</b> off also hides the Place of Supply box in Invoice Details; the tax then follows the client's state. Choosing a type without GST turns it off for you.</p>
+</section>
+
+<section id="show-meta">
+<h3>Invoice meta</h3>
+<p><b>Invoice number</b>, <b>Invoice date</b> and <b>Due date</b> on the invoice's side of the header. All on to start. A GST tax invoice must show its number and date, so keep those on. The due date only prints when one is set.</p>
+</section>
+
+<section id="show-items">
+<h3>Items table</h3>
+<div class="table-wrap"><table>
+  <tr><th>Option</th><th>Turning it off</th></tr>
+  <tr><td>HSN/SAC column</td><td>Hides the column on the invoice and the HSN/SAC box in each row of the form. GST rules require HSN for most businesses, so keep it on for tax invoices.</td></tr>
+  <tr><td>Qty column</td><td>Hides the quantity column on the invoice (the unit goes with it). The form keeps its Qty box. Useful for a fixed-fee job billed as quantity 1.</td></tr>
+  <tr><td>Unit (Hrs, Nos...) next to Qty</td><td>Prints "5" instead of "5 Hrs". In Classic, Modern, Minimal and on thermal receipts the unit is part of the Qty column; in Boxed grid the UNIT column goes away, and in Tally style the "per" column goes away. <b>It turns off by itself</b> when you pick <b>Services</b> for an invoice (and back on for Goods or Mixed), until you tick or untick it yourself; after that your choice stays. A freelancer's invoices start with it off.</td></tr>
+  <tr><td>Rate column</td><td>Hides the price per unit; the Amount still prints.</td></tr>
+  <tr><td>Discount column</td><td>Hides the Disc. column and the Discount box in each row.</td></tr>
+  <tr><td>Tax % column (GST/VAT/etc.)</td><td>No GST is charged at all: the tax columns and tax rows disappear, and the GST % box goes from the form. Bill of Supply, Composition and Delivery Challan turn it off for you.</td></tr>
+  <tr><td>GST Cess % column</td><td>Off to start. Turning it <em>on</em> adds a Cess % box to each row of the form. The printed invoice shows cess as one line in the totals.</td></tr>
+</table></div>
+</section>
+
+<section id="show-totals">
+<h3>Totals</h3>
+<ul>
+  <li><b>Subtotal row</b>: the value of the items before tax.</li>
+  <li><b>Amount in words</b>: the total written out in words, in the invoice's currency.</li>
+  <li><b>Round-off line</b>: rounds the grand total to the nearest rupee and shows the difference. The default for new invoices is set in <a href="print-settings.html#round-off">Print &amp; PDF</a>; a saved invoice keeps what it was saved with.</li>
+  <li><b>HSN/SAC tax summary table</b>: the tax grouped by HSN code and rate, as on a Tally invoice. On to start only in Tally style.</li>
+  <li><b>Tax amount in words</b>: the total GST in words. On to start only in Tally style.</li>
+</ul>
+</section>
+
+<section id="show-footer">
+<h3>Footer</h3>
+<div class="table-wrap"><table>
+  <tr><th>Option</th><th>What it prints</th></tr>
+  <tr><td>Bank details</td><td>The BANK DETAILS block from the <a href="#payment-account">payment account</a>, with your PAN. Off hides the PAN too.</td></tr>
+  <tr><td>Show "Pay via: &lt;account&gt;" label</td><td>The account's label above the bank block. Off to start.</td></tr>
+  <tr><td>UPI QR (rupee invoices)</td><td>A <b>Scan to pay</b> QR with the amount filled in. Needs a UPI ID on the account and a rupee invoice.</td></tr>
+  <tr><td>Signature block</td><td>Your signature and stamp, uploaded in <a href="settings.html#branding">Settings</a>. Prints only when one is uploaded.</td></tr>
+  <tr><td>Show "Authorized Signatory" caption</td><td>The words under the signature.</td></tr>
+  <tr><td>Terms &amp; Conditions, Notes / Remarks</td><td>What you typed in the <a href="invoices.html#terms-notes">Terms &amp; Conditions card</a>.</td></tr>
+  <tr><td>Note: system-generated invoice…</td><td>See <a href="#system-generated-note">below</a>. Off to start.</td></tr>
+  <tr><td>Declaration</td><td>A declaration paragraph. When on, a <b>Declaration text</b> box appears to change its wording. It starts as the standard "We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct." On to start only in Tally style.</td></tr>
+  <tr><td>"Customer's Seal and Signature" box</td><td>An empty box for the client to stamp and sign, in Boxed grid and Tally style. On to start only in Tally style.</td></tr>
+</table></div>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>Logo, signature, stamp or UPI QR missing from the PDF?</b> See <a href="troubleshooting.html#missing-on-pdf">Something is missing from the PDF</a>.</p></div>
 </section>
 
 <section id="system-generated-note">
@@ -431,16 +810,19 @@ export default [
   <tr><td>Custom size</td><td>Width 30 to 500 mm, height 50 to 1200 mm</td></tr>
 </table></div>
 <p>For a custom size, enter the printer's <em>printable</em> width, not the roll width. Anything under 100 mm wide prints as a receipt. The quick buttons ${ui('40mm')}, ${ui('76mm')}, ${ui('90mm')} and ${ui('110mm')} fill in common rolls.</p>
-<p>A client can have their own preferred paper size, which is used when you pick them on a new invoice.</p>
+<p>A one-line hint under the <b>Paper / print size</b> list says what the chosen size is good for. The preview changes to the new size straight away.</p>
+<p>A client can have their own preferred paper size, which is used when you pick them on a new invoice. Saving an invoice for a saved client makes its paper size that client's preference, so a client you always bill on a receipt gets a receipt next time while the others stay on A4.</p>
+<div class="note tip"><strong>Something wrong?</strong>
+<p><b>Every invoice turned into a receipt.</b> The last size you chose is remembered for new invoices. Pick <b>A4 Portrait (default)</b> again. <b>Text cut off on a receipt</b>: see <a href="thermal-printing.html#receipt-problems">When a receipt prints badly</a>.</p></div>
 </section>
 
 <section id="thermal-options">
 <h2>Thermal printer settings</h2>
-<p>When a thermal size is chosen, three more settings appear:</p>
+<p>When a thermal size is chosen (or a custom size under 100 mm wide), a <b>Thermal printer settings</b> box appears under the paper size:</p>
 <table>
-  <tr><td>Font size</td><td>Small, Medium (the default) or Large</td></tr>
-  <tr><td>Compact mode</td><td>Tighter item rows. Off to start.</td></tr>
-  <tr><td>Cut mark at bottom</td><td>Prints a CUT HERE line, for printers without an automatic cutter. On to start.</td></tr>
+  <tr><td>Font size</td><td>Small (fits more per page), Medium (recommended, the default) or Large (easier to read)</td></tr>
+  <tr><td>Compact mode</td><td>Tighter item rows, to save paper on long orders. Off to start. Whether HSN and the quantity × rate line print is set in Print Settings.</td></tr>
+  <tr><td>Cut mark at bottom</td><td>Prints a CUT HERE line to tear against. On to start. Turn it off if your printer cuts the paper itself.</td></tr>
 </table>
 <p>More receipt settings are in <a href="print-settings.html#thermal">Print Settings</a>. See also <a href="thermal-printing.html">Thermal receipt printing</a>.</p>
 </section>

@@ -1,15 +1,165 @@
 # Changelog
 
-All notable changes to **E-Munim Software** are documented here.
+All notable changes to **Free GST Billing Software** are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.10.83] - unreleased
+## [1.10.83] - 2026-10-31
+
+### How to update
+
+**Current version:** 1.10.82  →  **New version:** 1.10.83
+
+#### If the in-app Update button works for you (1.10.73 and later)
+1. Open the app and click **Update to v1.10.83** in the menu, or
+   **Settings → Updates → Update Now**.
+2. Wait about a minute, then reload the page.
+
+The first time the app starts after the update, the **Free GST Billing** icon
+on your Desktop and in the Start menu changes: from then on one click starts
+the app and opens it. If you have a Free GST Billing icon made by Chrome or
+Edge, remove it (right-click it, then **Uninstall**): it cannot start the app.
+
+#### On 1.10.72 or older
+Use the launcher: **More options → Update to the latest version**, then
+**Open App**.
+
+#### If that does not work (or you are unsure)
+1. Download `Free-GST-Billing.zip` from the
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
+2. Close the app (Control Panel → **Stop Server**, or the launcher's
+   **More options → Stop the app**).
+3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
+5. Double-click **Free GST Billing - WINDOWS**.
+
+#### Mac
+Use the **Update** button in the app. **Never drag the new folder over the
+old one on a Mac**: Finder's Replace swaps the whole folder, including
+`_system/data` with your invoices. Step by step:
+[Updating on a Mac](https://dicecodes.com/free-gst-software-documentation/update.html#mac).
+
+#### Linux / NAS
+Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
+the old folder. Restart the app afterwards.
+
+Your invoices, clients, products and settings are never touched by an update;
+a backup is made first.
 
 ### Added
+- **Offline mode, and proof the app keeps your data private.** Settings has
+  a new *Privacy & internet* tab: one table of everything the app uses the
+  internet for, and when, and an *Offline mode* switch. The same switch is a
+  Wi-Fi button at the top right of every screen, which shows what Offline
+  mode changes and what stays the same. With it on, the app
+  never goes online by itself: no update check, no supporters list, no
+  automatic copy of each PDF to Google Drive. Check for Updates and other
+  things you click still work. The tab, the *Is it safe?* guide page and the
+  GitHub page also explain how to check it yourself in two minutes (switch the
+  internet off: everything works) and why the app is free. **Free forever**
+  is now at the top right of every screen: no paid version, no locked
+  features, no ads, no tracking. While Offline mode is on, Support & About says the
+  supporters figures are the last ones seen; turning it off reads the latest.
+- **Purpose code for payments from abroad.** Each payment account can hold
+  an RBI purpose code (for example P0802 software consultancy, P1006
+  business consultancy, P1099 other services), picked from a list or typed.
+  It prints with the bank details, next to SWIFT, on invoices to clients
+  abroad or in a foreign currency, so the client can quote it on the
+  transfer. One invoice can use another code (*Purpose code (RBI)* on the
+  invoice).
+- **Remove the app in one click** (#128, thanks @ravidas9191-png). *Control
+  Panel → Remove…*, or on Windows the launcher's *More options → Remove the
+  app...*, uninstalls the
+  app with its Desktop, Start-menu and start-up icons (Mac: the app in
+  Applications; Linux: the menu entry). Tick boxes choose what else goes:
+  your invoices, clients and settings; saved PDFs; the backups folder.
+  *Select everything* ticks all three. Nothing is ticked at first, so by
+  default your books stay and reinstalling brings them back. Deleting the
+  data while keeping backups saves a last copy first; if that copy fails,
+  the data is kept.
+- **Products: Goods or Service.** The product form asks *This is a: Goods
+  (stock counted) / Service (no stock)*. A service has no stock box and is
+  never counted: selling it, buying it on a purchase bill, importing it or
+  using it in manufacturing moves no stock, and it never shows *Out of
+  Stock*, never appears in low-stock alerts, the bell or the stock report.
+  Its unit list shows service units (Hrs, Day, Month, Project, Page...) and
+  the code box says *SAC*. Products you already have stay Goods; open one and
+  pick *Service* to switch it. (#121, thanks @apfx007)
+- **Sample files for importing Products and Clients.** *Import CSV* now opens
+  a window with *Download sample file* (the exact column headings and two
+  demo rows), shows how many will be added and any row with a problem before
+  anything is saved, and points to *Dashboard → CSV import / export* for old
+  invoices. The products file has a *Type* column (Goods or Service), and the
+  Products CSV export imports straight back. (#121, thanks @apfx007)
+- **Pay your suppliers on the purchase bill** (#123, thanks @neelind11). The
+  green ₹ button on a purchase bill records a payment to the supplier: amount
+  (starts at what is still owed, the total less any TDS you keep back), date,
+  Cash / UPI / Bank transfer / Cheque / Card / Other, reference or cheque
+  number, and a note. Pay in parts, as many times as you like; change or
+  delete a payment from its Payment History. The bill shows **Unpaid**,
+  **Partly paid** or **Paid** by itself, the list has a *Balance due* column,
+  an *Unpaid / Partly paid* filter and an *Owed to suppliers* card, and the
+  bill's view and PDF list the payments and the balance. Cash payments show
+  in the Cash book as money out, once. Reports → Party Outstanding has a new
+  *You owe suppliers* view, supplier by supplier, month by month. Bills you
+  marked Paid before stay Paid; *Paid* in the Status dropdown now records one
+  payment for the balance, and *Unpaid* takes it back.
+- **"Is it safe?"** A short *Safe and private* note on the first welcome
+  screen and on Support & About (your data stays on this computer, no account,
+  works offline, open source), linking to a new help page that answers the
+  question in full: where your data is, every internet address the app ever
+  contacts and why, the PIN lock and backups, and how to check it yourself.
+- **Change the currency right on the invoice.** If you bill abroad (Region
+  International or Both, or a client outside India), a *Currency* box such as
+  "$ USD" sits in Invoice Details, with *1 USD = ? INR* for the exchange rate
+  and the total in rupees under it. Every amount on screen and in the preview
+  switches at once. Each client remembers their currency; a new client abroad
+  starts in their own country's currency.
+- **Getting paid from abroad**: a payment account can have an IBAN and an
+  online payment link (PayPal, Wise, Payoneer), printed as *Pay online* on
+  invoices in a foreign currency, where the UPI QR (rupees only) is left off.
+  Record Payment on such an invoice can note the rupees credited, bank
+  charges and the FIRC / e-BRC number.
+- **Clients abroad**: no GSTIN or state needed; their own tax ID (VAT number,
+  EIN...) and country print on the invoice, and the place of supply prints as
+  *Outside India*. Preferred currency lists every currency, not seven.
+- **GSTR-1 lists exports (Table 6A) in rupees**, each at its invoice's own
+  exchange rate, with WPAY / WOPAY, ready to type into the portal, and an
+  *Exports* CSV.
+- **Reports: "All, in ₹"** - with invoices in more than one currency, profit
+  and loss and the other reports count every invoice in rupees at its own
+  rate (the default). The Dashboard shows "≈ ₹ in all" under the totals.
+- **Freelancers**: choosing the Freelancer business type starts new invoices
+  in Services mode, without the unit next to the quantity, due in 15 days.
+  *Due in 7 / 15 / 30 days* buttons under the due date for everyone. In
+  Services mode the unit list starts with Hrs, Day, Month, Project, Nos, the
+  HSN box is labelled SAC, and the unit is left off the printed invoice
+  unless you turn it on (Customize → Items table).
+- **Business type comes first.** Settings has a new first tab, *Business
+  type*: pick Retail shop, Freelancer, Restaurant, Wholesale, Manufacturing,
+  Service / repair or Everything, and the Features tick boxes are filled in
+  for that business (a freelancer does not see Products or Purchases). New
+  installs choose it in the first-run setup. If you are updating, your
+  current choices stay exactly as they are until you pick a type.
+- **Settings → Features lists everything the app can show**, one tick box
+  each, plus arrows to change the order of the menu. Nothing changes until
+  you click *Save all changes*, and nothing is ever deleted: unticked things
+  are only hidden. Support & About is always shown.
+- **Install with one line** (Windows, Mac and Linux): paste one line from the
+  install guide and the app installs itself, with its own icon, and opens in
+  its own window. No administrator password and no "unknown publisher"
+  warning. The same line updates or repairs the app; your data is backed up
+  first.
+- **Cost centres** (#112, thanks @vhoramunis9510): turn on in Settings →
+  Features, then tag sales, purchases and expenses with a branch, site or
+  project and see the totals per cost centre.
+- **Problem log and "Report on GitHub"**: if something goes wrong, the app
+  shows a plain message instead of a blank screen, keeps a log (Support &
+  About → Problem log) and fills in a GitHub issue for you with the details,
+  ready to send. The docs have a new list of messages and how to fix each.
 - **Supporters list with amounts:** Support & About shows "Thank you to our
   N supporters - see all"; one click opens the full list with each name, the
   amount and the date, newest first, with a search once the list is long.
@@ -17,12 +167,262 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Business Profile → *Signature and stamp layout*: side by side, the stamp
   above the signature, or the stamp on the signature, with a preview. Every
   invoice design follows it.
+- **Cash book:** a new screen in the sidebar for cash in and out that is not
+  on an invoice or bill: counter sales, advances, salary, tea, auto fare,
+  money taken home, deposits to the bank. Each entry is Money in or Money out
+  with an amount, name, note, date and category, typed in the form at the top
+  (Enter saves). Shows cash in hand, today's and this month's in and out, a
+  running balance, search, dates (this month, last month, this financial
+  year, your own dates, all) and Print / PDF, Excel and CSV. Cash payments on
+  invoices, cash receipts and cash expenses show in it on their own, read-only,
+  each counted once. One per business; on to start (Settings → Features).
+
+- **Purchase orders** (#112, thanks @vhoramunis9510). Turn on in Settings →
+  Features. Make a purchase order for a supplier (own number PO/26-27/0001
+  per business), print it, download the PDF or send it on WhatsApp / email.
+  **Convert to purchase bill** fills the bill in for you; the order shows
+  Open, Partly received or Received from what the bills received. Stock
+  changes only when the bill is saved.
+- **E-invoicing (IRN), offline** (#111, thanks @Sumit200507). Turn on
+  *E-invoicing (IRN)* in Settings → Features (off by default; only for
+  businesses above ₹5 crore turnover). Download the e-invoice JSON for one
+  invoice (**E-invoice** in the invoice toolbar) or many (tick them →
+  **E-invoice JSON**). It is checked first, and anything the portal would
+  reject is listed in plain English. Upload it on einvoice1.gst.gov.in, then
+  **Import IRN** on the Dashboard (or paste the values into the invoice).
+  Every invoice design then prints the IRN, Ack No, Ack Date and the signed
+  QR code.
+- **Manufacturing (bill of materials)** (#115, thanks @infoaimautomation-ui).
+  Turn it on in Settings → Features. Tick *Made here* on a product and list
+  its raw materials and the quantity per unit; the app shows the cost per
+  unit from purchase prices. **Make** on the Products screen records
+  production: raw materials go down and the finished product goes up in one
+  step, with a clear warning if anything would go below zero. Production
+  entries are listed per business with a date filter; deleting one puts its
+  stock back exactly (to change one, delete it and enter it again). The stock
+  report counts production by its date.
+- **Exports and SEZ supplies under a LUT:** Settings → Company has a new box
+  for your LUT (the Letter of Undertaking, form GST RFD-11, filed free on the
+  GST portal each financial year): its ARN and the year it covers. An invoice
+  for a client abroad or an SEZ client then shows *Export / SEZ supply under
+  LUT (no IGST)*, ticked by itself when your LUT covers the invoice date: no
+  IGST is charged and every invoice design prints the declaration Rule 46
+  requires, with your LUT's ARN. Untick it to charge IGST instead (the "on
+  payment of integrated tax" declaration prints). No LUT saved? The box
+  explains in one line why it is worth filing and links to the guide. GSTR-1,
+  the e-invoice file and the E-Way Bill follow the tick.
+- **Reports → TDS & TCS:** TDS your clients deducted from your sales (with a
+  *Certificate* tick per invoice, to match against Form 16A / Form 26AS), TCS
+  you collected, and TDS you deducted from suppliers, with totals by client,
+  section and quarter. Choose a financial year, a quarter or your own dates;
+  every list prints and downloads as Excel or CSV.
+- **TDS on purchase bills:** tick *TDS deducted* on a purchase bill, pick the
+  section (the rate fills in, or type the amount) and the bill shows *Paid to
+  supplier* = total less TDS, on screen and on its PDF.
+- **Client paid less because of TDS?** The Record Payment window has *Client
+  deducted TDS*: pick the section and rate, and the invoice is marked Paid
+  once the rest arrives. You can also record the TDS on its own.
 
 ### Changed
+- **Your business name and logo in the menu.** Tick *Show my business name
+  and logo in the app's menu* in Settings → Company → Branding (new installs
+  are asked in the first setup): the top of the menu shows your logo, or your
+  first letter, and your business name, for whichever business is open.
+  "by DiceCodes" stays under it.
+- **One icon that opens the app.** On Windows, the Free GST Billing icon (the
+  blue B) on the Desktop and in the Start menu now starts the app if it is not
+  running and opens it in its own window: one click, nothing else. Before, an
+  install from the ZIP opened the launcher and needed a second click on
+  *Open App*. Icons from an earlier install change over by themselves the
+  first time the app starts after this update. The launcher stays in the app
+  folder for installing, updating and repairs; update, backup, restart and
+  stop are in the Control Panel.
+- **No more "Install as Desktop App" banner.** The icon it made (through
+  Chrome or Edge) opened only a browser window and could not start the app,
+  so after a restart it showed *Needs a Quick Start*. That screen now says so
+  and points to the Free GST Billing icon. Remove the old one: right-click
+  it, then *Uninstall*.
+- **"Can I put it online?" answered.** The guide's *Is it safe?* page and the
+  GitHub page now say why the app should not be hosted on Railway, Render or
+  a server yet (no login on its server; Supabase would not be used). The old
+  online-deployment guide, which said it worked with no code changes, is
+  replaced by that answer.
+- **Control Panel → Restart the App.** When something is not working, one
+  click restarts the app on the same address and reloads the page.
+- **Remove the App always leads somewhere.** Where the app cannot remove
+  itself (run from source code or an old ZIP), the button reads *How to
+  remove it* and opens the steps, instead of a greyed-out *Not available
+  here*.
+- **The help "?" sits next to each page title**, instead of floating in
+  the middle of the header.
+- **Safe and private is its own section on Support & About**, after the ways to support, with every
+  point: data on this computer, no account, offline, no tracking, not open
+  to other computers, open source, the install, backups, PIN lock, problem
+  reports, security fixes and your part. Each opens its part of the guide.
+- **Support amounts are ₹200, ₹500, ₹1,000 or any amount.**
+- **Full view while making an invoice.** The Live preview bar has *Full
+  view*: the whole page in the print preview window, with Print and
+  Download PDF. The print preview also opens at a size that fits the window,
+  phone included.
+- **The LUT line on an export invoice is one quiet line.** The Rule 46 words
+  are unchanged (they are required word for word), but the green box and
+  bold type are gone.
+- **Ticked invoices as separate PDFs.** Next to *One merged PDF* (formerly
+  *Bulk PDF*), *Separate PDFs (ZIP)* downloads one PDF per invoice, named by
+  its invoice number, in one ZIP. The date filters now read *From* and *To*,
+  so any date range is easy to pick before ticking the header box.
+- **The app's status is a dot on *Control Panel*.** The *App Ready* box
+  under the menu is gone: a green dot on the Control Panel button means the
+  app is running, red means it is not. Control Panel holds what the
+  launcher window does (Update, Back up, Restore, Move, Stop, Remove).
+- **A services invoice shows only what services need.** In Services mode
+  (where the Freelancer / consultant type starts every invoice), these are
+  left out: the Unit column (while the unit is not printed), *Delivery
+  charges*, *Ship to*, and the goods boxes under *Order, dispatch &
+  reference details*. A line discount is just an amount or a percent, and
+  the whole-bill discount sits behind *+ Discount on the whole bill*.
+  Anything already filled in still shows; Goods or Mixed brings every box
+  back.
+- **The item box grows with the text.** A long item name wraps and stays
+  readable, and the box can be dragged taller. Enter still adds the next
+  row. The box is also wider.
+- **GST returns, income tax and the TDS & TCS report count invoices billed in
+  dollars, euros... in rupees**, at the exchange rate saved on each invoice.
+  An invoice in another currency without a rate is listed so you can add it,
+  and the GSTR-1 file waits for it.
+- **Dark mode, Notifications, User Guide and Lock moved to the top right** of
+  every screen as small buttons (on a phone, into the top bar), so the
+  sidebar holds only the screens. Settings → Features can hide or reorder
+  them.
+- **Settings opens as tabs**: one page per tab (Business type, Company,
+  Profiles, Print & PDF, Features...) instead of one very long page.
+- **Every ? opens its guide at the right place**: the ? on each screen, each
+  Settings tab and each dialog goes straight to that topic in the online
+  guide, and the guide highlights it.
+- **Smaller download**: the app ZIP is about 25 MB instead of 58 MB, so it
+  downloads, starts for the first time and updates faster.
 - **Purchases show CGST + SGST** (#117): the purchase form shows the tax split
   as you type (IGST for an inter-state bill), and the purchase register export
   has CGST, SGST and IGST columns instead of one tax column. CGST and SGST
   always add up to the tax exactly.
+- **TCS under CGST section 52 starts at 0.5%** (the rate since 10 July 2024;
+  it was 1%). Invoices already made keep the rate they were made with.
+- **The Export / International (LUT) terms preset** now uses the exact Rule 46
+  wording.
+
+### Fixed
+- **Products CSV import filled in only the names** (#134, thanks
+  @ethbroken-svg). A file with HSN/SAC, Purchase price, Selling price and
+  GST % columns (what the Products export itself writes) left those empty. The
+  import now reads them. Products already imported without their details:
+  delete them and import the file again.
+- **A purchase bill that added several new products could lose one.** Two
+  products saved in the same instant got the same ID, so one replaced the
+  other. New records now always get an ID of their own.
+- **The bulk PDF buttons stayed greyed out** after "Could not generate any
+  PDFs" until you left the Dashboard.
+- **Clicking the app icon twice while it started** could start two copies of
+  the app on the same books; the second one now waits for the first.
+- **Deleting a purchase bill with payments** now says those payments go
+  with it (they leave the Cash book), and suggests editing the bill instead.
+- **The one-line remove** deletes only the app's own files: anything else in
+  the folder it was installed into is left alone. The Windows remove line in
+  the install script's notes now works in Windows PowerShell 5.1.
+- **The GST portal refused the GSTR-1 JSON** with "File could not be
+  uploaded! Download the latest version of Offline tool..." (#133, thanks
+  @abhi783821). From the May 2025 return the portal wants the HSN summary
+  (Table 12) as two lists, B2B and B2C; the app still sent one. The file now
+  has both lists, HSN descriptions of at most 30 characters, *OE* on every
+  B2C row, no empty tables or blank values, and no turnover fields (they were
+  only for 2017-18). Credit notes to buyers without a GSTIN are now in it
+  too: they reduce the B2C totals, and a large inter-state one goes in Table
+  9B. The export now stops, with the reason, when your GSTIN is missing, the
+  period is a full year, or an invoice has no place of supply. **Export the
+  JSON again** for any month you could not upload.
+- **CSV invoice import made a duplicate client when the name was mistyped**
+  even though the GSTIN matched a saved client (#132, thanks @surajparshad8).
+  A row with a saved GSTIN now goes to that client under its saved name, and
+  two new rows with one GSTIN make one client.
+- **Billing a client abroad in dollars, with the client saved as in India,
+  gave a domestic invoice with no LUT.** The client form starts on India, so
+  clients abroad were often saved that way. The invoice now says *Billing in
+  USD to a client in India?* with a button to the client's Country box.
+  Setting it makes the invoice an export: "Outside India", the LUT, no IGST.
+  A client abroad with an Indian state as Place of supply (picked by hand or
+  kept from a copied invoice) gets the same kind of note, with *Make it an
+  export*. So does a tax invoice to a client abroad with GST turned off
+  (Customize → Tax % column, which hides the LUT too), with *Turn GST on*.
+- **The purpose-code suggestion list showed dark on a light screen** when
+  Windows was in dark mode. The browser's own pop-ups now follow the app's
+  theme.
+- **"Out of Stock" on things whose stock was never entered.** A product with
+  a blank stock is now "not counted" (shown as a dash), not 0; the Dashboard
+  low-stock strip, the bell and the products list all agree. A blank Stock box
+  in the form or in Bulk edit no longer saves 0. (#121, thanks @apfx007)
+- **GSTR-3B put supplies to SEZ units in 3.1(a)**; as zero-rated supplies they
+  belong in 3.1(b) with exports (CBIC Circular 147/03/2021-GST). They are now
+  there, in rupees, with their IGST if paid; the tax payable is unchanged.
+- **Foreign-currency invoices were added up as if they were rupees** in the
+  GST returns (Table 3.1(b), the HSN summary) and left out of income tax.
+- **TDS recorded with a payment (Client deducted TDS) could turn into 0** when
+  the invoice was opened and saved again (the 194Q ₹50 lakh threshold was
+  applied afresh). It now stays as recorded unless you change its rate.
+- **After a dollar invoice, the next Indian client was billed in dollars too.**
+  An Indian client now starts in rupees.
+- **A foreign client's VAT number printed as "GSTIN"** and was flagged as an
+  invalid GSTIN on the GST returns screen.
+- **Boxed grid and Tally style kept the unit column** when the unit was
+  switched off; thermal receipts printed "Rs." on a dollar invoice.
+- **Purchase bills took 18% GST for every product picked on a new line**,
+  instead of the product's own rate (a 12% item was booked at 18%, giving the
+  wrong input tax credit). A product with no rate saved still gets 18%.
+- **After an update the app could open blank (or as the old version) until
+  you refreshed a second time**: the browser's offline copy still held the
+  old version, which asked for files the update had removed. The new version
+  now reloads open windows when it takes over, and if the app's code ever
+  cannot load, it clears its offline copy once and reloads by itself. Your
+  data is never part of that copy.
+- **Updates now leave a clean folder**: files an older version had and the
+  new one no longer needs are removed (the Update button, the update scripts
+  and the one-line install all do this). Your books, saved PDFs, the bin and
+  the backups are never touched, and your data is still backed up first.
+- **The Windows installer said "Drive C:\ is almost full. It has 0 MB free"**
+  on a drive with plenty of space (some PCs do not report free space the way
+  the installer asked). It now asks Windows directly and never blocks when it
+  cannot tell.
+- **Opening the app no longer contacts Google**: its font is now built into
+  the app instead of loaded from Google Fonts each time, and the supporters
+  list is read only when it is shown.
+- **On a phone, the buttons at the top of a screen** (such as New Invoice on
+  the Dashboard) ran off the right edge; they now wrap.
+- **Stop Server did nothing on Mac and Linux** (the button was greyed out).
+  It now stops the app there too.
+- **Windows: the first Open App could wait 90 seconds and give up** when
+  another program was using the app's usual port. It now finds the port the
+  app moved to.
+- **The Windows install line failed on some older Windows 10 PCs** that do
+  not use the newer secure connection by default. The line now turns it on.
+- **E-Way Bill did nothing** when your or the client's PIN code was missing.
+  It now says which PIN code is missing and where to fill it in.
+- **"Cancel this invoice?" said to undo it from the status dropdown**; undo is
+  the *Undo cancel* arrow on the row. The message now says so.
+- **Send reminder showed on open quotations and proformas.** Only invoices
+  that are owed money offer a payment reminder now.
+- **The NIL return banner ignored purchase bills:** a period with purchases
+  has input tax credit to claim, so it is not a NIL GSTR-3B. The banner now
+  appears only when there are no invoices, purchase bills or expenses.
+- **The NIL-by-SMS hint left out the return type.** It now gives the GST
+  portal's exact formats: `NIL R1`, `NIL 3B` or `NIL C8`, then the GSTIN and
+  the period, sent to 14409.
+- **The GST rate suggested for an HSN code was the old, pre-September-2025
+  rate**, and the invoice filled it in for you: chocolates, biscuits and
+  mineral water came up at 18% instead of 5%, soft drinks at 28% instead of
+  40%, TVs and cement at 28% instead of 18%, medicines at 12% instead of 5%.
+  Suggestions now follow the rates in force since 22 September 2025. Where the
+  rate depends on the price, size or packing (clothes and shoes up to or above
+  ₹2,500, cars and bikes by engine size, loose or packed food), the hint shows
+  every possible rate and leaves your GST % alone. The hint is still a guide:
+  check the rate for your item.
 
 ---
 
@@ -41,8 +441,8 @@ because Mac users could not start the app at all.
 
 #### Mac
 1. Download `Free-GST-Billing.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
-2. Double-click it to unzip, then double-click **E-Munim - MAC**.
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
+2. Double-click it to unzip, then double-click **Free GST Billing - MAC**.
 3. The first time, macOS may say it "cannot be opened because Apple cannot
    check it". **Hold Control, click the file, choose Open, then Open again.**
    Only once.
@@ -50,7 +450,7 @@ because Mac users could not start the app at all.
    instead. **Never drag the new folder over the old one on a Mac**: Finder's
    Replace swaps the whole folder, including `_system/data` with your
    invoices. Step-by-step:
-   [Updating on a Mac](https://freeinvoicefast.com/docs/update.html#mac).
+   [Updating on a Mac](https://dicecodes.com/free-gst-software-documentation/update.html#mac).
 
 #### Windows (1.10.73 and later)
 Click **Update to v1.10.82** in the sidebar, or **Settings → App Updates →
@@ -63,7 +463,7 @@ Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
 the old folder. Restart the app afterwards.
 
 ### Fixed
-- **Mac: "E-Munim - MAC.command could not be executed because you do
+- **Mac: "Free GST Billing - MAC.command could not be executed because you do
   not have appropriate access privileges"** (#120, thanks
   @saraiwalaneeraj-cell). The ZIP is built on Windows, which has no
   "executable" mark, so the Mac launcher and the Linux scripts arrived as
@@ -88,8 +488,8 @@ welcome for new users.**
 
 > **If the app does not start since the last update (#109):** download
 > `Free-GST-Billing.zip` from the
-> [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest),
-> extract it over your E-Munim folder (replace files when asked) and
+> [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest),
+> extract it over your Free GST Billing folder (replace files when asked) and
 > click **Open App**. It sets itself up; your data is kept.
 
 #### If the in-app Update button works for you (1.10.73 and later)
@@ -103,11 +503,11 @@ Use the launcher: **More options → Update to the latest version**, then
 
 #### If that does not work (or you are unsure)
 1. Download `Free-GST-Billing.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
-5. Double-click **E-Munim - WINDOWS**.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -187,13 +587,13 @@ Use the launcher: **More options → Update to the latest version**, then
 
 #### If that does not work (or you are unsure)
 1. Download `Free-GST-Billing.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
    (Extracted it somewhere else? Its launcher offers **Update the installed
    copy**, which works without internet.)
-5. Double-click **E-Munim - WINDOWS**.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -290,13 +690,13 @@ Use the launcher: **More options → Update to the latest version**, then
 
 #### If that does not work (or you are unsure)
 1. Download `Free-GST-Billing.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
    (Extracted it somewhere else? Its launcher offers **Update the installed
    copy**, which works without internet.)
-5. Double-click **E-Munim - WINDOWS**.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -309,7 +709,7 @@ an update never touches. The updater also takes an automatic backup to
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Added
 - **Own invoice numbering for each business** (#95, thanks @Vim1972). With
@@ -385,13 +785,13 @@ Use the launcher: **More options → Update to the latest version**, then
 
 #### If that does not work (or you are unsure)
 1. Download `Free-GST-Billing.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
    (Extracted it somewhere else? Its launcher offers **Update the installed
    copy**, which works without internet.)
-5. Double-click **E-Munim - WINDOWS**.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -404,7 +804,7 @@ an update never touches. The updater also takes an automatic backup to
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Added
 - **Start numbering from** (#93, thanks @ved935030-afk): **Settings →
@@ -451,13 +851,13 @@ Use the launcher: **More options → Update to the latest version**, then
 
 #### If that does not work (or you are unsure)
 1. Download `Free-GST-Billing.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
    (Extracted it somewhere else? Its launcher offers **Update the installed
    copy**, which works without internet.)
-5. Double-click **E-Munim - WINDOWS**.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -470,7 +870,7 @@ an update never touches. The updater also takes an automatic backup to
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed
 - **Opening a saved invoice replaced its Terms & Conditions** with your first
@@ -564,13 +964,13 @@ Use the launcher: **More options → Update to the latest version**, then
 
 #### If that does not work (or you are unsure)
 1. Download `Free-GST-Billing.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
    (Extracted it somewhere else? Its launcher offers **Update the installed
    copy**, which works without internet.)
-5. Double-click **E-Munim - WINDOWS**.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -583,7 +983,7 @@ an update never touches. The updater also takes an automatic backup to
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed
 - **Stock follows the invoice** (#80, thanks @raviagrawal01). Changing a
@@ -643,13 +1043,13 @@ Use the launcher: **More options → Update to the latest version**, then
 
 #### If that does not work (or you are unsure)
 1. Download `Free-GST-Billing-v1.10.75.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
    (If you extract it somewhere else instead, the launcher there now tells you
    where your app is installed and offers **Update the installed copy**.)
-5. Double-click **E-Munim - WINDOWS**.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -662,7 +1062,7 @@ an update never touches. The updater also takes an automatic backup to
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed
 - **A new ZIP no longer installs a second copy.** Extracting a new version
@@ -673,7 +1073,7 @@ https://github.com/aman1455/gst-billing-desktop/issues
   you extracted, so it needs no download and works offline. Your invoices,
   saved PDFs and trash are never replaced.
 - **Old files from earlier versions are removed** on the next Open App:
-  launchers under their old names (`E-Munim.command`/`.sh`, the old
+  launchers under their old names (`Free GST Billing.command`/`.sh`, the old
   `.bat` files) and the old `_system-scripts` folder - only when the file that
   replaced each one is present. Your data, backups and Node.js are never
   touched.
@@ -694,7 +1094,7 @@ https://github.com/aman1455/gst-billing-desktop/issues
   and always shows that invoice's own options (the app-wide defaults used to
   replace them a moment after it opened).
 - **User Guide** in the sidebar (and "Read the 5-minute guide" on the Dashboard)
-  now opens the [online documentation](https://freeinvoicefast.com/docs/),
+  now opens the [online documentation](https://dicecodes.com/free-gst-software-documentation/),
   which covers every screen. The old built-in guide had fallen behind the app
   and is removed.
 - **Support & About** in the sidebar: who makes the app, free ways to help
@@ -703,7 +1103,7 @@ https://github.com/aman1455/gst-billing-desktop/issues
   small thank-you card (Maybe later / Don't show again). Nothing is locked and
   nothing is printed on your invoices.
   The documentation has the same page, linked from its top bar next to the
-  name: [Support & About](https://freeinvoicefast.com/docs/support.html).
+  name: [Support & About](https://dicecodes.com/free-gst-software-documentation/support.html).
 - A one-line **"Star on GitHub"** note at the top of the app, at most once a
   month: first 3 days after you start using the app, then 30 days after you
   close it with ✕. **Star on GitHub** or **Already starred** hides it for good.
@@ -738,11 +1138,11 @@ Use the launcher: **More options → Update to the latest version**, then
 
 #### If that does not work (or you are unsure)
 1. Download `Free-GST-Billing-v1.10.74.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
-5. Double-click **E-Munim - WINDOWS**.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -755,7 +1155,7 @@ an update never touches. The updater also takes an automatic backup to
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed - GST returns
 - **Exports without a GSTIN were counted twice** in GSTR-3B: in 3.1(a) and the
@@ -823,17 +1223,17 @@ online guide.**
 #### Use the launcher for this update
 Versions up to 1.10.71 cannot update themselves from inside the app (fixed
 in 1.10.72, below). Use the launcher:
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **More options → Update to the latest version**.
 3. Wait for it to finish, then click **Open App**.
 
 #### If the launcher update does not work (or you are unsure)
 1. Download `Free-GST-Billing-v1.10.73.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
-5. Double-click **E-Munim - WINDOWS**.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -846,7 +1246,7 @@ an update never touches. The updater also takes an automatic backup to
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### New - two invoice designs
 Under **Customize → PDF Style** (or Settings → Print & PDF for every invoice):
@@ -913,7 +1313,7 @@ button have one now, and the User Guide links to the online docs.
 #### Use the launcher for this update
 The in-app **Update Now** button is the thing this version fixes, so on your
 current version it cannot update itself. Use the launcher instead:
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **More options → Update to the latest version**.
 3. Wait for it to finish, then click **Open App**.
 
@@ -921,11 +1321,11 @@ From 1.10.72 on, **Update Now** inside the app works again.
 
 #### If the launcher update does not work (or you are unsure)
 1. Download `Free-GST-Billing-v1.10.72.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
-5. Double-click **E-Munim - WINDOWS**.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 Run `update-unix.sh` from the `_system` folder, or extract the new ZIP over
@@ -939,7 +1339,7 @@ before it changes anything.
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed - "Launcher scripts not detected" (#73)
 Reported by @deppen12. The Control Panel said the launcher scripts were
@@ -967,7 +1367,7 @@ invoices keep their settings.**
 **Current version:** 1.10.70 (or 1.10.69)  →  **New version:** 1.10.71
 
 #### If the in-app Update button works for you
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **More options → Update to the latest version**.
 3. Wait for it to finish, then click **Open App**.
 
@@ -975,11 +1375,11 @@ That is all — your data is not touched.
 
 #### If the Update button does not work (or you are unsure)
 1. Download `Free-GST-Billing-v1.10.71.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
-5. Double-click **E-Munim - WINDOWS**.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 The in-app **Control Panel → Update Now** works here too. It needs `unzip`
@@ -993,7 +1393,7 @@ before it changes anything.
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed - invoices
 - **Print now saves the invoice** before printing, like Save & Download. It
@@ -1057,7 +1457,7 @@ signature block — and you can add a "system-generated invoice" note (#72).**
 **Current version:** 1.10.69  →  **New version:** 1.10.70
 
 #### If the in-app Update button works for you
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **More options → Update to the latest version**.
 3. Wait for it to finish, then click **Open App**.
 
@@ -1065,11 +1465,11 @@ That is all — your data is not touched.
 
 #### If the Update button does not work (or you are unsure)
 1. Download `Free-GST-Billing-v1.10.70.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app (click **Stop the app** in the launcher if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open anything while still inside the ZIP.
-4. Extract over your existing E-Munim folder, replacing files when asked.
-5. Double-click **E-Munim - WINDOWS**.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
+5. Double-click **Free GST Billing - WINDOWS**.
 
 #### Linux / NAS
 The in-app **Control Panel → Update Now** works here too. It needs `unzip`
@@ -1083,7 +1483,7 @@ before it changes anything.
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed - the stamp could be cut in half across two pages
 
@@ -1130,7 +1530,7 @@ one-command install for anyone who prefers a terminal.**
 **Current version:** 1.10.68  →  **New version:** 1.10.69
 
 #### If the in-app Update button works for you
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -1138,11 +1538,11 @@ That is all — your data is not touched.
 
 #### If the Update button does not work (or you are unsure)
 1. Download `Free-GST-Billing-v1.10.69.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
 3. **Right-click the ZIP → Extract All.** Do not open the launcher from inside
    the ZIP — Windows unpacks only that one file and the app cannot start.
-4. Extract over your existing E-Munim folder, replacing files when asked.
+4. Extract over your existing Free GST Billing folder, replacing files when asked.
 5. Double-click the launcher again.
 
 #### Linux / NAS
@@ -1157,7 +1557,7 @@ before it changes anything.
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed - the launcher had no icon, so Windows drew a blank white page
 
@@ -1299,13 +1699,13 @@ are done, and there is an X if you would rather not see it at all.
 
 ### Changed - the launchers say which system they are for
 
-The ZIP used to hold three files called `E-Munim` with three
+The ZIP used to hold three files called `Free GST Billing` with three
 extensions most people never see, because Windows hides them. They are now:
 
 ```
-E-Munim - WINDOWS.hta
-E-Munim - MAC.command
-E-Munim - LINUX.sh
+Free GST Billing - WINDOWS.hta
+Free GST Billing - MAC.command
+Free GST Billing - LINUX.sh
 ```
 
 Nothing to work out, and nothing to click by mistake.
@@ -1313,7 +1713,7 @@ Nothing to work out, and nothing to click by mistake.
 **Already installed?** The update copies the new launcher in beside the old
 one. The first time you click **Open App** afterwards, your Desktop and
 Start-Menu shortcuts are moved over to the new launcher and the old
-`E-Munim.hta` is removed. Only shortcuts pointing at *this*
+`Free GST Billing.hta` is removed. Only shortcuts pointing at *this*
 install are touched, and nothing is removed while a shortcut still needs it.
 
 ### Changed - the launcher explains itself
@@ -1339,7 +1739,7 @@ Explorer never implemented, and the launcher renders in Internet Explorer.
 ### Added - install with one PowerShell command
 
 ```powershell
-irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex
 ```
 
 Fetches the latest release, extracts it to `%LOCALAPPDATA%\Programs\Free GST
@@ -1381,7 +1781,7 @@ GSTIN is caught on the spot. No internet, no account, no API key.**
 **Current version:** 1.10.67  →  **New version:** 1.10.68
 
 #### If the in-app Update button works for you
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -1389,9 +1789,9 @@ That is all — your data is not touched.
 
 #### If the Update button does not work (or you are unsure)
 1. Download `Free-GST-Billing-v1.10.68.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when asked.
 4. Double-click the launcher again.
 
@@ -1407,7 +1807,7 @@ before it changes anything.
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Added - a GSTIN fills in the state, and catches its own typos
 
@@ -1453,7 +1853,7 @@ Mode, and a stamp of your own.**
 **Current version:** 1.10.66  →  **New version:** 1.10.67
 
 #### If the in-app Update button works for you
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -1461,9 +1861,9 @@ That is all — your data is not touched.
 
 #### If the Update button does not work (or you are unsure)
 1. Download `Free-GST-Billing-v1.10.67.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when asked.
 4. Double-click the launcher again.
 
@@ -1479,7 +1879,7 @@ before it changes anything.
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed - adding a new company could replace the one you had
 
@@ -1569,7 +1969,7 @@ Reported in #64 by @sangwanmail-eng, #61 / #62 / #63 by @Yashparmar1125, and
 **Current version:** 1.10.65  →  **New version:** 1.10.66
 
 #### If the in-app Update button works for you
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -1577,9 +1977,9 @@ That is all — your data is not touched.
 
 #### If the Update button does not work (or you are unsure)
 1. Download `Free-GST-Billing-v1.10.66.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when asked.
 4. Double-click the launcher again.
 
@@ -1598,7 +1998,7 @@ before it changes anything.
 
 #### Something went wrong?
 Open an issue with a screenshot of the error:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed - one company's expenses and purchases counted in another's figures
 
@@ -1732,7 +2132,7 @@ All three requested in #58 by @sangwanmail-eng.
 
 Launcher -> **Update** -> **Stop Server** -> **Open App**, or download
 `Free-GST-Billing-v1.10.65.zip` from the
-[Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+[Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 
 ### Fixed - the dashboard did not refresh after switching business
 
@@ -1809,7 +2209,7 @@ belonging to one company should not appear under the other."*
 
 Launcher -> **Update** -> **Stop Server** -> **Open App**, or download
 `Free-GST-Billing-v1.10.64.zip` from the
-[Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+[Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 
 ### Added - invoices are scoped to the business that issued them
 
@@ -1867,7 +2267,7 @@ Reported (#54, @ANIM35H), with the exact cause already diagnosed. Thank you.
 ### How to update
 
 Download `Free-GST-Billing-v1.10.63.zip` from the
-[Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest)
+[Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest)
 and extract it over your folder. If your app never started, this is the
 release that fixes it - nothing else needs doing.
 
@@ -1928,7 +2328,7 @@ Reported (#53, @sangwanmail-eng).
 
 Launcher -> **Update** -> **Stop Server** -> **Open App**, or download
 `Free-GST-Billing-v1.10.62.zip` from the
-[Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest)
+[Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest)
 and extract it over your folder.
 
 ### Added - "Mark all as read" on the notification bell
@@ -2022,7 +2422,7 @@ Reported by @sguptagzb (#51) with a sample PDF attached, and by
 
 Launcher -> **Update** -> **Stop Server** -> **Open App**, or download
 `Free-GST-Billing-v1.10.60.zip` from the
-[Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest)
+[Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest)
 and extract it over your folder. Data in `_system/data/` is untouched.
 
 ### Fixed - the PDF came out with no formatting at all (#51)
@@ -2088,7 +2488,7 @@ optimisation - and an honest negative result on the scrolling report.**
 
 Launcher -> **Update** -> **Stop Server** -> **Open App**, or download
 `Free-GST-Billing-v1.10.59.zip` from the
-[Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest)
+[Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest)
 and extract it over your folder. Data in `_system/data/` is untouched.
 
 ### Security - all open advisories closed
@@ -2150,7 +2550,7 @@ Reported (#47, @sangwanmail-eng).
 
 Launcher -> **Update** -> **Stop Server** -> **Open App**, or download
 `Free-GST-Billing-v1.10.58.zip` from the
-[Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest)
+[Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest)
 and extract it over your folder. Data in `_system/data/` is untouched.
 
 ### Fixed - an empty invoice could be saved and printed
@@ -2211,7 +2611,7 @@ Items 1-3 of #44 (@sangwanmail-eng). Item 4 is still open - see below.
 
 Launcher -> **Update** -> **Stop Server** -> **Open App**, or download
 `Free-GST-Billing-v1.10.57.zip` from the
-[Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest)
+[Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest)
 and extract it over your folder. Data in `_system/data/` is untouched.
 
 ### Fixed - terms and conditions ran together as one paragraph
@@ -2277,7 +2677,7 @@ every time show popup"*. A regression from v1.10.55, four days old.
 
 Launcher -> **Update** -> **Stop Server** -> **Open App**, or download
 `Free-GST-Billing-v1.10.56.zip` from the
-[Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest)
+[Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest)
 and extract it over your folder. Data in `_system/data/` is untouched.
 
 ### Fixed
@@ -2337,7 +2737,7 @@ Reported (#43, @sangwanmail-eng).
 
 1. Open the launcher, click **Update**, then **Stop Server** -> **Open App**.
 2. Or download `Free-GST-Billing-v1.10.55.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest)
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest)
    and extract it over your existing folder.
 
 Your data in `_system/data/` is never touched by an update.
@@ -2418,7 +2818,7 @@ added in v1.10.50.
 
 **If the in-app Update button works for you**
 
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2427,9 +2827,9 @@ That is all - your data is not touched.
 **If the Update button does not work (or you are unsure)**
 
 1. Download `Free-GST-Billing-v1.10.54.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2487,7 +2887,7 @@ of every year; the other made the Income Tax screen quietly compute zero.
 
 **If the in-app Update button works for you**
 
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2496,9 +2896,9 @@ That is all - your data is not touched.
 **If the Update button does not work (or you are unsure)**
 
 1. Download `Free-GST-Billing-v1.10.53.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2575,7 +2975,7 @@ supplier recall added in v1.10.50 the previous day.
 
 **If the in-app Update button works for you**
 
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2584,9 +2984,9 @@ That is all - your data is not touched.
 **If the Update button does not work (or you are unsure)**
 
 1. Download `Free-GST-Billing-v1.10.52.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2594,7 +2994,7 @@ That is all - your data is not touched.
 `_system/data/`, which an update never touches.
 
 **Something went wrong?** Open an issue with a screenshot:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed - supplier and item lists showed the wrong text
 
@@ -2642,7 +3042,7 @@ Adapted from a fix proposed by **@venkateshpabbati** in #38.
 
 **If the in-app Update button works for you**
 
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2651,9 +3051,9 @@ That is all — your data is not touched.
 **If the Update button does not work (or you are unsure)**
 
 1. Download `Free-GST-Billing-v1.10.51.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2663,7 +3063,7 @@ automatic backup to `Documents\FreeGSTBill Backups\` before it changes
 anything.
 
 **Something went wrong?** Open an issue with a screenshot:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed — empty Terms / Notes printed a stray heading
 
@@ -2722,7 +3122,7 @@ supplier name, gst number, address, item name etc"*.
 
 **If the in-app Update button works for you**
 
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2731,9 +3131,9 @@ That is all — your data is not touched.
 **If the Update button does not work (or you are unsure)**
 
 1. Download `Free-GST-Billing-v1.10.50.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2743,7 +3143,7 @@ automatic backup to `Documents\FreeGSTBill Backups\` before it changes
 anything.
 
 **Something went wrong?** Open an issue with a screenshot:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Added — supplier and item recall in Add Purchase Bill
 
@@ -2907,7 +3307,7 @@ updating is the only way to get the fix.
 
 **If the in-app Update button works for you**
 
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -2916,9 +3316,9 @@ That is all — your data is not touched.
 **If the Update button does not work (or you are unsure)**
 
 1. Download `Free-GST-Billing-v1.10.49.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -2928,7 +3328,7 @@ automatic backup to `Documents\FreeGSTBill Backups\` before it changes
 anything.
 
 **Something went wrong?** Open an issue with a screenshot:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Security — jspdf 4.2.0 → 4.2.1 (critical)
 
@@ -3004,7 +3404,7 @@ machine — one needs Firefox, the other needs a screen narrower than about
 
 **If the in-app Update button works for you**
 
-1. Open the E-Munim launcher.
+1. Open the Free GST Billing launcher.
 2. Click **Update**.
 3. Wait for "Update complete", then click **Stop Server**, then **Open App**.
 
@@ -3013,9 +3413,9 @@ That is all — your data is not touched.
 **If the Update button does not work (or you are unsure)**
 
 1. Download `Free-GST-Billing-v1.10.48.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/latest).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -3025,7 +3425,7 @@ automatic backup to `Documents\FreeGSTBill Backups\` before it changes
 anything.
 
 **Something went wrong?** Open an issue with a screenshot:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ### Fixed — "PDF saves as thermal printer" (it was not thermal, it was unstyled)
 
@@ -3137,7 +3537,7 @@ Four scripts were broken, not just the updater:
   both BOM handling and the user's locale.
 - Root `.bat` launchers ASCII-ified too — they were printing mojibake
   under the cp437/cp850 OEM codepage (cosmetic, not fatal).
-- `E-Munim.hta` declared no charset, so the launcher UI was
+- `Free GST Billing.hta` declared no charset, so the launcher UI was
   being decoded with the system codepage. Added
   `<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />`.
 
@@ -3155,9 +3555,9 @@ offending `file:line` if a non-ASCII character is reintroduced.
 > broken component. Please download the ZIP manually, this one time.
 
 1. Download `Free-GST-Billing-v1.10.47.zip` from the
-   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/tag/v1.10.47).
+   [Releases page](https://github.com/IamRamgarhia/Free-GST-Billing-Software/releases/tag/v1.10.47).
 2. Close the app completely (click **Stop Server** first if it is running).
-3. Extract the ZIP over your existing E-Munim folder, replacing
+3. Extract the ZIP over your existing Free GST Billing folder, replacing
    files when Windows asks.
 4. Double-click the launcher again.
 
@@ -3169,7 +3569,7 @@ automatic backup to `Documents\FreeGSTBill Backups\` before it changes
 anything.
 
 **Something went wrong?** Open an issue with a screenshot:
-https://github.com/aman1455/gst-billing-desktop/issues
+https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues
 
 ---
 
@@ -3189,18 +3589,18 @@ Control Panel so the user never has to touch the folder again.
 
 ### Added — three platform launchers under `release-templates/`
 
-- **`E-Munim.hta`** (Windows) — real HTML app opened by
+- **`Free GST Billing.hta`** (Windows) — real HTML app opened by
   `mshta.exe`. Detects install state (Node? deps? corrupt install?)
   and renders only the buttons that make sense right now — one
   "Install Node & App" button when nothing's installed, or a grid
   of "Open App / Update / Backup / Restore / Move / Stop" once
   everything's ready. DOM API used throughout instead of innerHTML
   strings to avoid HTA-quirky escaping bugs.
-- **`E-Munim.command`** (macOS) — Finder double-click opens
+- **`Free GST Billing.command`** (macOS) — Finder double-click opens
   Terminal, walks the user through Node install if missing (points
   at Homebrew + official pkg), then runs npm install and starts
   the server. Opens `/control-panel` in the default browser.
-- **`E-Munim.sh`** (Linux) — same shape as `.command` with
+- **`Free GST Billing.sh`** (Linux) — same shape as `.command` with
   Debian / Fedora / Arch / nvm install instructions when Node is
   missing.
 
@@ -8220,7 +8620,7 @@ If you still see a white screen after the update:
 1. Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> in the browser
    to force-reload past any cache
 2. Press <kbd>F12</kbd> → Console tab → screenshot anything in red,
-   share via [GitHub issue](https://github.com/aman1455/gst-billing-desktop/issues)
+   share via [GitHub issue](https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues)
 3. Or just run `Start FreeGSTBill.bat` directly from the install
    folder while we debug
 
@@ -8268,7 +8668,7 @@ whether the server's already running and skip directly to "Open Billing
 App", or show the broken state with recovery steps.
 
 Power users who want the old auto-start behaviour can use the new
-**"Open E-Munim"** shortcut in the Start Menu folder, which
+**"Open Free GST Billing"** shortcut in the Start Menu folder, which
 still runs `Start FreeGSTBill.bat` directly.
 
 ### Added — `freegstbill-stop://` URL protocol

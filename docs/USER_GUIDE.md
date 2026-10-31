@@ -1,11 +1,11 @@
-# E-Munim Software — User Guide
+# Free GST Billing Software — User Guide
 
 A plain-language guide for everyone who uses this app — no coding background
 needed. If you only have 2 minutes, jump to [Quick Start](#quick-start).
 
 > **TL;DR**
-> 1. [Download the ZIP](https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip), **extract it**, and double-click **E-Munim - WINDOWS** once.
-> 2. Click **Install Node & App**, then **Open App**. A desktop icon appears called *E-Munim*. Use it from then on.
+> 1. [Download the ZIP](https://github.com/aman1455/gst-billing-desktop/releases/latest/download/Free-GST-Billing.zip), **extract it**, and double-click **Free GST Billing - WINDOWS** once.
+> 2. Click **Install Node & App**, then **Open App**. A desktop icon appears called *Free GST Billing*. Use it from then on.
 > 3. Your data lives in the `_system\data\` folder inside the app folder. Back that folder up and you have backed up everything.
 
 ---
@@ -68,13 +68,13 @@ internet, your data stays on your machine, and there is no monthly fee — ever.
    folder and the launcher will tell you the `_system` folder is missing —
    even though you can plainly see it in the window behind. Extract first.)
 
-3. **Open the extracted folder and double-click `E-Munim - WINDOWS`.**
+3. **Open the extracted folder and double-click `Free GST Billing - WINDOWS`.**
    (Each launcher is named after the system it is for, so there is nothing to
    work out — Mac and Linux users pick theirs.)
    A small window opens with buttons. Click **Install Node & App**.
    - It installs Node.js for you if it is not already on your computer.
    - It installs the app's dependencies (one-time, takes ~2 minutes).
-   - It creates a *E-Munim* shortcut on your Desktop and in the
+   - It creates a *Free GST Billing* shortcut on your Desktop and in the
      Start Menu.
 
 4. **Click `Open App`.** Your browser opens straight to the app. From now on,
@@ -86,11 +86,11 @@ If you are comfortable with a terminal, this does all of the above by itself.
 It needs no admin rights and writes nothing outside your own user folder:
 
 ```powershell
-irm https://raw.githubusercontent.com/aman1455/gst-billing-desktop/main/install.ps1 | iex
+[Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex
 ```
 
-It installs to `%LOCALAPPDATA%\Programs\E-Munim`. To pick your own
-folder, run `$env:FREEGSTBILL_DIR = 'D:\Apps\E-Munim'` first.
+It installs to `%LOCALAPPDATA%\Programs\Free GST Billing`. To pick your own
+folder, run `$env:FREEGSTBILL_DIR = 'D:\Apps\Free GST Billing'` first.
 
 > **First-run wizard:** The first time you open the app, a 4-step wizard asks
 > for your business name, country, bank details, and so on. Pick *India*,
@@ -98,8 +98,8 @@ folder, run `$env:FREEGSTBILL_DIR = 'D:\Apps\E-Munim'` first.
 > adapts to your choice.
 
 ### macOS / Linux users
-The `.hta` launcher is Windows-only — use `E-Munim - MAC.command` or
-`E-Munim - LINUX.sh` from the same ZIP, or run it from source:
+The `.hta` launcher is Windows-only — use `Free GST Billing - MAC.command` or
+`Free GST Billing - LINUX.sh` from the same ZIP, or run it from source:
 ```bash
 git clone https://github.com/aman1455/gst-billing-desktop.git
 cd Free-GST-Billing-Software
@@ -232,7 +232,7 @@ On the **old** computer:
    somewhere portable (USB drive, email to yourself, Google Drive).
 
 On the **new** computer:
-1. Install the app fresh (extract the ZIP, run `E-Munim - WINDOWS`, click
+1. Install the app fresh (extract the ZIP, run `Free GST Billing - WINDOWS`, click
    **Install Node & App**).
 2. Skip or fill in the welcome wizard — doesn't matter, the import will
    overwrite.
@@ -319,8 +319,8 @@ your unit name. It's saved on this device and shows up everywhere.
 A: Open *Bills*, find the invoice and press the red **Cancel invoice** button.
 The invoice keeps its number and stays in the list marked *Cancelled*, prints
 with **CANCELLED** across it, and stops counting in your totals, reports and GST
-returns. Any stock on it is put back. Changed your mind? Pick another status
-(for example *Unpaid*) from the status dropdown on that row.
+returns. Any stock on it is put back. Changed your mind? Click the **Undo
+cancel** arrow among that row's actions.
 
 Invoice numbers must run without gaps for GST, which is why a saved invoice is
 cancelled rather than deleted.
@@ -358,7 +358,7 @@ installer is plain text — you can open it in Notepad and read every line
 before running. To proceed:
 
 - **SmartScreen blue screen** → click **More info** → **Run anyway**
-- **"File came from another computer"** → right-click `E-Munim - WINDOWS`
+- **"File came from another computer"** → right-click `Free GST Billing - WINDOWS`
   → **Properties** → tick **Unblock** at the bottom → OK
 - **Antivirus quarantine** → add the project folder to your AV's exclusion
   list, then re-run the installer
@@ -392,7 +392,7 @@ backup to `Documents\FreeGSTBill Backups\` before it started. Either:
    so it survives).
 
 ### The launcher says "`_system` folder is missing"
-You opened `E-Munim - WINDOWS` while still looking **inside** the ZIP.
+You opened `Free GST Billing - WINDOWS` while still looking **inside** the ZIP.
 Windows unpacks just that one file to a temp folder and runs it there, so the
 rest of the app really is missing — from the temp folder, not from your
 download. Close the launcher, right-click the ZIP in your Downloads folder,

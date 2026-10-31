@@ -10,8 +10,12 @@ import { toast } from './Toast';
 import { getProfile } from '../store';
 import { upiNote } from '../utils/supporters';
 import useSupporters from './useSupporters';
+import { useOfflineMode } from '../utils/offlineMode';
 import WhatsNew from './WhatsNew';
 import SupportersList from './SupportersList';
+import ProblemLog from './ProblemLog';
+import HelpButton from './HelpButton';
+import { SafePrivateSection } from './SafePrivateNote';
 
 const inr = (n) => `₹${Number(n).toLocaleString('en-IN')}`;
 
@@ -20,7 +24,8 @@ const UPI_NAME = 'DiceCodes';
 const REPO = 'https://github.com/aman1455/gst-billing-desktop';
 const EMAIL = 'contact@dicecodes.com';
 const SITE = 'https://dicecodes.com';
-const AMOUNTS = [0, 101, 251, 501];
+// v1.10.83 - ₹200 is the smallest suggested amount; "Any amount" (0) comes last.
+const AMOUNTS = [200, 500, 1000, 0];
 
 const SERVICES = [
   { icon: Code, title: 'Custom software & web apps', text: 'Websites, web apps and business tools built for how you work.' },
@@ -38,12 +43,13 @@ const upiLink = (amount, note) => `upi://pay?pa=${encodeURIComponent(SUPPORT_UPI
   + `&tn=${encodeURIComponent(note)}${amount ? `&am=${amount}.00` : ''}`;
 
 export default function SupportView() {
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState(AMOUNTS[0]);
   const [qr, setQr] = useState('');
   const [copied, setCopied] = useState(false);
   const [businessName, setBusinessName] = useState('');
   const [withName, setWithName] = useState(true);
   const tracker = useSupporters();
+  const [offline] = useOfflineMode();
   const note = upiNote(withName ? businessName : '');
 
   useEffect(() => { getProfile().then((p) => setBusinessName(p?.businessName || '')).catch(() => {}); }, []);
@@ -78,7 +84,7 @@ export default function SupportView() {
     <div className="dashboard-container">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Support &amp; About</h1>
+<h1 className="page-title">Support &amp; About <HelpButton title="Support & About" doc="support" size={16} style={{ marginLeft: 6 }} /></h1>
           <p className="page-subtitle">About E-Munim and developer support</p>
         </div>
       </div>
@@ -86,7 +92,7 @@ export default function SupportView() {
       <div className="glass-panel" style={{ ...card, marginBottom: '1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
         <Heart size={28} style={{ color: '#e11d48', flexShrink: 0, marginTop: 2 }} />
         <div>
-          <h3 style={{ margin: '0 0 0.4rem', fontSize: '1.05rem' }}>Free, and it stays free</h3>
+          <h3 style={{ margin: '0 0 0.4rem', fontSize: '1.05rem' }}>Free, and it stays free <HelpButton title="Free, and it stays free" doc="support#about" size={16} /></h3>
           <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: '70ch' }}>
             E-Munim is built and maintained by <b>DiceCodes</b> in India. No ads, no account, no locked features,
             and your invoices never leave this computer. If it saves you time every month, you can help keep the
@@ -97,7 +103,7 @@ export default function SupportView() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
         <div className="glass-panel" style={card}>
-          <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem' }}>Support with UPI</h3>
+          <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem' }}>Support with UPI <HelpButton title="Support with UPI" doc="support#upi" size={16} /></h3>
           <p style={{ margin: '0 0 1rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>Scan with GPay, PhonePe, Paytm or any UPI app. Any amount helps.</p>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '1rem' }} role="group" aria-label="Amount">
             {AMOUNTS.map((a) => (
@@ -132,7 +138,7 @@ export default function SupportView() {
         </div>
 
         <div className="glass-panel" style={card}>
-          <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem' }}>Help without paying</h3>
+          <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem' }}>Help without paying <HelpButton title="Help without paying" doc="support#free-ways" size={16} /></h3>
           <p style={{ margin: '0 0 0.5rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>These matter just as much.</p>
           {freeWays.map((w) => (
             <a key={w.title} href={w.href} target="_blank" rel="noopener noreferrer" style={linkRow}>
@@ -154,11 +160,19 @@ export default function SupportView() {
               <h3 style={{ margin: '0 0 0.2rem', fontSize: '1rem' }}>
                 {tracker.totalReceived > 0
                   ? <>{inr(tracker.totalReceived)} received so far{tracker.supporters ? ` from ${tracker.supporters} supporter${tracker.supporters === 1 ? '' : 's'}` : ''}</>
-                  : 'Be the first to support E-Munim'}
+: 'Be the first to support E-Munim'}
+                {' '}<HelpButton title="Supporters" doc="support#supporters-card" size={16} />
               </h3>
               <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 Every rupee goes into fixes and new features.{tracker.updated ? ` Updated ${new Date(`${tracker.updated}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}.` : ''}
               </p>
+              {/* v1.10.83 - Offline mode does not read the list, so say these
+                  are the last numbers seen (reported: "I only see 6"). */}
+              {offline && (
+                <p style={{ margin: '0.35rem 0 0', fontSize: '0.8rem', color: '#d97706' }}>
+                  Offline mode is on, so these are the last numbers this app saw. Turn it off with the Wi-Fi button at the top to see the latest.
+                </p>
+              )}
               {tracker.goal && (
                 <div style={{ marginTop: '0.85rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', fontSize: '0.8rem', flexWrap: 'wrap' }}>
@@ -178,10 +192,14 @@ export default function SupportView() {
         </div>
       )}
 
+      <SafePrivateSection style={{ marginBottom: '1.25rem' }} />
+
       <WhatsNew />
 
+      <ProblemLog />
+
       <div className="glass-panel" style={card}>
-        <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem' }}>Work with DiceCodes</h3>
+        <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem' }}>Work with DiceCodes <HelpButton title="Work with DiceCodes" doc="support#services" size={16} /></h3>
         <p style={{ margin: '0 0 1rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>The team behind this app builds software for businesses too.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '1.1rem' }}>
           {SERVICES.map((w) => (

@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- v1.10.83 - runs even when the app's code cannot load (a stale offline
+         copy after an update): clears that copy once and reloads. -->
+    <script src="/boot-guard.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!--
@@ -50,10 +53,10 @@
       default-src 'self';
       script-src  'self' 'wasm-unsafe-eval' https://accounts.google.com https://apis.google.com;
       worker-src  'self' blob:;
-      style-src   'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* https://fonts.googleapis.com;
-      font-src    'self' https://fonts.gstatic.com data:;
+      style-src   'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:*;
+      font-src    'self' http://localhost:* http://127.0.0.1:* data:;
       img-src     'self' data: blob: https://*.googleusercontent.com;
-      connect-src 'self' http://localhost:* https://accounts.google.com https://www.googleapis.com https://api.github.com https://nodejs.org https://raw.githubusercontent.com;
+      connect-src 'self' http://localhost:* https://accounts.google.com https://www.googleapis.com https://raw.githubusercontent.com;
       frame-src   'self' blob: https://accounts.google.com;
       object-src  'none';
       base-uri    'self';
@@ -127,10 +130,8 @@
     }
     </script>
 
-    <!-- Preconnect for Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- v1.10.83 - the Inter font ships inside the app (main.jsx), so opening
+         the app contacts nobody (it was loaded from Google Fonts each time). -->
   </head>
   <body>
     <!--

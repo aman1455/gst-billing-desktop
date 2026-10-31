@@ -53,3 +53,6 @@ release/
 *.key
 .keys/
 scripts/.keys/
+
+# Playwright MCP browser-tool scratch files
+.playwright-mcp/

@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { X, Printer, Download, Loader, ZoomIn, ZoomOut } from 'lucide-react';
 import InvoicePreview from './InvoicePreview';
+import HelpButton from './HelpButton';
 import { getPaperSize } from '../utils';
 
 // v1.10.36 — Portal-based print preview modal.
@@ -29,13 +30,23 @@ import { getPaperSize } from '../utils';
 export default function PrintPreviewModal({
   isOpen, onClose, onPrint, onDownloadPdf,
   profile, client, details, items, totals, invoiceType,
-  customTerms, customNotes, extraSections, invoiceOptions, cancelled = false,
+  customTerms, customNotes, extraSections, invoiceOptions, cancelled = false, einvoice = null,
 }) {
   const [printing, setPrinting] = useState(false);
   // #100: zoom slider, kept between opens. null = the default size for the
   // paper (see fitZoom below).
   const [zoom, setZoom] = useState(null);
   const modalRef = useRef(null);
+  // v1.10.83 - the width the page has to fit in, so the default size follows
+  // the window (asked for: "it should be responsive").
+  const [areaW, setAreaW] = useState(0);
+  const observer = useRef(null);
+  const areaRef = useCallback((el) => {
+    observer.current?.disconnect();
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    observer.current = new ResizeObserver(([entry]) => setAreaW(entry.contentRect.width));
+    observer.current.observe(el);
+  }, []);
 
   // Esc-to-close keyboard shortcut, matching every other modal in the app.
   useEffect(() => {
@@ -88,8 +99,11 @@ export default function PrintPreviewModal({
   // For thermal the preview scales to fit the modal since the receipt
   // is very narrow (48-104mm) — a 1:1 view would show a strip that's
   // dwarfed by the modal chrome. For A4 we show at ~70% so the whole
-  // page fits without scrolling on typical laptop viewports.
-  const fitZoom = isThermal ? 160 : 70; // on the slider's 5% steps
+  // page fits without scrolling on typical laptop viewports. v1.10.83 -
+  // smaller when the window is narrower, so the page always fits across.
+  const pagePx = (Number(paperCfg.widthMm) || 210) * 96 / 25.4 + 16; // + the 0.5rem frame
+  const maxFit = isThermal ? 160 : 70;
+  const fitZoom = areaW ? Math.max(30, Math.min(maxFit, Math.floor((areaW / pagePx) * 20) * 5)) : maxFit; // on the slider's 5% steps
   const zoomPct = zoom ?? fitZoom;
   const stepZoom = (d) => setZoom(Math.max(30, Math.min(250, zoomPct + d)));
 
@@ -102,7 +116,7 @@ export default function PrintPreviewModal({
         onClick={(e) => e.stopPropagation()}
         style={{
           maxWidth: isThermal ? 'min(520px, 96vw)' : 'min(900px, 96vw)',
-          maxHeight: '92vh',
+          maxHeight: 'min(92vh, 92dvh)',
           padding: 0,
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
@@ -119,6 +133,7 @@ export default function PrintPreviewModal({
               style={{ margin: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Printer size={18} style={{ color: 'var(--primary)' }} />
               Print preview
+              <HelpButton title="Viewing and printing an invoice" doc="dashboard#print-preview" size={16} />
             </h3>
             <p style={{ margin: '0.2rem 0 0 1.75rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
               {paperLabel} — click Print to send to your printer
@@ -138,7 +153,7 @@ export default function PrintPreviewModal({
             size: zoomed in, the page scrolls both ways instead of being cut
             off. margin auto, not flex centring, keeps the left edge
             reachable when it is wider than the window. */}
-        <div style={{
+        <div ref={areaRef} style={{
           flex: 1, minHeight: 0,
           overflow: 'auto',
           padding: '1.25rem 0.75rem',
@@ -158,7 +173,7 @@ export default function PrintPreviewModal({
               profile={profile} client={client} details={details}
               items={items} totals={totals} invoiceType={invoiceType}
               customTerms={customTerms} customNotes={customNotes}
-              extraSections={extraSections} options={invoiceOptions} cancelled={cancelled}
+              extraSections={extraSections} options={invoiceOptions} cancelled={cancelled} einvoice={einvoice}
             />
           </div>
         </div>

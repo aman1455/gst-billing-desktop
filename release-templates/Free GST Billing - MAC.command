@@ -20,6 +20,8 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 SYSTEM_DIR="$SCRIPT_DIR/_system"
+# v1.10.83 - Node.js the one-line install put inside the app folder.
+if [ -x "$SYSTEM_DIR/node/bin/node" ]; then export PATH="$SYSTEM_DIR/node/bin:$PATH"; fi
 
 clear
 echo

@@ -1,6 +1,7 @@
 import { Building2 } from 'lucide-react';
 import { confirmAction } from './ConfirmModal';
 import { toast } from './Toast';
+import HelpButton from './HelpButton';
 
 /**
  * Offers to attach records that predate multi-business separation to the
@@ -65,6 +66,7 @@ export default function UnassignedBanner({ count, businessName, noun, onAssign }
         <span>
           <strong>{label}</strong> {count === 1 ? 'is' : 'are'} not assigned to a business,
           so {count === 1 ? 'it shows' : 'they show'} under all of them.
+          <HelpButton title="Not assigned to a business" doc="purchases#unassigned" size={16} />
         </span>
       </span>
       <button type="button" className="btn" onClick={handleClick} style={{ fontSize: '0.85rem' }}>

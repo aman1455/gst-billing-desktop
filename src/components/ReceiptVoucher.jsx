@@ -308,16 +308,9 @@ export default function ReceiptVoucher() {
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div>
-            <h1 className="page-title">Receipts</h1>
+            <h1 className="page-title">Receipts <HelpButton title="Receipts — how to use" doc="receipts" size={16} /></h1>
             <p className="page-subtitle">Generate payment receipts for clients</p>
           </div>
-          <HelpButton title="Receipts — how to use" doc="receipts">
-            <ul style={{ paddingLeft: '1.1rem', margin: 0 }}>
-              <li><strong>New Receipt</strong>: pick an unpaid invoice to fill in the client, amount and invoice number.</li>
-              <li>When <strong>Against Invoice</strong> matches one of your invoice numbers, the payment is also recorded on that invoice.</li>
-              <li>Payments recorded on the Dashboard make their own receipt; print it from the invoice's payment history.</li>
-            </ul>
-          </HelpButton>
         </div>
         <button className="btn btn-primary" onClick={openAdd}><Plus size={18} /> New Receipt</button>
       </div>
@@ -333,12 +326,15 @@ export default function ReceiptVoucher() {
       {showForm && (
         <div className="modal-overlay" onClick={closeForm}>
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
-            <h3 className="section-title">{editingId ? 'Edit Payment Receipt' : 'New Payment Receipt'}</h3>
+            <h3 className="section-title">
+              {editingId ? 'Edit Payment Receipt' : 'New Payment Receipt'}
+              <HelpButton title={editingId ? 'Edit Payment Receipt' : 'New Payment Receipt'} doc={editingId ? 'receipts#edit-receipt' : 'receipts#new-receipt'} size={16} />
+            </h3>
 
             {/* Quick select from unpaid invoices */}
             {unpaidBills.length > 0 && !form.againstInvoice && (
               <div style={{ marginBottom: '1rem' }}>
-                <label className="form-label">Quick Select — Unpaid Invoices</label>
+                <label className="form-label">Quick Select — Unpaid Invoices<HelpButton title="Quick Select — Unpaid Invoices" doc="receipts#quick-select" size={14} /></label>
                 {/* v1.10.57 — reported (#44 item 2, @sangwanmail-eng):
                     "payment receipt overlapped". This capped the height of
                     `.client-picker`, which has no overflow handling — the
@@ -450,7 +446,7 @@ export default function ReceiptVoucher() {
 
       {/* Receipts Table */}
       <div className="glass-panel">
-        <div className="table-header"><h3>Payment Receipts</h3></div>
+        <div className="table-header"><h3>Payment Receipts<HelpButton title="Payment Receipts" doc="receipts#receipt-list" size={16} /></h3></div>
         {filtered.length === 0 ? (
           <div className="empty-state">
             <Receipt size={48} />

@@ -13,6 +13,7 @@ import {
   salesCsvToBills, billsToSalesCsv, purchaseCsvToRecords, purchasesToCsv, SALES_TEMPLATE, PURCHASE_TEMPLATE,
 } from '../utils/bulkCsv';
 import { toast } from './Toast';
+import HelpButton from './HelpButton';
 
 const download = (text, name) => {
   const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8;' }));
@@ -153,7 +154,7 @@ export default function BulkCsvImport({ kind = 'sales', onDone }) {
         <div className="modal-overlay" onClick={close}>
           <div className="modal-content" style={{ maxWidth: 640 }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 className="section-title" style={{ margin: 0 }}>{sales ? 'Sales invoices' : 'Purchase bills'}: CSV import / export</h3>
+              <h3 className="section-title" style={{ margin: 0 }}>{sales ? 'Sales invoices' : 'Purchase bills'}: CSV import / export <HelpButton title="CSV import" doc={sales ? 'dashboard#csv' : 'purchases#csv-purchases'} size={16} style={{ marginLeft: 6 }} /></h3>
               <button type="button" className="icon-btn" onClick={close} title="Close"><X size={16} /></button>
             </div>
             <p className="text-muted" style={{ fontSize: '0.85rem' }}>

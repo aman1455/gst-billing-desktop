@@ -4,8 +4,24 @@ import { registerSW } from 'virtual:pwa-register'
 import App from './App.jsx'
 import AppLockGate from './components/AppLock.jsx'
 import LicenseGate from './components/LicenseGate.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
+import { toast } from './components/Toast.jsx'
+import { logProblem } from './utils/problemLog'
+import { isChunkLoadError } from './utils/errorReport'
 import { restorePrefs, startMirroring } from './utils/prefsMirror'
+// v1.10.83 - Inter from the app's own files, not Google Fonts. Each file holds
+// every alphabet with a unicode-range, so the browser fetches only the parts it
+// needs (Latin; Latin-extended has the ₹ sign).
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/600.css'
+import '@fontsource/inter/700.css'
 import './index.css'
+
+// v1.10.83 - the app's code loaded: tell public/boot-guard.js, and let it
+// try again next time something goes wrong.
+window.__fgsbBooted = true;
+try { sessionStorage.removeItem('fgsb-boot-retry'); } catch { /* storage blocked */ }
 
 // v1.10.2 — Deferred SW update. Prior code called `updateSW(true)`
 // inside `onNeedRefresh` which triggers `location.reload()` immediately.
@@ -132,17 +148,45 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// v1.10.83 - every other uncaught error goes to the Problem log, with a
+// toast that offers Report (Toast adds it for a just-logged problem). The
+// chunk-load case above still reloads instead. Two browser messages are
+// noise, not problems: ResizeObserver's loop notice, and "Script error."
+// from another origin, which carries no details at all.
+const NOISE = /ResizeObserver loop|^Script error\.?$/i;
+let lastProblemToast = 0;
+const recordUncaught = (message, stack, alreadyLogged = false) => {
+  const msg = String(message || '');
+  if (!msg || NOISE.test(msg) || isChunkLoadError(msg)) return;
+  // apiFetch logs its own failures (with method, path and status) first.
+  if (!alreadyLogged) logProblem({ kind: 'uncaught', message: msg, stack });
+  if (Date.now() - lastProblemToast > 10_000) {
+    lastProblemToast = Date.now();
+    toast('Something went wrong. Your data is safe.', 'error');
+  }
+};
+window.addEventListener('error', (e) => {
+  try { recordUncaught(e?.error?.message || e?.message, e?.error?.stack); } catch { /* never throw from here */ }
+});
+window.addEventListener('unhandledrejection', (e) => {
+  try { recordUncaught(e?.reason?.message || e?.reason, e?.reason?.stack, e?.reason?.problemLogged); } catch { /* never throw from here */ }
+});
+
 // v1.10.77 (#84) - settings the browser has lost come back from the data
 // folder before the first render (the wizard and Region read them on start).
 restorePrefs().then((restored) => {
   startMirroring(restored)
   createRoot(document.getElementById('root')).render(
     <StrictMode>
-      <LicenseGate>
-        <AppLockGate>
-          <App />
-        </AppLockGate>
-      </LicenseGate>
+      <ErrorBoundary>
+        <LicenseGate>
+          <AppLockGate>
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
+          </AppLockGate>
+        </LicenseGate>
+      </ErrorBoundary>
     </StrictMode>,
   )
 })

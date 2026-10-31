@@ -87,7 +87,10 @@ Write-Host '  Downloading update...'
 Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath -UseBasicParsing
 
 Write-Host '  Extracting...'
-Expand-Archive -Path $zipPath -DestinationPath $tmp -Force
+# v1.10.83 - the ZIP now carries about 12,000 package files. Expand-Archive
+# takes minutes over that many; .NET's own unzip takes seconds.
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[IO.Compression.ZipFile]::ExtractToDirectory($zipPath, $tmp)
 
 # The extract may contain either the pretty release structure
 # (root has E-Munim - WINDOWS.hta + _system/) or the source zipball
@@ -110,6 +113,10 @@ Write-Host '  Applying update (your data folder is untouched)...'
 # packages. (A folder the user extracted and opened may hold its own empty
 # copies of these; they must not land on top of the real ones.)
 $keep = @('data', 'node_modules', 'node', 'Saved Invoices', 'Trash')
+# v1.10.83 - a release that ships its packages replaces node_modules too, and
+# then nothing needs npm. Older packages (or the source zipball) still do.
+$shipped = Test-Path -LiteralPath (Join-Path $newSystem 'node_modules\express\package.json')
+if ($shipped) { $keep = $keep | Where-Object { $_ -ne 'node_modules' } }
 Get-ChildItem -Path $newSystem -Force | Where-Object { $keep -notcontains $_.Name } | ForEach-Object {
   $dest = Join-Path $SystemDir $_.Name
   if (Test-Path $dest) { Remove-Item $dest -Recurse -Force -ErrorAction SilentlyContinue }
@@ -119,16 +126,33 @@ Get-ChildItem -Path $newSystem -Force | Where-Object { $keep -notcontains $_.Nam
 Get-ChildItem -Path $sourceRoot -File | Where-Object { $_.Extension -match '\.(hta|command|sh)$' -or $_.Name -match '^E-Munim' } | ForEach-Object {
   Copy-Item -Path $_.FullName -Destination (Join-Path $RootDir $_.Name) -Force
 }
+# v1.10.83 - a clean update: files an older version had and this one does not
+# are removed. Only for a full release package (never a source zipball, which
+# has no built app), and never the books, saved PDFs, the bin or Node.js.
+if ($shipped) {
+  $shippedNames = @(Get-ChildItem -Path $newSystem -Force | ForEach-Object { $_.Name })
+  $protected = @('data', 'Saved Invoices', 'Trash', 'node', 'node-dir.txt')
+  Get-ChildItem -Path $SystemDir -Force | Where-Object {
+    $shippedNames -notcontains $_.Name -and $protected -notcontains $_.Name -and -not $_.Name.StartsWith('.')
+  } | ForEach-Object { Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue }
+  $rootNames = @(Get-ChildItem -Path $sourceRoot -File | ForEach-Object { $_.Name })
+  Get-ChildItem -Path $RootDir -File | Where-Object {
+    ($_.Name -like 'Free GST Billing - *' -or $_.Name -eq 'READ ME FIRST.txt') -and $rootNames -notcontains $_.Name
+  } | ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue }
+}
 
 # --- Step 5: Reinstall dependencies (safest - new package.json may add packages) ---
-Write-Host '  Re-installing dependencies...'
+if (-not $shipped) { Write-Host '  Re-installing dependencies...' }
 Push-Location $SystemDir
 # v1.10.69 - Node.js may live inside the app folder (see install-windows.ps1).
 # v1.10.81 (#109) - and it must be new enough: an old Node.js on PATH (6.10)
 # brought npm 3, which broke the install, and this still said "complete".
 . (Join-Path $SystemDir 'ensure-node.ps1')
 $npmOk = $false
-if ((Use-GoodNode) -and (Test-InstallReady)) {
+if ($shipped) {
+  # Only Node.js itself may still be needed (fetched once if this PC has none).
+  $npmOk = [bool](Use-GoodNode)
+} elseif ((Use-GoodNode) -and (Test-InstallReady)) {
   if ($script:NodeWasFetched -or (Test-PackagesBroken)) { Reset-Packages }
   npm install --omit=dev --no-audit --no-fund --loglevel=error
   $npmOk = ($LASTEXITCODE -eq 0)
@@ -140,7 +164,7 @@ if (-not $npmOk) {
   Write-Host ''
   Write-Host '  The new version is in place, but it is not ready to run yet (see above).' -ForegroundColor Red
   Write-Host '  Your data is safe (a backup was made above). Fix the problem shown,'
-  Write-Host '  then click Open App: it finishes the install by itself.'
+  Write-Host '  then open the app from its icon: it finishes the install by itself.'
   Read-Host '  Press Enter to close'
   exit 1
 }

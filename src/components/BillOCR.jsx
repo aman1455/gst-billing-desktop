@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Upload, Loader, Wand2, Package, Sparkles, Trash2, Plus } from 'lucide-react';
 import { toast } from './Toast';
+import HelpButton from './HelpButton';
 // v1.10.29 — Pull the installed tesseract.js version straight from its
 // package.json so that when we `npm update tesseract.js`, the CDN paths
 // track automatically. Vite handles JSON imports natively — no bundle
@@ -472,7 +473,7 @@ export default function BillOCR({ onClose, onExtracted }) {
       <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 'min(1080px, 96vw)', maxHeight: '92vh', overflow: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
           <h3 className="section-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Wand2 size={18} /> Import from bill image (OCR)
+            <Wand2 size={18} /> Import from bill image (OCR) <HelpButton title="Reading a bill from a photo" doc="purchases#ocr" size={16} />
           </h3>
           <button className="icon-btn" onClick={onClose} title="Close"><X size={18} /></button>
         </div>
@@ -525,7 +526,7 @@ export default function BillOCR({ onClose, onExtracted }) {
           {/* Right: extracted result */}
           {parsed && (
             <div style={{ background: 'var(--bg-secondary)', padding: '0.85rem', borderRadius: 6, maxHeight: 'calc(88vh - 100px)', overflowY: 'auto' }}>
-              <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>Extracted fields</h4>
+              <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>Extracted fields <HelpButton title="Checking what was read" doc="purchases#ocr-review" size={16} /></h4>
               <FieldPreview label="Supplier" value={parsed.supplierName} onChange={v => setParsed(p => ({ ...p, supplierName: v }))} />
               <FieldPreview label="GSTIN" value={parsed.supplierGstin} onChange={v => setParsed(p => ({ ...p, supplierGstin: v }))} />
               <FieldPreview label="Invoice No." value={parsed.invoiceNumber} onChange={v => setParsed(p => ({ ...p, invoiceNumber: v }))} />

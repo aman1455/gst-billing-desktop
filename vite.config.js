@@ -25,6 +25,11 @@ const readActivePort = () => {
 const activeExpressPort = readActivePort();
 
 export default defineConfig({
+  // v1.10.83 - the Problem log stamps each entry with the version of the
+  // bundle that failed; it must not depend on reaching the server.
+  define: {
+    __APP_VERSION__: JSON.stringify(JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8')).version),
+  },
   // Vite source root lives in src/ rather than the project root. Reason:
   // the project root holds the user-facing Launcher (renamed to index.html
   // so users see ONE html file). Keeping Vite's own index.html inside
@@ -143,6 +148,11 @@ export default defineConfig({
         // least once. Trims initial precache from 1.63 MiB → ~0.85 MiB.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         globIgnores: [
+          // v1.10.83 - the bundled Inter font: only the Latin parts are ever
+          // drawn (the app is in English; ₹ is in Latin-extended), and every
+          // browser that runs the app reads .woff2, never the .woff copy.
+          '**/assets/inter-{cyrillic,cyrillic-ext,greek,greek-ext,vietnamese}-*',
+          '**/assets/*.woff',
           '**/assets/pdf-*.js',
           '**/assets/qr-*.js',
           '**/assets/index.es-*.js',
@@ -174,6 +184,9 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
+        // v1.10.83 - a new version reloads open windows of the old one, which
+        // can be stuck blank after an update (public/sw-reload.js).
+        importScripts: ['sw-reload.js'],
         runtimeCaching: [
           // v1.10.2 — /api/* runtime cache. Missing this rule meant the
           // "offline billing counter" promise was broken: fetch() throws
@@ -203,24 +216,6 @@ export default defineConfig({
             options: {
               cacheName: 'lazy-chunks-cache',
               expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-cache',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'gstatic-fonts-cache',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] },
             },
           },
           {

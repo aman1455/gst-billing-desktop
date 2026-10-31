@@ -1,24 +1,12 @@
 import { useState } from 'react';
 import { X, ChevronRight, Check } from 'lucide-react';
-import { getPrintSettings, savePrintSettings, BUSINESS_PRESETS, applyBusinessPreset } from '../utils/printSettings';
+import { getPrintSettings, savePrintSettings, applyBusinessPreset } from '../utils/printSettings';
 import { toast } from './Toast';
-import { getInvoiceDisplayOptions, saveInvoiceDisplayOptions } from '../store';
+import HelpButton from './HelpButton';
+import { patchInvoiceDefaults, getEnabledModules, setEnabledModules, setBusinessType } from '../store';
+import { BUSINESS_TYPES, businessTypeById, applyBusinessType, invoiceDefaultsForType } from '../utils/businessTypes';
 
 const PAPER_LABELS = { a4: 'A4', a5: 'A5', thermal80: '80mm thermal', thermal58: '58mm thermal' };
-
-// The invoice screen takes its paper size from the invoice defaults (browser
-// copy + server copy, server wins), not from print settings. Writing it only
-// to print settings, as before, meant the choice made here did nothing.
-const setDefaultPaperSize = async (paperSize) => {
-  try {
-    const local = JSON.parse(localStorage.getItem('freegstbill_invoiceOptions') || '{}');
-    localStorage.setItem('freegstbill_invoiceOptions', JSON.stringify({ ...local, paperSize }));
-  } catch { /* private window: server copy below still applies */ }
-  try {
-    const server = (await getInvoiceDisplayOptions()) || {};
-    await saveInvoiceDisplayOptions({ ...server, paperSize });
-  } catch { /* offline: the browser copy above still applies */ }
-};
 
 // ============================================================================
 // v1.9.3 — First-run Setup Wizard
@@ -49,10 +37,21 @@ export default function SetupWizard({ onClose }) {
     // Preset first, THEN the language picked on step 2: four presets set
     // English, which used to overwrite a Hindi / Tamil / ... choice.
     if (selectedBiz) next = applyBusinessPreset(next, selectedBiz);
+    // v1.10.83 - the business type also decides which features show. A new
+    // install has nothing to lose, so it applies without asking (Settings →
+    // Business type asks first).
+    if (selectedBiz) {
+      setEnabledModules(applyBusinessType(selectedBiz, getEnabledModules()));
+      setBusinessType(selectedBiz);
+    }
     next.labelLanguage = language;
     if (paperSize) next.paperSize = paperSize;
     savePrintSettings(next);
-    if (paperSize) setDefaultPaperSize(paperSize);
+    // The invoice screen takes its paper size from the invoice defaults, not
+    // from print settings. v1.10.83 - with the business type's invoice
+    // defaults (a freelancer's invoices start in Services mode).
+    const invoiceDefaults = { ...(selectedBiz ? invoiceDefaultsForType(selectedBiz) : {}), ...(paperSize ? { paperSize } : {}) };
+    patchInvoiceDefaults(invoiceDefaults);
     toast('Setup complete! Your defaults are configured.', 'success');
     onClose();
   };
@@ -77,7 +76,7 @@ export default function SetupWizard({ onClose }) {
       <div className="modal-content" style={{ maxWidth: '640px', maxHeight: '90vh', overflow: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '1.35rem' }}>👋 Welcome to E-Munim</h2>
+            <h2 style={{ margin: 0, fontSize: '1.35rem' }}>👋 Welcome to E-Munim <HelpButton title="Setting up your invoices" doc="first-run#setup-wizard" size={16} /></h2>
             <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               Step {step} of 3 · Takes 90 seconds
             </p>
@@ -97,12 +96,12 @@ export default function SetupWizard({ onClose }) {
 
         {step === 1 && (
           <>
-            <h3 style={{ marginTop: 0 }}>What kind of business do you run?</h3>
+            <h3 style={{ marginTop: 0 }}>What kind of business do you run? <HelpButton title="What kind of business do you run?" doc="first-run#wizard-business-type" size={16} /></h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-              Pick one and we'll set the invoice style, receipt options and features that suit that kind of business. You can change anything later.
+              Pick one and the app shows the features that business needs, and sets an invoice style to match. You can change it later in Settings → Business type.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.6rem' }}>
-              {Object.entries(BUSINESS_PRESETS).map(([key, preset]) => (
+              {BUSINESS_TYPES.map(({ id: key, ...preset }) => (
                 <button key={key} type="button"
                   onClick={() => setSelectedBiz(key)}
                   style={{
@@ -144,7 +143,7 @@ export default function SetupWizard({ onClose }) {
 
         {step === 2 && (
           <>
-            <h3 style={{ marginTop: 0 }}>Paper size + language</h3>
+            <h3 style={{ marginTop: 0 }}>Paper size + language <HelpButton title="Paper size + language" doc="first-run#wizard-paper-language" size={16} /></h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
               What are you mostly printing on?
             </p>
@@ -198,13 +197,13 @@ export default function SetupWizard({ onClose }) {
 
         {step === 3 && (
           <>
-            <h3 style={{ marginTop: 0 }}>Ready to go 🚀</h3>
+            <h3 style={{ marginTop: 0 }}>Ready to go 🚀 <HelpButton title="Ready to go" doc="first-run#wizard-ready" size={16} /></h3>
             <p style={{ fontSize: '0.85rem', marginBottom: '1rem' }}>
               We'll apply these defaults to every new invoice. You can change any of them later in <strong>Settings → Print & PDF</strong>.
             </p>
 
             <div style={{ padding: '1rem', background: 'var(--bg-secondary)', borderRadius: 8, fontSize: '0.9rem' }}>
-              <Row label="Business type" value={selectedBiz ? BUSINESS_PRESETS[selectedBiz]?.label : '(none — manual config)'} />
+              <Row label="Business type" value={selectedBiz ? businessTypeById(selectedBiz)?.label : '(none — manual config)'} />
               <Row label="Default paper size" value={PAPER_LABELS[paperSize] || paperSize} />
               <Row label="Section label language" value={
                 { en: 'English', hi: 'हिन्दी', ta: 'தமிழ்', mr: 'मराठी', bn: 'বাংলা' }[language]

@@ -72,7 +72,10 @@ else {
       `Not executable: ${scripts.filter((x) => !(x.mode & 0o111)).map((x) => x.name).join(', ')}. macOS: "you do not have appropriate access privileges".`);
     const ps1 = e.filter((x) => x.name.endsWith('.ps1')).map((x) => x.name.split('/').pop());
     check('ensure-node.ps1 ships with the scripts that use it (#109)', ps1.includes('ensure-node.ps1') && e.some((x) => x.name.endsWith('/check-node.sh')), 'ensure-node.ps1 / check-node.sh missing: install, update and start would fail.');
-    check('ZIP size looks right (5-60 MB)', statSync(appZip).size > 5e6 && statSync(appZip).size < 6e7, `It is ${(statSync(appZip).size / 1e6).toFixed(1)} MB.`);
+    // v1.10.83 - the packages ship inside the ZIP: no user's PC runs npm.
+    check('node_modules ships inside the ZIP (no npm install on users\' PCs)', e.some((x) => x.name === 'Free-GST-Billing/_system/node_modules/express/package.json'),
+      '_system/node_modules/express is missing. Build with npm run release:zip (it runs npm ci in the staging folder).');
+    check('ZIP size looks right (12-60 MB; the server packages only)', statSync(appZip).size > 1.2e7 && statSync(appZip).size < 6e7, `It is ${(statSync(appZip).size / 1e6).toFixed(1)} MB.`);
   }
 }
 
@@ -89,10 +92,28 @@ console.log('\nScripts that users run');
 const tdir = join(ROOT, 'release-templates', '_system-scripts');
 const nonAscii = readdirSync(tdir).filter((f) => f.endsWith('.ps1') && /[^\x00-\x7F]/.test(readFileSync(join(tdir, f), 'latin1')));
 check('every .ps1 is plain ASCII (ERR-001: Windows PowerShell misreads it)', !nonAscii.length, `Non-ASCII in ${nonAscii.join(', ')}.`);
-const unixScripts = [...readdirSync(tdir).filter((f) => f.endsWith('.sh')).map((f) => join(tdir, f)), join(ROOT, 'release-templates', 'E-Munim - MAC.command'), join(ROOT, 'release-templates', 'E-Munim - LINUX.sh')];
+const unixScripts = [...readdirSync(tdir).filter((f) => f.endsWith('.sh')).map((f) => join(tdir, f)), join(ROOT, 'release-templates', 'Free GST Billing - MAC.command'), join(ROOT, 'release-templates', 'Free GST Billing - LINUX.sh')];
 const crlf = unixScripts.filter((f) => readFileSync(f, 'latin1').includes('\r'));
 check('every .sh / .command uses LF line endings (ERR-014)', !crlf.length, `CRLF in ${crlf.join(', ')}.`);
 check('READ ME FIRST.txt is plain ASCII', !/[^\x00-\x7F]/.test(read('release-templates/READ ME FIRST.txt')), 'Notepad on some PCs garbles other characters.');
+
+// Errors users reported, each with the cheapest check that would catch it
+// coming back (the 30 Oct 2026 guard audit of docs/KNOWN_ERRORS.md).
+console.log('\nErrors users reported stay fixed');
+const hta = read('release-templates/Free GST Billing - WINDOWS.hta');
+check('ERR-002 the launcher says UTF-8 and is plain ASCII', /charset=utf-8/i.test(hta) && !/[^\x00-\x7F]/.test(hta), 'Its text turns into garbage on Indian-locale Windows.');
+check('ERR-017 the launcher spots being run from inside the ZIP', hta.includes("'\\\\appdata\\\\local\\\\temp\\\\'"), 'Run from the ZIP it said "_system missing" instead of "extract first".');
+const csp = (/http-equiv="Content-Security-Policy" content="([^"]*)"/.exec(read('src/index.html')) || [])[1] || '';
+const cspHas = (dir, src) => new RegExp(`${dir}[^;]*\\s${src.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|;|$)`).test(csp);
+check('ERR-004 the security policy allows the print frame, workers and blob images', ['frame-src', 'worker-src', 'img-src'].every((d) => cspHas(d, 'blob:')), 'Print, PDF or OCR is blocked by src/index.html.');
+const minNode = Number((/\$MinNodeMajor\s*=\s*(\d+)/.exec(readFileSync(join(tdir, 'ensure-node.ps1'), 'utf8')) || [])[1]);
+check('ERR-060 the scripts and package.json agree on the oldest Node.js', minNode === Number((/(\d+)/.exec(pkg.engines?.node || '') || [])[1]), `ensure-node.ps1 says ${minNode}, package.json engines says ${pkg.engines?.node}.`);
+const psdrive = [...readdirSync(tdir).filter((f) => f.endsWith('.ps1')).map((f) => join(tdir, f)), join(ROOT, 'install.ps1')]
+  .filter((f) => /Get-PSDrive/.test(readFileSync(f, 'utf8')) && !(/AvailableFreeSpace/.test(readFileSync(f, 'utf8')) && /-le 0/.test(readFileSync(f, 'utf8'))));
+check('ERR-067 free-space checks treat "0 MB free" as unknown', !psdrive.length, `${psdrive.join(', ')}: Get-PSDrive alone reported 0 MB free and blocked installs.`);
+const srcFiles = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? srcFiles(join(dir, e.name)) : /\.(jsx?|html)$/.test(e.name) ? [join(dir, e.name)] : []));
+const installPrompt = srcFiles(join(ROOT, 'src')).filter((f) => readFileSync(f, 'utf8').includes('beforeinstallprompt'));
+check('ERR-072 the app does not offer the browser\'s "Install app" icon', !installPrompt.length, `${installPrompt.join(', ')}: that icon cannot start the app ("Needs a Quick Start").`);
 
 console.log('\nLive data the app reads');
 let sup = null; try { sup = parseSupporters(JSON.parse(read('supporters.json'))); } catch { /* reported below */ }

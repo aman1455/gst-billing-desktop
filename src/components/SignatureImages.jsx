@@ -10,7 +10,12 @@ export const SIGN_LAYOUTS = [
   { value: 'over', label: 'Stamp on the signature' },
 ];
 
-export default function SignatureImages({ sigImg, stampImg, sigHeight = 60, stampHeight = 70, layout = 'side', align = 'center', gap = 8, sigMaxWidth = 180, stampMaxWidth = 120 }) {
+
+// spaceBelow: the gap under the images. The Tally / Boxed designs pass 0:
+// they space the block themselves, and their one-page fit is tight (a few
+// extra pixels pushed a one-item Tally invoice onto a second page).
+export default function SignatureImages({ sigImg, stampImg, sigHeight = 60, stampHeight = 70, layout = 'side', align = 'center', gap = 8, sigMaxWidth = 180, stampMaxWidth = 120, spaceBelow = '0.4rem' }) {
+
   if (!sigImg && !stampImg) return null;
   const justify = align === 'right' ? 'flex-end' : align === 'left' ? 'flex-start' : 'center';
   const img = (src, alt, h, w, extra = {}) => (
@@ -21,7 +26,9 @@ export default function SignatureImages({ sigImg, stampImg, sigHeight = 60, stam
 
   if (layout === 'stack' || (layout === 'over' && !(sigImg && stampImg))) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: justify, gap: Math.round(gap / 2), marginBottom: '0.4rem' }}>
+
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: justify, gap: Math.round(gap / 2), marginBottom: spaceBelow }}>
+
         {stamp}{sign}
       </div>
     );
@@ -30,7 +37,9 @@ export default function SignatureImages({ sigImg, stampImg, sigHeight = 60, stam
     // The stamp sits across the right half of the signature, a little
     // transparent so the signature still reads through it.
     return (
-      <div style={{ display: 'flex', justifyContent: justify, marginBottom: '0.4rem' }}>
+
+      <div style={{ display: 'flex', justifyContent: justify, marginBottom: spaceBelow }}>
+
         <div style={{ position: 'relative', display: 'inline-block', paddingRight: Math.round(stampMaxWidth * 0.35) }}>
           {sign}
           {img(stampImg, 'Stamp', stampHeight, stampMaxWidth, { position: 'absolute', right: 0, bottom: 0, opacity: 0.85 })}
@@ -39,7 +48,9 @@ export default function SignatureImages({ sigImg, stampImg, sigHeight = 60, stam
     );
   }
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: justify, gap, marginBottom: '0.4rem' }}>
+
+    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: justify, gap, marginBottom: spaceBelow }}>
+
       {stamp}{sign}
     </div>
   );

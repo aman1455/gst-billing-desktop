@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { getProfile, saveProfile, exportAllData, importData, inspectBackup, getTermsTemplates, saveTermsTemplate, deleteTermsTemplate, getAllProfiles, saveBusinessProfile, deleteBusinessProfile, getRegionMode, setRegionMode, getEnabledModules, setEnabledModules, getStockAlertSettings, saveStockAlertSettings, renameNumberSeries, getInvoiceDisplayOptions, saveInvoiceDisplayOptions } from '../store';
+import { getProfile, saveProfile, exportAllData, importData, inspectBackup, getTermsTemplates, saveTermsTemplate, deleteTermsTemplate, getAllProfiles, saveBusinessProfile, deleteBusinessProfile, getRegionMode, setRegionMode, getStockAlertSettings, saveStockAlertSettings, renameNumberSeries, getInvoiceDisplayOptions, saveInvoiceDisplayOptions, getCostCentres, saveCostCentres } from '../store';
 import { ensureToken, findOrCreateFolder, uploadJSON } from '../services/googleDrive';
-import { getCountryConfig, getStatesForCountry, validateTaxId, getCountriesForRegion, FEATURE_GROUPS, isModuleEnabled, getPaymentAccounts, createEmptyAccount, maskAccountNumber, reorderAccounts, setDefaultAccount, isValidUpiId, findSameBusiness, businessKeyOf, stockDelta } from '../utils';
+import { getCountryConfig, getStatesForCountry, validateTaxId, getCountriesForRegion, isModuleEnabled, getPaymentAccounts, createEmptyAccount, maskAccountNumber, reorderAccounts, setDefaultAccount, isValidUpiId, findSameBusiness, businessKeyOf, stockDelta, localToday } from '../utils';
+import { normaliseLutArn, isLikelyLutArn, lutFyOptions, fyOf } from '../utils/lut';
 // v1.10.36 — lucide's `Image` icon was imported as `Image`, which
 // SHADOWED the browser's `HTMLImageElement` constructor. Reported:
 // "Uncaught TypeError: et is not a constructor at onChange" on logo
@@ -16,14 +17,23 @@ import { confirmAction } from './ConfirmModal';
 import PrintSettings from './PrintSettings';
 import HelpButton from './HelpButton';
 import AppLockSettings from './AppLockSettings';
+import PrivacyInternet from './PrivacyInternet';
+import CostCentreSettings from './CostCentreSettings';
+import { BusinessTypePanel, FeaturesPanel, useFeatureDraft } from './FeatureSettings';
+import { rekeyCentres } from '../utils/costCentres';
 import InvoiceNumberSettings from './InvoiceNumberSettings';
 import SignatureImages, { SIGN_LAYOUTS } from './SignatureImages';
+
+import { PURPOSE_CODES } from '../utils/purposeCodes';
+
 import { getBackupsList, restoreBackup, triggerBackup, deleteBackup, getTrashedBills, restoreTrashedBill, purgeTrashedBill, runUpdateNow, saveBill, applyStockChanges, getBackupFolder, setBackupFolder } from '../store';
 
 // v1.10.36 — Section order for the jump-nav pill bar. Keeping this at
 // module scope so the scroll-spy effect below can reference it without
 // re-computing on every render.
+// v1.10.83 - "Business type comes first": it decides which features show.
 const JUMP_NAV_SECTIONS = [
+  ['section-biztype',  'Business type'],
   ['section-company',  'Company'],
   ['section-profiles', 'Profiles'],
   ['section-terms',    'Terms'],
@@ -32,11 +42,23 @@ const JUMP_NAV_SECTIONS = [
   ['section-stock',    'Stock'],
   ['section-region',   'Region'],
   ['section-lock',     'App lock'],
+  ['section-privacy',  'Privacy & internet'],
   ['section-backups',  'Backups'],
   ['section-cloud',    'Google Drive'],
   ['section-data',     'Import/Export'],
   ['section-updates',  'Updates'],
 ];
+// v1.10.83 - the ? button opens the guide for the tab that is open.
+// Each card inside a tab has its own ? next to its title too. The docs build
+// (docs-site/build.mjs) checks that every one of these exists.
+const SETTINGS_TAB_DOCS = {
+  'section-biztype': 'settings#business-type',
+  'section-company': 'settings#company-details', 'section-profiles': 'settings#business-profiles',
+  'section-terms': 'settings#terms', 'section-print': 'print-settings', 'section-modules': 'settings#features',
+  'section-stock': 'settings#stock', 'section-region': 'settings#region', 'section-lock': 'settings#lock', 'section-privacy': 'security#offline-mode',
+  'section-backups': 'backup#automatic-backups', 'section-cloud': 'settings#google-drive', 'section-data': 'backup#export-import',
+  'section-updates': 'settings#updates',
+};
 
 export default function SettingsView({ onSaved }) {
   const [profile, setProfile] = useState({
@@ -44,11 +66,23 @@ export default function SettingsView({ onSaved }) {
     email: '', phone: '', bankName: '', accountNumber: '', ifsc: '',
     logo: '', logoHeight: 48, signature: '', signatureHeight: 60, stamp: '', stampHeight: 70, upiId: '', googleClientId: '', googleDriveFolder: 'GST Billing Invoices',
   });
-  // v1.10.36 — Scroll-spy: which section is currently in the viewport,
-  // so the corresponding pill lights up as the user scrolls. Cheap
-  // IntersectionObserver — a single observer watching all 11 sections;
-  // fires when any crosses the top-of-viewport band.
-  const [activeSection, setActiveSection] = useState(JUMP_NAV_SECTIONS[0][0]);
+  // v1.10.83 - Settings is tabbed: each tab shows only its own page (asked
+  // for: "instead of bigger setting pages it should load as tab pages").
+  // Hidden tabs stay mounted, so an unsaved change on one tab is kept when
+  // switching and the one Save bar still covers every tab. The open tab is
+  // remembered for this browser session.
+  const TAB_KEY = 'gst_settingsTab';
+  const [activeSection, setActiveSectionState] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem(TAB_KEY);
+      if (JUMP_NAV_SECTIONS.some(([id]) => id === saved)) return saved;
+    } catch { /* storage blocked */ }
+    return JUMP_NAV_SECTIONS[0][0];
+  });
+  const setActiveSection = (id) => {
+    setActiveSectionState(id);
+    try { sessionStorage.setItem(TAB_KEY, id); } catch { /* storage blocked */ }
+  };
 
   // v1.10.55 — reported (#43, @sangwanmail-eng): "Some time details not save
   // after update in setting tab", and the title said there was no save button
@@ -78,15 +112,9 @@ export default function SettingsView({ onSaved }) {
   // share top: 0, so the save bar sat on top of the jump bar and hid it. The
   // jump bar now sticks just below the save bar, measured live because the
   // save bar wraps to two lines on narrow screens.
+  // v1.10.83 - its height only set where a scrolled-to section stopped; tabs
+  // open each page at the top, so that measurement went.
   const saveBarRef = useRef(null);
-  const [saveBarH, setSaveBarH] = useState(56);
-  useEffect(() => {
-    const el = saveBarRef.current;
-    if (!el || typeof ResizeObserver === 'undefined') return undefined;
-    const ro = new ResizeObserver(() => setSaveBarH(el.offsetHeight));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   // v1.10.56 — reported (#44, @sangwanmail-eng): "Firm profile setting not
   // saved. every time show popup".
@@ -124,29 +152,6 @@ export default function SettingsView({ onSaved }) {
   // saving, and any future drift in the dirty check turns straight into a
   // popup on every exit. The sticky bar already makes unsaved work visible
   // without interrupting anyone.
-  useEffect(() => {
-    const els = JUMP_NAV_SECTIONS
-      .map(([id]) => document.getElementById(id))
-      .filter(Boolean);
-    if (!els.length) return;
-    const io = new IntersectionObserver((entries) => {
-      // Multiple sections may be in view at once. Pick the top-most
-      // one that's still intersecting so the highlight tracks the
-      // section the user is actually reading.
-      const visible = entries
-        .filter(e => e.isIntersecting)
-        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-      if (visible?.target?.id) setActiveSection(visible.target.id);
-    }, {
-      // Fires when a section enters the top 40% band — feels natural
-      // while scrolling because the section header is usually the
-      // trigger point (not the entire panel).
-      rootMargin: '-10% 0px -50% 0px',
-      threshold: 0.01,
-    });
-    els.forEach(el => io.observe(el));
-    return () => io.disconnect();
-  }, []);
   const [saving, setSaving] = useState(false);
   const [termsTemplates, setTermsTemplates] = useState([]);
   const [editingTemplate, setEditingTemplate] = useState(null);
@@ -174,25 +179,13 @@ export default function SettingsView({ onSaved }) {
       result.ok ? 'success' : 'error', 10000);
   };
   const [regionMode, setRegionModeState] = useState(getRegionMode());
-  const [enabledModules, setEnabledModulesState] = useState(getEnabledModules());
+  // v1.10.83 - Business type + Features: a draft, applied by "Save all changes".
+  const features = useFeatureDraft();
   const [stockAlerts, setStockAlerts] = useState({ enabled: true, threshold: 5 });
   const [stockAlertsSaving, setStockAlertsSaving] = useState(false);
   // v1.10.75 - what is on disk for the forms that have their own Save, so
   // the bottom "Save all changes" bar knows what is still unsaved.
   const [stockSaved, setStockSaved] = useState(null);
-
-  const toggleModule = (moduleId) => {
-    const next = { ...enabledModules, [moduleId]: !isModuleEnabled(moduleId, enabledModules) };
-    setEnabledModulesState(next);
-    setEnabledModules(next);
-  };
-
-  const resetModules = () => {
-    setEnabledModulesState({});
-    setEnabledModules({});
-    // v1.10.74 - defaults keep some features off (e.g. TDS/TCS), so don't say "all visible"
-    toast('Features reset to default', 'success');
-  };
   const fileInputRef = useRef(null);
   const logoInputRef = useRef(null);
   const sigInputRef = useRef(null);
@@ -444,6 +437,12 @@ export default function SettingsView({ onSaved }) {
       const oldKey = businessKeyOf(activeBusiness);
       const newKey = businessKeyOf(profile);
       if (oldKey && newKey && oldKey !== newKey) await renameNumberSeries(oldKey, newKey).catch(() => {});
+      // v1.10.83 (#112) - and its cost centres.
+      if (oldKey && newKey && oldKey !== newKey) {
+        await getCostCentres()
+          .then((list) => list.some((c) => c.business === oldKey) && saveCostCentres(rekeyCentres(list, oldKey, newKey)))
+          .catch(() => {});
+      }
       // v1.10.16 — reported: "uploaded logo and saved but it's not showing on
       // invoice". Root cause was a stale `freegstbill_invoiceOptions.showLogo`
       // in localStorage from before the upload — DEFAULT_OPTIONS has it true,
@@ -522,8 +521,8 @@ export default function SettingsView({ onSaved }) {
     { id: 'bills',          label: 'Invoices / bills',         hint: 'Tax invoices, proforma, credit notes, etc.' },
     { id: 'clients',        label: 'Clients',                  hint: 'Saved client directory' },
     { id: 'products',       label: 'Products / Inventory',     hint: 'Product catalog with HSN, rate, stock' },
-    { id: 'expenses',       label: 'Expenses',                 hint: 'Expense tracker entries' },
-    { id: 'purchases',      label: 'Purchase bills',           hint: 'Vendor bills used for ITC' },
+    { id: 'expenses',       label: 'Expenses',                 hint: 'Expense tracker entries and the cash book' },
+    { id: 'purchases',      label: 'Purchase bills',           hint: 'Vendor bills used for ITC, and purchase orders' },
     { id: 'recurring',      label: 'Recurring invoices',       hint: 'Auto-billing schedule entries' },
     { id: 'receipts',       label: 'Receipts',                 hint: 'Payment receipts' },
     { id: 'termsTemplates', label: 'Terms templates',          hint: 'Reusable T&C library' },
@@ -737,19 +736,22 @@ export default function SettingsView({ onSaved }) {
     setProfile(blank);
     markProfileSaved(blank);
     setTaxIdWarning('');
-    toast(current ? `${current} is safe in Business Profiles below - fill in the new company and press Save Profile` : 'Fill in the new company, then press Save Profile', 'info', 6000);
-    companyFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    toast(current ? `${current} is safe under the Profiles tab - fill in the new company and press Save Profile` : 'Fill in the new company, then press Save Profile', 'info', 6000);
+    setActiveSection('section-company');
+    setTimeout(() => companyFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   };
 
   // v1.10.75 - one Save for the whole page (asked for: "a global save button
   // at the bottom, sticky, that saves all data filled anywhere"). Bank
-  // accounts, Features, Region and Print & PDF already save as they change;
-  // these are the four that wait for a Save.
+  // accounts, Region and Print & PDF already save as they change; these wait
+  // for a Save. v1.10.83 - Business type and Features joined them (asked for:
+  // "just checkbox and save button to apply").
   const unsaved = [
     profileDirty && 'Company Details',
     invNumDirty && 'Invoice Number Format',
     stockSaved !== null && JSON.stringify(stockAlerts) !== stockSaved && 'Low-stock alerts',
     !!editingTemplate && 'Terms template',
+    ...features.unsaved,
   ].filter(Boolean);
   const saveAll = async () => {
     if (!unsaved.length) { toast('Everything is already saved', 'info'); return; }
@@ -759,6 +761,7 @@ export default function SettingsView({ onSaved }) {
     if (unsaved.includes('Invoice Number Format')) jobs.push(invNumRef.current?.save());
     if (unsaved.includes('Low-stock alerts')) jobs.push(saveStockAlerts());
     if (editingTemplate) jobs.push(handleSaveTemplate());
+    if (features.unsaved.length) features.save();
     await Promise.all(jobs);
   };
   const discardAll = () => {
@@ -766,6 +769,7 @@ export default function SettingsView({ onSaved }) {
     invNumRef.current?.discard();
     if (stockSaved !== null) setStockAlerts(JSON.parse(stockSaved));
     setEditingTemplate(null);
+    features.discard();
   };
 
   const [taxIdWarning, setTaxIdWarning] = useState('');
@@ -799,7 +803,7 @@ export default function SettingsView({ onSaved }) {
             boxShadow: '0 6px 18px rgba(var(--primary-rgb), 0.35)',
           }}>⚙</div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h1 className="page-title" style={{ margin: 0 }}>Settings</h1>
+            <h1 className="page-title" style={{ margin: 0 }}>Settings <HelpButton title="Settings" doc={SETTINGS_TAB_DOCS[activeSection] || 'settings'} size={16} /></h1>
             <p className="page-subtitle" style={{ margin: '0.15rem 0 0' }}>
               Business profile, branding, integrations & data
               <span style={{ fontSize: '0.7rem', padding: '0.1rem 0.5rem', borderRadius: 999, background: 'var(--bg-secondary)', border: '1px solid var(--border)', marginLeft: '0.55rem', fontWeight: 600 }}>
@@ -807,18 +811,6 @@ export default function SettingsView({ onSaved }) {
               </span>
             </p>
           </div>
-          <HelpButton title="Settings — how to use" doc="settings">
-            <ul style={{ paddingLeft: '1.1rem', margin: 0 }}>
-              <li><strong>Company Details</strong> — this is the header block on every invoice. GSTIN drives place-of-supply detection.</li>
-              <li><strong>Multi-business profiles</strong> — Save as Profile keeps the current form as a switchable profile; switch between them from the business name at the top of the sidebar.</li>
-              <li><strong>Payment Accounts</strong> — add multiple bank / UPI accounts; ⭐ marks the default. Every inline change (add / edit / ⭐ / reorder / delete) auto-saves.</li>
-              <li><strong>Invoice Number Settings</strong> — brand prefix, financial-year suffix, padding. Live preview at the bottom.</li>
-              <li><strong>Print Settings</strong> — templates, colors, watermark, thermal font size, per-type prefix overrides.</li>
-              <li><strong>Backup Management</strong> — daily auto-backups kept 30 days. Restore any date, or Delete to reclaim disk. Trash bin keeps deleted invoices for 30 days.</li>
-              <li><strong>Google Drive</strong> — easiest: install Google Drive for Desktop and sync the Saved Invoices folder. Advanced: connect your own Google Client ID to upload each downloaded invoice PDF.</li>
-              <li><strong>Data Management</strong> — export all or part of your data to one backup file, and import it here or on another computer. Clients and products import from CSV on their own screens.</li>
-            </ul>
-          </HelpButton>
         </div>
       </div>
 
@@ -840,6 +832,10 @@ export default function SettingsView({ onSaved }) {
           background: 'var(--bg-secondary)', // solid: content must not show through
           boxShadow: '0 4px 20px rgba(15, 23, 42, 0.08)',
         }}>
+        <style>{JUMP_NAV_SECTIONS.map(([id]) => id)
+          .concat('section-costcentres')
+          .filter((id) => id !== activeSection && !(id === 'section-costcentres' && activeSection === 'section-modules'))
+          .map((id) => `#${id}`).join(', ') + ' { display: none !important; }'}</style>
         <nav className="settings-jumpnav" aria-label="Settings sections" style={{
           display: 'flex', gap: '0.3rem', flexWrap: 'wrap', alignItems: 'center',
         }}>
@@ -847,15 +843,11 @@ export default function SettingsView({ onSaved }) {
             const active = activeSection === id;
             return (
               <a key={id} href={`#${id}`}
+                aria-current={active ? 'page' : undefined}
                 onClick={(e) => {
                   e.preventDefault();
-                  const el = document.getElementById(id);
-                  // Stop below the sticky bar, not underneath it.
-                  if (el) {
-                    const offset = saveBarH + 20;
-                    el.style.scrollMarginTop = `${offset}px`;
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
+                  setActiveSection(id);
+                  window.scrollTo({ top: 0 });
                 }}
                 style={{
                   fontSize: '0.76rem',
@@ -923,7 +915,7 @@ export default function SettingsView({ onSaved }) {
             fontSize: '1.15rem',
           }}>🔔</div>
           <div>
-            <h3 className="section-title" style={{ marginTop: 0, marginBottom: '0.25rem' }}>Low-stock alerts</h3>
+            <h3 className="section-title" style={{ marginTop: 0, marginBottom: '0.25rem' }}>Low-stock alerts <HelpButton title="Low-stock alerts" doc="settings#stock" size={16} style={{ marginLeft: 6 }} /></h3>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
               Powers the 🔔 sidebar badge and the Dashboard low-stock list. The Inventory page colour-codes products against this threshold too.
             </p>
@@ -1018,52 +1010,18 @@ export default function SettingsView({ onSaved }) {
       {/* v1.9.5 — Backup Management + Trash Bin */}
       <div id="section-backups" style={{ order: 8 }}><BackupAndTrashPanel /></div>
 
-      {/* ---- Modules / Features ---- */}
-      <div id="section-modules" className="glass-panel p-6 mb-6" style={{ order: 5 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <div>
-            <h3 className="section-title" style={{ marginTop: 0, marginBottom: '0.25rem' }}>Modules</h3>
-            <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0 }}>
-              Turn off the features you don't need. They disappear from the sidebar and forms — your data stays untouched.
-            </p>
-          </div>
-          <button type="button" className="btn btn-secondary" onClick={resetModules} style={{ fontSize: '0.78rem', padding: '0.35rem 0.7rem' }}>
-            Reset to default
-          </button>
-        </div>
-        <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.75rem' }}>
-          {FEATURE_GROUPS.map(group => (
-            <div key={group.id} className="surface-card">
-              <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: '0.15rem' }}>{group.label}</div>
-              <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0 0 0.6rem' }}>{group.description}</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                {group.modules.map(mod => {
-                  const enabled = isModuleEnabled(mod.id, enabledModules);
-                  // Hide India-only modules entirely when region is "international" — toggling
-                  // them on wouldn't have any effect.
-                  if (mod.indiaOnly && regionMode === 'international') return null;
-                  return (
-                    <label key={mod.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.78rem', cursor: mod.core ? 'not-allowed' : 'pointer', opacity: mod.core ? 0.55 : 1 }}>
-                      <input type="checkbox" checked={enabled} disabled={mod.core}
-                        onChange={() => !mod.core && toggleModule(mod.id)}
-                        style={{ width: 15, height: 15, accentColor: 'var(--primary)', marginTop: '2px' }} />
-                      <span style={{ lineHeight: 1.35 }}>
-                        {mod.label}
-                        {mod.core && <span style={{ fontSize: '0.65rem', color: '#94a3b8', marginLeft: '0.4rem' }}>(always on)</span>}
-                        {mod.indiaOnly && <span style={{ fontSize: '0.65rem', color: '#94a3b8', marginLeft: '0.4rem' }} title="India-only feature">🇮🇳</span>}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* v1.10.83 - Business type (first tab) and Features: FeatureSettings.jsx. */}
+      <BusinessTypePanel features={features} />
+      <FeaturesPanel features={features} regionMode={regionMode} />
+
+      {/* v1.10.83 (#112) - only while the feature is on, right under Features. */}
+      {isModuleEnabled('costCentres', features.saved.modules) && (
+        <div id="section-costcentres" style={{ order: 5 }}><CostCentreSettings profile={activeBusiness} /></div>
+      )}
 
       {/* ---- Region Preference ---- */}
       <div id="section-region" className="glass-panel p-6 mb-6" style={{ order: 7 }}>
-        <h3 className="section-title" style={{ marginTop: 0 }}>Region Preference</h3>
+        <h3 className="section-title" style={{ marginTop: 0 }}>Region Preference <HelpButton title="Region Preference" doc="settings#region" size={16} style={{ marginLeft: 6 }} /></h3>
         <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '0.85rem' }}>
           Choose how the app behaves. You can change this any time without losing data.
         </p>
@@ -1089,11 +1047,14 @@ export default function SettingsView({ onSaved }) {
       <div id="section-lock" className="glass-panel p-6 mb-6" style={{ order: 7 }}>
         <AppLockSettings />
       </div>
+      <div id="section-privacy" className="glass-panel p-6 mb-6" style={{ order: 7 }}>
+        <PrivacyInternet />
+      </div>
 
       {/* ---- Business Profile ---- */}
       <form id="section-company" onSubmit={handleSave} className="glass-panel p-6 mb-6" ref={companyFormRef} style={{ order: 1 }}>
         <fieldset disabled={!profileLoaded} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
-        <h3 className="section-title">Company Details</h3>
+        <h3 className="section-title">Company Details <HelpButton title="Company Details" doc="settings#company-details" size={16} style={{ marginLeft: 6 }} /></h3>
         {(() => {
           const cc = getCountryConfig(profile.country);
           return (
@@ -1158,11 +1119,11 @@ export default function SettingsView({ onSaved }) {
               </div>
               {/* v1.10.43 — GST-specific fields: AATO band + turnover
                   numbers. Drive the GSTR-1 export's HSN digit-length
-                  gate + the gt/cur_gt root fields the offline utility
-                  requires. India-only. */}
+                  gate (the gt/cur_gt turnover boxes were removed in v1.10.83;
+                  the portal no longer wants them). India-only. */}
               {(profile.country || 'India') === 'India' && (
                 <div className="form-group full-width" style={{ background: 'var(--bg-secondary)', padding: '0.85rem 1rem', borderRadius: 8, border: '1px solid var(--border)' }}>
-                  <label className="form-label" style={{ marginBottom: 6 }}>GSTR filing details (used only for GSTR-1 / GSTR-3B JSON export)</label>
+                  <label className="form-label" style={{ marginBottom: 6 }}>GSTR filing details (used only for GSTR-1 / GSTR-3B JSON export) <HelpButton title="GSTR filing details" doc="settings#gstr-details" size={16} style={{ marginLeft: 6 }} /></label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: 8 }}>
                     <input type="checkbox" id="aato-above-5cr" name="aatoAbove5Cr"
                       checked={!!profile.aatoAbove5Cr}
@@ -1174,25 +1135,46 @@ export default function SettingsView({ onSaved }) {
                   <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0 0 0.6rem' }}>
                     Drives HSN reporting rule — <strong>{profile.aatoAbove5Cr ? '6-digit HSN' : '4-digit HSN'}</strong> minimum on every item. Since Jan 2025 the portal blocks GSTR-1 if any HSN falls short.
                   </p>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
+                  {/* v1.10.83 (#133) - the turnover boxes (JSON gt / cur_gt) are
+                      gone: those fields were only for 2017-18 returns. */}
+                </div>
+              )}
+              {/* v1.10.83 - LUT for exports / SEZ supplies (form GST RFD-11),
+                  one per financial year, per business. */}
+              {(profile.country || 'India') === 'India' && (
+                <div id="lut" className="form-group full-width" style={{ background: 'var(--bg-secondary)', padding: '0.85rem 1rem', borderRadius: 8, border: '1px solid var(--border)' }}>
+                  <label className="form-label" style={{ marginBottom: 6 }}>LUT for exports and SEZ supplies <HelpButton title="LUT for exports" doc="settings#lut" size={16} style={{ marginLeft: 6 }} /></label>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0 0 0.6rem' }}>
+                    With a Letter of Undertaking (filed free on the GST portal, Form GST RFD-11, once per financial year) you bill exports and SEZ supplies without IGST. Invoices dated in the year below tick “under LUT” by themselves and print its ARN.
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.6rem' }}>
                     <div>
-                      <label className="form-label" style={{ fontSize: '0.72rem' }}>Previous FY aggregate turnover (₹) — sets JSON <code>gt</code></label>
-                      <input type="number" min="0" step="1" name="prevFYTurnover" className="form-input"
-                        value={profile.prevFYTurnover ?? ''}
-                        onChange={handleChange}
-                        placeholder="e.g. 5000000" />
+                      <label className="form-label" htmlFor="lut-arn" style={{ fontSize: '0.72rem' }}>LUT ARN (acknowledgement number)</label>
+                      <input id="lut-arn" type="text" name="lutArn" className="form-input" maxLength={20}
+                        value={profile.lutArn || ''}
+                        onChange={(e) => setProfile(p => ({ ...p, lutArn: normaliseLutArn(e.target.value) }))}
+                        placeholder="e.g. AD290426123456X" style={profile.lutArn && !isLikelyLutArn(profile.lutArn) ? { borderColor: '#f59e0b' } : undefined} />
+                      {profile.lutArn && !isLikelyLutArn(profile.lutArn) && (
+                        <small style={{ color: '#d97706', fontSize: '0.7rem', display: 'block', marginTop: '0.2rem' }}>⚠ An ARN is usually 15 letters and digits, starting with AD. Check it against the portal's acknowledgement.</small>
+                      )}
                     </div>
                     <div>
-                      <label className="form-label" style={{ fontSize: '0.72rem' }}>Current FY turnover so far (₹) — sets JSON <code>cur_gt</code></label>
-                      <input type="number" min="0" step="1" name="currentFYTurnover" className="form-input"
-                        value={profile.currentFYTurnover ?? ''}
-                        onChange={handleChange}
-                        placeholder="e.g. 1200000" />
+                      <label className="form-label" htmlFor="lut-fy" style={{ fontSize: '0.72rem' }}>Financial year it covers</label>
+                      <select id="lut-fy" name="lutFy" className="form-input" value={profile.lutFy || ''} onChange={handleChange}>
+                        <option value="">Choose the year</option>
+                        {[...new Set([...lutFyOptions(), profile.lutFy].filter(Boolean))].map(fy => <option key={fy} value={fy}>FY {fy}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="form-label" htmlFor="lut-date" style={{ fontSize: '0.72rem' }}>Date filed (optional)</label>
+                      <input id="lut-date" type="date" name="lutDate" className="form-input" value={profile.lutDate || ''} onChange={handleChange} />
                     </div>
                   </div>
-                  <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0.5rem 0 0' }}>
-                    Both are optional (default 0). The portal lets you edit these while filing — you're just avoiding a schema-validation reject on upload.
-                  </p>
+                  {profile.lutArn && profile.lutFy && profile.lutFy !== fyOf(localToday()) && (
+                    <p style={{ fontSize: '0.72rem', color: 'var(--warn-text)', margin: '0.5rem 0 0' }}>
+                      This LUT is for FY {profile.lutFy}; today is in FY {fyOf(localToday())}. File a fresh LUT for the current year before your next export.
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -1211,7 +1193,7 @@ export default function SettingsView({ onSaved }) {
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '0.5rem', marginTop: '2rem' }}>
                 <div>
-                  <h3 className="section-title" style={{ margin: 0 }}>Payment Accounts</h3>
+                  <h3 className="section-title" style={{ margin: 0 }}>Payment Accounts <HelpButton title="Payment Accounts" doc="settings#payment-accounts" size={16} style={{ marginLeft: 6 }} /></h3>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.15rem 0 0' }}>
                     Multiple bank / UPI accounts per profile. Pick one per invoice in the Customize panel.
                     The ⭐ default account is preselected on new invoices.
@@ -1262,6 +1244,9 @@ export default function SettingsView({ onSaved }) {
                           {a.accountNumber && <span>A/C {maskAccountNumber(a.accountNumber)} · </span>}
                           {a.ifsc && <span>{bankCC.bankLabel || 'IFSC'} {a.ifsc}</span>}
                           {a.swift && <span> · SWIFT {a.swift}</span>}
+                          {a.iban && <span> · IBAN {a.iban}</span>}
+                          {a.purposeCode && <span> · Purpose code {a.purposeCode}</span>}
+                          {a.paymentLink && <span> · 🔗 {a.paymentLink}</span>}
                           {a.upiId && <span> · 📱 {a.upiId}</span>}
                         </div>
                       </div>
@@ -1294,7 +1279,7 @@ export default function SettingsView({ onSaved }) {
               {editingAccount && (
                 <div className="modal-overlay" onClick={cancelAccount}>
                   <div className="modal-content" style={{ maxWidth: '560px' }} onClick={e => e.stopPropagation()}>
-                    <h3 className="section-title" style={{ marginTop: 0 }}>{getPaymentAccounts(profile).some(a => a.id === editingAccount.id) ? 'Edit account' : 'Add account'}</h3>
+                    <h3 className="section-title" style={{ marginTop: 0 }}>{getPaymentAccounts(profile).some(a => a.id === editingAccount.id) ? 'Edit account' : 'Add account'} <HelpButton title="Add or edit a payment account" doc="settings#add-account" size={16} style={{ marginLeft: 6 }} /></h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="form-group" style={{ gridColumn: 'span 2' }}>
                         <label className="form-label">Label (shown in the dropdown)</label>
@@ -1350,6 +1335,30 @@ export default function SettingsView({ onSaved }) {
                           onChange={e => setEditingAccount(a => ({ ...a, swift: e.target.value }))}
                           placeholder="e.g. HDFCINBB" />
                       </div>
+                      {/* v1.10.83 - getting paid from abroad. */}
+                      <div className="form-group">
+                        <label className="form-label">IBAN (optional) <HelpButton title="Getting paid from abroad" doc="settings#paid-from-abroad" size={14} /></label>
+                        <input type="text" className="form-input" value={editingAccount.iban || ''}
+                          onChange={e => setEditingAccount(a => ({ ...a, iban: e.target.value.toUpperCase() }))}
+                          placeholder="Only if a foreign bank gave you one" />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Purpose code for payments from abroad (optional) <HelpButton title="Purpose codes" doc="settings#paid-from-abroad" size={14} /></label>
+                        <input type="text" className="form-input" list="purpose-codes" value={editingAccount.purposeCode || ''}
+                          onChange={e => setEditingAccount(a => ({ ...a, purposeCode: e.target.value.toUpperCase().trim() }))}
+                          placeholder="e.g. P0802 for software work" />
+                        <datalist id="purpose-codes">
+                          {PURPOSE_CODES.map(p => <option key={p.code} value={p.code}>{`${p.code} - ${p.label}`}</option>)}
+                        </datalist>
+                        <small style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>The RBI code for what you are paid for. Printed with these bank details on invoices to clients abroad, so they can quote it on the transfer. Your bank can confirm it.</small>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Online payment link (optional)</label>
+                        <input type="text" className="form-input" value={editingAccount.paymentLink || ''}
+                          onChange={e => setEditingAccount(a => ({ ...a, paymentLink: e.target.value }))}
+                          placeholder="PayPal, Wise or Payoneer link" />
+                        <small style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>Printed on invoices in a foreign currency.</small>
+                      </div>
                       <div className="form-group" style={{ gridColumn: 'span 2' }}>
                         <label className="form-label">UPI ID (optional — drives the QR for this account)</label>
                         <input type="text" className="form-input"
@@ -1399,7 +1408,7 @@ export default function SettingsView({ onSaved }) {
           onDirtyChange={setInvNumDirty} onSavingChange={setInvNumSaving} />
 
         {/* Logo & Signature */}
-        <h3 className="section-title mt-8">Branding</h3>
+        <h3 className="section-title mt-8">Branding <HelpButton title="Branding: logo, signature and stamp" doc="settings#branding" size={16} style={{ marginLeft: 6 }} /></h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="form-group">
             <label className="form-label">Business Logo</label>
@@ -1428,6 +1437,13 @@ export default function SettingsView({ onSaved }) {
               )}
               <input ref={logoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload('logo', e)} />
             </div>
+            {/* v1.10.83 - the business's own name and logo at the top of the menu. */}
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.85rem', cursor: 'pointer', marginTop: '0.6rem' }}>
+              <input type="checkbox" checked={!!profile.showInMenu}
+                onChange={(e) => setProfile(prev => ({ ...prev, showInMenu: e.target.checked }))}
+                style={{ width: 16, height: 16, marginTop: 2, accentColor: 'var(--primary)' }} />
+              <span>Show my business name and logo in the app&apos;s menu (top left)</span>
+            </label>
           </div>
           <div className="form-group">
             <label className="form-label">Signature</label>
@@ -1487,7 +1503,9 @@ export default function SettingsView({ onSaved }) {
             {/* v1.10.83 (#117) - where the stamp goes relative to the signature. */}
             {profile.stamp && profile.signature && (
               <div style={{ marginTop: '0.75rem' }}>
-                <label className="form-label" htmlFor="sign-layout">Signature and stamp layout</label>
+
+                <label className="form-label" htmlFor="sign-layout">Signature and stamp layout <HelpButton title="Signature and stamp layout" doc="settings#sign-layout" size={16} style={{ marginLeft: 6 }} /></label>
+
                 <select id="sign-layout" className="form-input" value={profile.signLayout || 'side'}
                   onChange={(e) => setProfile(prev => ({ ...prev, signLayout: e.target.value }))}>
                   {SIGN_LAYOUTS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
@@ -1518,7 +1536,7 @@ export default function SettingsView({ onSaved }) {
            9 sections to find the switcher. */}
       <div id="section-profiles" className="glass-panel p-6 mb-6" style={{ order: 2 }}>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="section-title" style={{ margin: 0 }}>Business Profiles</h3>
+          <h3 className="section-title" style={{ margin: 0 }}>Business Profiles <HelpButton title="Business Profiles" doc="settings#business-profiles" size={16} style={{ marginLeft: 6 }} /></h3>
           <div className="flex gap-2">
             <button type="button" className="btn btn-secondary" onClick={handleAddNewProfile}>
               <Plus size={16} /> Add New Profile
@@ -1569,7 +1587,7 @@ export default function SettingsView({ onSaved }) {
 
       {/* ---- Cloud Backup ---- */}
       <div id="section-cloud" className="glass-panel p-6 mb-6" style={{ order: 9 }}>
-        <h3 className="section-title">Cloud Backup (Google Drive)</h3>
+        <h3 className="section-title">Cloud Backup (Google Drive) <HelpButton title="Cloud Backup (Google Drive)" doc="settings#google-drive" size={16} style={{ marginLeft: 6 }} /></h3>
         <p className="page-subtitle mb-4">
           Auto-sync your invoices to Google Drive — no coding or API setup needed.
         </p>
@@ -1598,7 +1616,7 @@ export default function SettingsView({ onSaved }) {
         {/* Advanced API method - collapsible */}
         <details style={{ fontSize: '0.85rem' }}>
           <summary style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '0.82rem', padding: '0.5rem 0' }}>
-            Advanced: Direct API Upload (for developers)
+            Advanced: Direct API Upload (for developers) <HelpButton title="Advanced: Direct API Upload" doc="settings#google-drive-api" size={16} style={{ marginLeft: 6 }} />
           </summary>
           <div style={{ paddingTop: '0.75rem' }}>
             <div className="grid grid-cols-2 gap-4">
@@ -1645,7 +1663,7 @@ export default function SettingsView({ onSaved }) {
       {/* ---- Terms Templates ---- */}
       <div id="section-terms" className="glass-panel p-6 mb-6" style={{ order: 3 }}>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="section-title" style={{ margin: 0 }}>Terms & Conditions Templates</h3>
+          <h3 className="section-title" style={{ margin: 0 }}>Terms & Conditions Templates <HelpButton title="Terms & Conditions Templates" doc="settings#terms" size={16} style={{ marginLeft: 6 }} /></h3>
           <button type="button" className="btn btn-secondary" onClick={() => setEditingTemplate({ id: '', name: '', content: '' })}>
             <Plus size={16} /> New Template
           </button>
@@ -1726,13 +1744,13 @@ export default function SettingsView({ onSaved }) {
 
       {/* ---- App Updates ---- */}
       <div id="section-updates" className="glass-panel p-6 mb-6" style={{ order: 11 }}>
-        <h3 className="section-title">App Updates</h3>
+        <h3 className="section-title">App Updates <HelpButton title="App Updates" doc="settings#updates" size={16} style={{ marginLeft: 6 }} /></h3>
         <p className="page-subtitle mb-4">Check if a newer version is available.</p>
         <div className="flex gap-4 items-center">
           <button type="button" className="btn btn-secondary" disabled={checkingUpdate} onClick={async () => {
             setCheckingUpdate(true);
             try {
-              const res = await fetch('/api/check-update');
+              const res = await fetch('/api/check-update?now=1');
               const data = await res.json();
               setUpdateInfo(data);
               if (data.updateAvailable) {
@@ -1767,7 +1785,7 @@ export default function SettingsView({ onSaved }) {
       </div>
 
       <div id="section-data" className="glass-panel p-6 mb-6" style={{ order: 10 }}>
-        <h3 className="section-title">Data Management</h3>
+        <h3 className="section-title">Data Management <HelpButton title="Data Management: Export and Import Backup" doc="backup#export-import" size={16} style={{ marginLeft: 6 }} /></h3>
 
         {/* Privacy notice — uses the global .notice .notice-info utility so dark/light look identical to every other info card. */}
         <div className="notice notice-info" style={{ marginBottom: '1rem' }}>
@@ -1775,9 +1793,10 @@ export default function SettingsView({ onSaved }) {
           <div>
             <strong>Your data is on this computer only.</strong> Nothing is uploaded to
             us, our servers, or any third party — not invoices, not clients, not
-            settings. The only time anything leaves your machine is if you explicitly
-            click <em>Save to Drive</em> below (uploads to <strong>your own</strong>
-            Google Drive account).
+            settings. Your data leaves this computer only if you send it to{' '}
+            <strong>your own</strong> Google Drive (<em>Save to Drive</em> below, or
+            with each PDF once Drive is set up). See Privacy &amp; internet for
+            everything the app uses the internet for.
             Files live under <code>data/</code> and <code>Saved Invoices/</code> next to the app.
           </div>
         </div>
@@ -1797,7 +1816,7 @@ export default function SettingsView({ onSaved }) {
       {showExportModal && (
         <div className="modal-overlay" onClick={() => !drivePending && setShowExportModal(false)}>
           <div className="modal-content" style={{ maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
-            <h3 className="section-title" style={{ marginTop: 0 }}>Export Backup</h3>
+            <h3 className="section-title" style={{ marginTop: 0 }}>Export Backup <HelpButton title="Export Backup" doc="backup#export-backup" size={16} style={{ marginLeft: 6 }} /></h3>
             <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '0.75rem' }}>
               Choose what to include. Everything is on by default — uncheck anything you don't want.
             </p>
@@ -1847,7 +1866,7 @@ export default function SettingsView({ onSaved }) {
       {showImportModal && importInspection && (
         <div className="modal-overlay" onClick={() => setShowImportModal(false)}>
           <div className="modal-content" style={{ maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
-            <h3 className="section-title" style={{ marginTop: 0 }}>Restore from Backup</h3>
+            <h3 className="section-title" style={{ marginTop: 0 }}>Restore from Backup <HelpButton title="Restore from Backup" doc="backup#restore-from-backup" size={16} style={{ marginLeft: 6 }} /></h3>
             <div style={{ fontSize: '0.78rem', color: '#64748b', marginBottom: '0.75rem' }}>
               File contents preview
               {importInspection.exportedAt && <span> — exported {new Date(importInspection.exportedAt).toLocaleString()}</span>}
@@ -1903,7 +1922,7 @@ export default function SettingsView({ onSaved }) {
           boxShadow: '0 -4px 16px rgba(15, 23, 42, 0.10)',
         }}>
         <span style={{ flex: '1 1 220px', fontSize: '0.85rem', fontWeight: 600, color: unsaved.length ? '#f59e0b' : 'var(--text-muted)' }}
-          title="Bank accounts, Features, Region and Print & PDF save as you change them.">
+          title="Payment accounts, Print & PDF, Region and App lock save as you change them. Business type and Features wait for Save all changes.">
           {unsaved.length ? <>● Unsaved changes in {unsaved.join(', ')}</> : '✓ All changes saved'}
         </span>
         {unsaved.length > 0 && (
@@ -2044,7 +2063,7 @@ function BackupAndTrashPanel() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.75rem' }}>
         <div>
           <h3 className="section-title" style={{ marginTop: 0, marginBottom: '0.25rem' }}>
-            💾 Backup Management + 🗑 Trash Bin
+            💾 Backup Management + 🗑 Trash Bin <HelpButton title="Backup Management + Trash Bin" doc="backup#automatic-backups" size={16} style={{ marginLeft: 6 }} />
           </h3>
           <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
             Automatic daily snapshots kept for 30 days · Deleted invoices stay in the trash for 30 days.
@@ -2067,7 +2086,7 @@ function BackupAndTrashPanel() {
 
       {/* v1.10.80 (#99) - requested: backups only on C: are lost when Windows fails. */}
       <div style={{ padding: '0.85rem', background: 'var(--bg-secondary)', borderRadius: 8, marginTop: '0.75rem' }}>
-        <label className="form-label" htmlFor="backup-folder">Also keep a copy of every daily backup in this folder</label>
+        <label className="form-label" htmlFor="backup-folder">Also keep a copy of every daily backup in this folder <HelpButton title="Backup copy in another folder" doc="backup#backup-copy" size={16} style={{ marginLeft: 6 }} /></label>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <input id="backup-folder" type="text" className="form-input" style={{ flex: 1, minWidth: 220 }}
             placeholder={'e.g. D:\\FreeGSTBill or E:\\ (a second drive or USB disk)'}
@@ -2089,7 +2108,7 @@ function BackupAndTrashPanel() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
         {/* Backups list */}
         <div style={{ padding: '0.85rem', background: 'var(--bg-secondary)', borderRadius: 8 }}>
-          <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>📅 Daily backups ({backups.length})</h4>
+          <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>📅 Daily backups ({backups.length}) <HelpButton title="Daily backups" doc="backup#restore-daily-backup" size={16} style={{ marginLeft: 6 }} /></h4>
           {loading && backups.length === 0 && <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Loading…</p>}
           {!loading && backups.length === 0 && <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>No backups yet — the first will be created at midnight or click "Backup now" above.</p>}
           <div style={{ maxHeight: 260, overflowY: 'auto' }}>
@@ -2125,7 +2144,7 @@ function BackupAndTrashPanel() {
 
         {/* Trash bin */}
         <div style={{ padding: '0.85rem', background: 'var(--bg-secondary)', borderRadius: 8 }}>
-          <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>🗑 Trash bin ({trash.length})</h4>
+          <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>🗑 Trash bin ({trash.length}) <HelpButton title="Trash bin" doc="backup#trash" size={16} style={{ marginLeft: 6 }} /></h4>
           {loading && trash.length === 0 && <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Loading…</p>}
           {!loading && trash.length === 0 && <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>No deleted invoices. Anything you delete lands here for 30 days.</p>}
           <div style={{ maxHeight: 260, overflowY: 'auto' }}>

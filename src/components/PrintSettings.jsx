@@ -367,14 +367,7 @@ export default function PrintSettings() {
             <Printer size={18} style={{ display: 'inline', verticalAlign: -3, marginRight: 6 }} />
             Print & PDF Settings
             <span style={{ marginLeft: 6, verticalAlign: -2, display: 'inline-block' }}>
-              <HelpButton title="Print & PDF settings — how to use" doc="print-settings" size={16}>
-                <ul style={{ paddingLeft: '1.1rem', margin: 0 }}>
-                  <li><strong>Business type</strong> sets up to a dozen settings for your kind of business in one click.</li>
-                  <li><strong>Visual style</strong> picks a design; everything below fine-tunes it.</li>
-                  <li>Changes save as you make them; the live preview shows the result.</li>
-                  <li>Each invoice can still change its own options under Customize.</li>
-                </ul>
-              </HelpButton>
+              <HelpButton title="Print & PDF Settings" doc="print-settings#how-it-saves" size={16} />
             </span>
           </h3>
           <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
@@ -426,7 +419,7 @@ export default function PrintSettings() {
         marginBottom: '1rem',
       }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '0.6rem', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <strong style={{ fontSize: '0.9rem' }}>⚡ Business type <span style={{ fontSize: '0.65rem', fontWeight: 500, color: 'var(--text-muted)', marginLeft: 6 }}>sets up to a dozen settings to match your workflow</span></strong>
+          <strong style={{ fontSize: '0.9rem' }}>⚡ Business type <HelpButton title="Business type preset" doc="print-settings#business-type" size={16} style={{ marginLeft: 6 }} /> <span style={{ fontSize: '0.65rem', fontWeight: 500, color: 'var(--text-muted)', marginLeft: 6 }}>sets up to a dozen settings to match your workflow</span></strong>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Pick this first. Every setting below is still editable.</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem' }}>
@@ -494,7 +487,7 @@ export default function PrintSettings() {
         marginBottom: '1rem',
       }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '0.6rem', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <strong style={{ fontSize: '0.9rem' }}>🎨 Visual style <span style={{ fontSize: '0.65rem', fontWeight: 500, color: 'var(--text-muted)', marginLeft: 6 }}>colours + typography for PDF & thermal</span></strong>
+          <strong style={{ fontSize: '0.9rem' }}>🎨 Visual style <HelpButton title="Visual style" doc="print-settings#visual-style" size={16} style={{ marginLeft: 6 }} /> <span style={{ fontSize: '0.65rem', fontWeight: 500, color: 'var(--text-muted)', marginLeft: 6 }}>colours + typography for PDF & thermal</span></strong>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Click a design to start. Edit anything below.</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.6rem' }}>
@@ -621,7 +614,7 @@ export default function PrintSettings() {
       {isVisibleFor(['retail_shop', 'restaurant']) ? (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
         {/* TYPOGRAPHY — thermal-only since v1.10.9 */}
-        <SettingGroup title="Typography (Thermal receipts)">
+        <SettingGroup title="Typography (Thermal receipts)" doc="print-settings#thermal-typography">
           <SelectRow label="Font family" value={settings.fontFamily} onChange={v => set({ fontFamily: v })}
             options={[
               ['mono', 'Monospace (Courier) — thermal-optimized'],
@@ -647,7 +640,7 @@ export default function PrintSettings() {
         </SettingGroup>
 
         {/* LAYOUT */}
-        <SettingGroup title="Layout">
+        <SettingGroup title="Layout" doc="print-settings#thermal-layout">
           <SelectRow label="Line spacing" value={settings.lineSpacing} onChange={v => set({ lineSpacing: v })}
             options={[
               ['compact', 'Compact (save paper)'],
@@ -675,7 +668,7 @@ export default function PrintSettings() {
         </SettingGroup>
 
         {/* CONTENT */}
-        <SettingGroup title="Content">
+        <SettingGroup title="Content" doc="print-settings#thermal-content">
           <ToggleRow label="Show business logo" value={settings.showLogo} onChange={v => set({ showLogo: v })} />
           <ToggleRow label="Show HSN code per item" value={settings.showHSN} onChange={v => set({ showHSN: v })}
             hint="Required for GST compliance if you're printing tax invoices. Turn off for informal counter receipts." />
@@ -694,7 +687,7 @@ export default function PrintSettings() {
         </SettingGroup>
 
         {/* FOOTER */}
-        <SettingGroup title="Footer">
+        <SettingGroup title="Footer" doc="print-settings#thermal-footer">
           <TextRow label="Custom footer message" value={settings.footerMessage} onChange={v => set({ footerMessage: v })}
             placeholder="Thank you for your business!"
             hint='Appears above the cut mark. Leave blank to hide.' />
@@ -724,7 +717,7 @@ export default function PrintSettings() {
       {/* ============================================================ */}
       <div style={{ marginTop: '1.75rem', padding: '1rem 1.25rem', background: 'var(--bg-secondary)', borderRadius: 8 }}>
         <h4 style={{ margin: '0 0 0.75rem', fontSize: '0.95rem', color: 'var(--primary)' }}>
-          📄 PDF & universal print features
+          📄 PDF & universal print features <HelpButton title="PDF & universal print features" doc="print-settings#pdf-features" size={16} style={{ marginLeft: 6 }} />
         </h4>
         <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '0 0 1rem' }}>
           Applies to A4 / A5 / Letter / Legal / thermal — every option here is dynamic (turn on / off any time).
@@ -733,7 +726,7 @@ export default function PrintSettings() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
 
           {/* AUTO-PRINT */}
-          <SettingGroup title="Auto-print">
+          <SettingGroup title="Auto-print" doc="print-settings#auto-print">
             <ToggleRow label="Auto-print on save" value={settings.autoPrintOnSave} onChange={v => set({ autoPrintOnSave: v })}
               hint="Send to your default printer immediately after Save & Download PDF. Perfect for POS counters — no manual click needed." />
           </SettingGroup>
@@ -746,7 +739,7 @@ export default function PrintSettings() {
               to be on in the other place. See the deleted duplicate
               section further down + the "warning banner" the v1.10.10
               comment described. */}
-          <SettingGroup title="Watermark">
+          <SettingGroup title="Watermark" doc="print-settings#watermark">
             <ToggleRow label="Show watermark" value={settings.watermarkEnabled} onChange={v => set({ watermarkEnabled: v })}
               hint="Big diagonal stamp across the PDF (e.g. PAID / DUPLICATE / DRAFT)." />
             {settings.watermarkEnabled && (
@@ -776,7 +769,7 @@ export default function PrintSettings() {
               sale, manufacturer) see this. Freelancer / service / retail
               typically don't need GST Rule 48 multi-copy print. */}
           {isVisibleFor(['wholesale', 'manufacturer']) && (
-          <SettingGroup title="Multi-copy (GST rule 48)">
+          <SettingGroup title="Multi-copy (GST rule 48)" doc="print-settings#copies">
             <ToggleRow label="Print multiple copies with labels" value={settings.multiCopyEnabled} onChange={v => set({ multiCopyEnabled: v })}
               tag={isRecommendedForActive(['wholesale', 'manufacturer']) ? 'Recommended for your business' : null}
               hint="Prints your invoice N times with corner labels (ORIGINAL FOR RECIPIENT / DUPLICATE FOR TRANSPORTER / etc.). GST rule 48 requires 3 copies for goods, 2 for services." />
@@ -788,7 +781,7 @@ export default function PrintSettings() {
           )}
 
           {/* PAGE NUMBERS + HEADER */}
-          <SettingGroup title="Multi-page invoices">
+          <SettingGroup title="Multi-page invoices" doc="print-settings#multi-page">
             {/* v1.10.74 - the PDF numbers page 2 onwards only; page 1 has no number */}
             <ToggleRow label="Page numbers on pages 2+" value={settings.pageNumbersEnabled} onChange={v => set({ pageNumbersEnabled: v })}
               hint='Shows "Page 2 of 5" bottom-right on pages 2+. The first page is not numbered.' />
@@ -797,7 +790,7 @@ export default function PrintSettings() {
           </SettingGroup>
 
           {/* MARGINS */}
-          <SettingGroup title="Print margins (mm)">
+          <SettingGroup title="Print margins (mm)" doc="print-settings#margins">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
               <NumInput label="Top" value={settings.marginTop} onChange={v => set({ marginTop: v })} />
               <NumInput label="Bottom" value={settings.marginBottom} onChange={v => set({ marginBottom: v })} />
@@ -810,7 +803,7 @@ export default function PrintSettings() {
           </SettingGroup>
 
           {/* BARCODE + QR */}
-          <SettingGroup title="Verification codes">
+          <SettingGroup title="Verification codes" doc="print-settings#verification-codes">
             <ToggleRow label="Invoice number as QR" value={settings.invoiceQrEnabled} onChange={v => set({ invoiceQrEnabled: v })}
               tag={isRecommendedForActive(['manufacturer', 'wholesale']) ? 'Recommended for your business' : null}
               hint="Prints a QR of the invoice number (or verification URL if set below) in the bottom-right corner." />
@@ -828,7 +821,7 @@ export default function PrintSettings() {
               restaurants. Freelancer / service / wholesale / manufacturer
               don't send this to their B2B clients. */}
           {isVisibleFor(['retail_shop', 'restaurant']) && (
-          <SettingGroup title="Customer feedback QR">
+          <SettingGroup title="Customer feedback QR" doc="print-settings#feedback-qr">
             <ToggleRow label="Feedback / review QR" value={settings.feedbackQrEnabled} onChange={v => set({ feedbackQrEnabled: v })}
               tag={isRecommendedForActive(['retail_shop', 'restaurant']) ? 'Recommended for your business' : null}
               hint="Adds a QR at the bottom-left of the PDF that opens a URL — Google Reviews, feedback form, WhatsApp chat, anything you want." />
@@ -844,7 +837,7 @@ export default function PrintSettings() {
           )}
 
           {/* DIGITAL SIGNATURE */}
-          <SettingGroup title="Digital signature">
+          <SettingGroup title="Digital signature" doc="print-settings#signature">
             <ToggleRow label="Show signature on invoice" value={settings.signatureShow} onChange={v => set({ signatureShow: v })} />
             {settings.signatureShow && (
               <>
@@ -881,13 +874,13 @@ export default function PrintSettings() {
           </SettingGroup>
 
           {/* T&C SEPARATE PAGE */}
-          <SettingGroup title="Terms &amp; Conditions">
+          <SettingGroup title="Terms &amp; Conditions" doc="print-settings#terms-page">
             <ToggleRow label="Print T&amp;C on a separate page" value={settings.termsSeparatePage} onChange={v => set({ termsSeparatePage: v })}
               hint="For long terms — puts them on page 2 instead of squishing on page 1. Only affects invoices with T&amp;C enabled." />
           </SettingGroup>
 
           {/* FONT FAMILY (PDF) */}
-          <SettingGroup title="PDF font family">
+          <SettingGroup title="PDF font family" doc="print-settings#pdf-font">
             <SelectRow label="Font used in generated PDFs" value={settings.pdfFontFamily} onChange={v => set({ pdfFontFamily: v })}
               options={[
                 ['helvetica', 'Helvetica (default, cleanest)'],
@@ -898,7 +891,7 @@ export default function PrintSettings() {
           </SettingGroup>
 
           {/* v1.10.11 — COMPACT HEADER + THERMAL BUFFER-SAFE MODE */}
-          <SettingGroup title="Layout &amp; printer compatibility">
+          <SettingGroup title="Layout &amp; printer compatibility" doc="print-settings#thermal-compatibility">
             <ToggleRow label="Compact upper header (fit more items on page 1)"
               value={settings.headerCompact} onChange={v => set({ headerCompact: v })}
               hint="Shrinks the header, billing block, and Place-of-Supply spacing so the items table starts higher up. Best when your invoices routinely spill to page 2 because of large headers." />
@@ -918,7 +911,7 @@ export default function PrintSettings() {
           </SettingGroup>
 
           {/* PER-TYPE INVOICE PREFIX OVERRIDES (v1.10.10) */}
-          <SettingGroup title="Custom prefix per invoice type">
+          <SettingGroup title="Custom prefix per invoice type" doc="print-settings#prefixes">
             <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0 0 0.5rem' }}>
               Leave blank to use the built-in default. Each type has its own atomic counter — changing a prefix starts a fresh count for the new one.
             </p>
@@ -946,7 +939,7 @@ export default function PrintSettings() {
               meaningful for retail counters (customer wants a duplicate
               of yesterday's bill). B2B invoicing rarely reprints. */}
           {isVisibleFor(['retail_shop', 'restaurant']) && (
-          <SettingGroup title="Reprint tracking">
+          <SettingGroup title="Reprint tracking" doc="print-settings#reprint">
             <ToggleRow label="Show REPRINT badge on reprints" value={settings.reprintLabelEnabled} onChange={v => set({ reprintLabelEnabled: v })}
               tag={isRecommendedForActive(['retail_shop', 'restaurant']) ? 'Recommended for your business' : null}
               hint="Automatic red badge in the top-left of the PDF when an invoice has been printed before. Tracks how many times each bill was printed." />
@@ -954,7 +947,7 @@ export default function PrintSettings() {
           )}
 
           {/* PRINT QUALITY */}
-          <SettingGroup title="PDF quality vs file size">
+          <SettingGroup title="PDF quality vs file size" doc="print-settings#pdf-quality">
             <SelectRow label="Print quality" value={settings.pdfQuality} onChange={v => set({ pdfQuality: v })}
               options={[
                 ['draft', 'Draft — smallest file (email-friendly)'],
@@ -969,10 +962,10 @@ export default function PrintSettings() {
               in INR + USD/EUR/GBP. Retail/restaurant/wholesale/manuf
               are domestic-only in the vast majority of cases. */}
           {isVisibleFor(['freelancer', 'service']) && (
-          <SettingGroup title="Dual currency display">
+          <SettingGroup title="Dual currency display" doc="print-settings#dual-currency">
             <ToggleRow label="Show foreign-currency equivalent" value={settings.dualCurrencyEnabled} onChange={v => set({ dualCurrencyEnabled: v })}
               tag={isRecommendedForActive(['freelancer', 'service']) ? 'Recommended for your business' : null}
-              hint="For INR invoices to foreign clients, shows the total in a second currency next to the ₹ amount. Uses YOUR manually set rate — no live conversion." />
+              hint="For INR invoices to foreign clients, shows the total in a second currency next to the ₹ amount, at the rate set here. For invoices billed in USD, EUR... it adds the ₹ total to the exchange rate line, at that invoice's own rate. No live conversion." />
             {settings.dualCurrencyEnabled && (
               <>
                 <SelectRow label="Secondary currency" value={settings.dualCurrencyCode} onChange={v => set({ dualCurrencyCode: v })}
@@ -993,7 +986,7 @@ export default function PrintSettings() {
           )}
 
           {/* COMPANY LETTERHEAD */}
-          <SettingGroup title="Company letterhead">
+          <SettingGroup title="Company letterhead" doc="print-settings#letterhead">
             <ToggleRow label="Use pre-printed letterhead image" value={settings.letterheadEnabled} onChange={v => set({ letterheadEnabled: v })}
               hint="Upload your own designed letterhead as a full-page background. Invoice content prints on top. Best for businesses with formal branded stationery." />
             {settings.letterheadEnabled && (
@@ -1038,7 +1031,7 @@ export default function PrintSettings() {
           </SettingGroup>
 
           {/* PDF TEMPLATE STYLE */}
-          <SettingGroup title="PDF template style (visual design)">
+          <SettingGroup title="PDF template style (visual design)" doc="print-settings#template">
             <SelectRow label="Template" value={settings.pdfTemplate} onChange={v => set({ pdfTemplate: v })}
               options={[
                 ['modern', 'Modern (colorful header · default)'],
@@ -1053,13 +1046,13 @@ export default function PrintSettings() {
           </SettingGroup>
 
           {/* v1.9.2 — DARKEN ON PRINT */}
-          <SettingGroup title="Print darkness">
+          <SettingGroup title="Print darkness" doc="print-settings#print-darkness">
             <ToggleRow label="Force darker text on printed PDF" value={settings.pdfDarkenOnPrint} onChange={v => set({ pdfDarkenOnPrint: v })}
               hint="Fixes light-gray labels + addresses fading on paper printers. Applies automatically when generating the PDF (screen view is unchanged). Turn off if your printer already prints greys crisply." />
           </SettingGroup>
 
           {/* v1.9.2 — FONT SIZE SCALE */}
-          <SettingGroup title="PDF font scale">
+          <SettingGroup title="PDF font scale" doc="print-settings#pdf-font-scale">
             <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, marginBottom: 4 }}>
               Overall size: <strong>{Math.round((settings.pdfFontScale || 1) * 100)}%</strong>
             </label>
@@ -1085,7 +1078,7 @@ export default function PrintSettings() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
           <div>
             <h4 style={{ margin: 0, fontSize: '0.95rem', color: 'var(--primary)' }}>
-              🎨 PDF Style Editor — full control over every colour
+              🎨 PDF Style Editor — full control over every colour <HelpButton title="PDF Style Editor" doc="print-settings#colours" size={16} style={{ marginLeft: 6 }} />
             </h4>
             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>
               Match your brand. Every colour you change updates the live preview instantly and gets baked into your PDFs.
@@ -1135,7 +1128,7 @@ export default function PrintSettings() {
       {/* -- SECTION LABELS (multi-language + custom text) -- */}
       <div style={{ marginTop: '1.5rem', padding: '1rem 1.25rem', background: 'var(--bg-secondary)', borderRadius: 8 }}>
         <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.95rem', color: 'var(--primary)' }}>
-          🌐 Section labels — multi-language + custom text
+          🌐 Section labels — multi-language + custom text <HelpButton title="Section labels and language" doc="print-settings#labels-language" size={16} style={{ marginLeft: 6 }} />
         </h4>
         <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '0 0 0.75rem' }}>
           Pick a language preset OR override any individual label. Custom text overrides the language preset for that field.
@@ -1171,7 +1164,7 @@ export default function PrintSettings() {
       {/* -- FORMATTING (date, number, currency) -- */}
       <div style={{ marginTop: '1.5rem', padding: '1rem 1.25rem', background: 'var(--bg-secondary)', borderRadius: 8 }}>
         <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.95rem', color: 'var(--primary)' }}>
-          📅 Formatting — date, number, currency
+          📅 Formatting — date, number, currency <HelpButton title="Formatting: date, number, currency" doc="print-settings#formats" size={16} style={{ marginLeft: 6 }} />
         </h4>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
           <SelectRow label="Date format" value={settings.dateFormat} onChange={v => set({ dateFormat: v })}
@@ -1201,7 +1194,7 @@ export default function PrintSettings() {
       {/* -- ROW DENSITY -- */}
       <div style={{ marginTop: '1.5rem', padding: '1rem 1.25rem', background: 'var(--bg-secondary)', borderRadius: 8 }}>
         <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.95rem', color: 'var(--primary)' }}>
-          📏 Row density
+          📏 Row density <HelpButton title="Row density" doc="print-settings#row-density" size={16} style={{ marginLeft: 6 }} />
         </h4>
         <SelectRow label="Vertical spacing in tables + sections" value={settings.rowDensity} onChange={v => set({ rowDensity: v })}
           options={[
@@ -1222,10 +1215,10 @@ export default function PrintSettings() {
       {/* -- CUSTOM TAX RATES -- */}
       <div style={{ marginTop: '1.5rem', padding: '1rem 1.25rem', background: 'var(--bg-secondary)', borderRadius: 8 }}>
         <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.95rem', color: 'var(--primary)' }}>
-          💯 Custom tax rate presets
+          💯 Custom tax rate presets <HelpButton title="Custom tax rate presets" doc="print-settings#tax-rates" size={16} style={{ marginLeft: 6 }} />
         </h4>
         <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '0 0 0.6rem' }}>
-          Built-in rates: 0% · 5% · 12% · 18% · 28%. Add your own (e.g. 3% jewellery, 0.25% diamond, 7.5% custom).
+          Built-in rates: 0% · 0.1% · 0.25% · 3% · 5% · 12% · 18% · 28% · 40%. Since 22 Sep 2025 most goods are 5%, 18% or 40%; 12% and 28% stay for older bills. Add your own (e.g. 1.5%, 7.5%).
         </p>
         <CustomListEditor
           values={settings.customTaxRates || []}
@@ -1249,7 +1242,7 @@ export default function PrintSettings() {
       {/* -- SAVED CUSTOM TEMPLATES -- */}
       <div style={{ marginTop: '1.5rem', padding: '1rem 1.25rem', background: 'var(--bg-secondary)', borderRadius: 8 }}>
         <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.95rem', color: 'var(--primary)' }}>
-          💾 My saved templates
+          💾 My saved templates <HelpButton title="My saved templates" doc="print-settings#templates" size={16} style={{ marginLeft: 6 }} />
         </h4>
         <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '0 0 0.6rem' }}>
           Save your current setup as a named template. Recall any time.
@@ -1291,7 +1284,7 @@ export default function PrintSettings() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <strong style={{ fontSize: '0.9rem' }}>
               <Info size={14} style={{ display: 'inline', verticalAlign: -2, marginRight: 5 }} />
-              Live preview
+              Live preview <HelpButton title="Live preview" doc="print-settings#preview" size={16} style={{ marginLeft: 6 }} />
             </strong>
             <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Updates as you type</span>
           </div>
@@ -1389,11 +1382,13 @@ export default function PrintSettings() {
 
 // ---- small building blocks -------------------------------------------------
 
-function SettingGroup({ title, children }) {
+// `doc` is the docs section about this group (its ? button).
+function SettingGroup({ title, doc, children }) {
   return (
     <div>
-      <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.6rem' }}>
+      <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: 4 }}>
         {title}
+        {doc && <HelpButton title={title} doc={doc} size={16} style={{ width: 24, height: 24 }} />}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
         {children}
@@ -1433,7 +1428,7 @@ function RoundOffSetting() {
   return (
     <div style={{ marginTop: '1.5rem', padding: '1rem 1.25rem', background: 'var(--bg-secondary)', borderRadius: 8 }}>
       <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.95rem', color: 'var(--primary)' }}>
-        🧮 Totals
+        🧮 Totals <HelpButton title="Round off invoice totals" doc="print-settings#round-off" size={16} style={{ marginLeft: 6 }} />
       </h4>
       <ToggleRow label="Round off invoice totals" value={on} onChange={change}
         hint="Rounds the grand total to the nearest rupee and prints the difference as a Round-off line. Applies to new invoices; you can still change it per invoice under Customize → Totals." />

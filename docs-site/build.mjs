@@ -20,21 +20,29 @@ import { fileURLToPath } from 'url';
 import sharp from 'sharp';
 import { NAV, SITE, SEO } from './site.mjs';
 import start from './pages/start.mjs';
+import gstBasics from './pages/gst-basics.mjs';
 import install from './pages/install.mjs';
 import daily from './pages/daily.mjs';
+import clients from './pages/clients.mjs';
+import products from './pages/products.mjs';
+import payments from './pages/payments.mjs';
+import buying from './pages/buying.mjs';
 import money from './pages/money.mjs';
+import reports from './pages/reports.mjs';
+import incomeTax from './pages/income-tax.mjs';
 import setup from './pages/setup.mjs';
 import invoice from './pages/invoice.mjs';
 import print from './pages/print.mjs';
 import help from './pages/help.mjs';
 import about from './pages/about.mjs';
+import security from './pages/security.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = join(HERE, 'out', SITE.folder);
 const IMG_SRC = join(HERE, 'assets', 'img');
-const PAGES = [...start, ...install, ...invoice, ...daily, ...money, ...setup, ...print, ...help, ...about];
+const PAGES = [...start, ...gstBasics, ...install, ...invoice, ...daily, ...clients, ...products, ...payments, ...buying, ...money, ...reports, ...incomeTax, ...setup, ...print, ...help, ...about, ...security];
 const TODAY = new Date().toISOString().slice(0, 10);
-const BRAND = 'E-Munim';
+const BRAND = 'Free GST Billing Software';
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const text = (html) => html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
@@ -51,8 +59,10 @@ for (const group of NAV) for (const slug of group.pages) {
 for (const p of PAGES) {
   if (!NAV.some((g) => g.pages.includes(p.slug))) throw new Error(`page "${p.slug}" is not in the sidebar`);
 }
-const sectionsOf = (p) => [...p.body.matchAll(/<section id="([a-z0-9-]+)"[^>]*>\s*<h2>([\s\S]*?)<\/h2>/g)]
-  .map((m) => ({ id: m[1], title: text(m[2]) }));
+// v1.10.83 - an <h3> section is an entry under the <h2> group before it (the
+// Troubleshooting error catalogue): linkable and searchable, not in the TOC.
+const sectionsOf = (p) => [...p.body.matchAll(/<section id="([a-z0-9-]+)"[^>]*>\s*<h([23])>([\s\S]*?)<\/h\2>/g)]
+  .map((m) => ({ id: m[1], title: text(m[3]), level: Number(m[2]) }));
 for (const p of PAGES) {
   const ids = sectionsOf(p).map((s) => s.id);
   const dupe = ids.find((id, i) => ids.indexOf(id) !== i);
@@ -77,14 +87,32 @@ for (const p of PAGES) {
   const SRC = join(HERE, '..', 'src');
   const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (
     e.isDirectory() ? walk(join(dir, e.name)) : /\.jsx$/.test(e.name) ? [join(dir, e.name)] : []));
-  for (const file of walk(SRC)) {
-    for (const m of readFileSync(file, 'utf8').matchAll(/\bdoc="([a-z0-9-]+)(?:#([a-z0-9-]+))?"/g)) {
-      const target = bySlug.get(m[1]);
-      if (!target) throw new Error(`${file}: Help button links to missing docs page "${m[1]}"`);
-      if (m[2] && !sectionsOf(target).some((s) => s.id === m[2])) {
-        throw new Error(`${file}: Help button links to missing docs section "${m[1]}#${m[2]}"`);
-      }
+  const check = (file, page, id) => {
+    const target = bySlug.get(page);
+    if (!target) throw new Error(`${file}: Help button links to missing docs page "${page}"`);
+    if (id && !sectionsOf(target).some((s) => s.id === id)) {
+      throw new Error(`${file}: Help button links to missing docs section "${page}#${id}"`);
     }
+  };
+  for (const file of walk(SRC)) {
+    const src = readFileSync(file, 'utf8');
+    // doc="page#id", doc={'page#id'}, and SETTINGS_TAB_DOCS-style maps: any
+    // 'page#id' literal naming a docs page, so a ternary or a map is checked too.
+    for (const m of src.matchAll(/\bdoc=\{?\s*["']([a-z0-9-]+)(?:#([a-z0-9-]+))?["']/g)) check(file, m[1], m[2]);
+    for (const m of src.matchAll(/["'`]([a-z0-9-]+)#([a-z0-9-]+)["'`]/g)) if (bySlug.has(m[1])) check(file, m[1], m[2]);
+    const map = /SETTINGS_TAB_DOCS = \{([\s\S]*?)\};/.exec(src);
+    if (map) for (const m of map[1].matchAll(/:\s*'([a-z0-9-]+)(?:#([a-z0-9-]+))?'/g)) check(file, m[1], m[2]);
+  }
+}
+
+// v1.10.83 - the app's "known problem: how to fix it" links (KNOWN_PROBLEMS in
+// src/utils/errorReport.js) point at Troubleshooting sections; a renamed
+// section would leave a dead fix link in front of a user with a problem.
+{
+  const { KNOWN_PROBLEMS } = await import('../src/utils/errorReport.js');
+  const ts = bySlug.get('troubleshooting');
+  for (const k of KNOWN_PROBLEMS) {
+    if (!sectionsOf(ts).some((s) => s.id === k.id)) throw new Error(`src/utils/errorReport.js: known problem links to missing section troubleshooting#${k.id}`);
   }
 }
 
@@ -122,7 +150,7 @@ async function makeSocialImage(file) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
     <rect width="1200" height="630" fill="#f6f8fb"/>
     <rect x="0" y="0" width="14" height="630" fill="#2563eb"/>
-    <text x="64" y="170" font-family="Segoe UI, Arial, sans-serif" font-size="52" font-weight="700" fill="#15233f">E-Munim</text>
+    <text x="64" y="170" font-family="Segoe UI, Arial, sans-serif" font-size="52" font-weight="700" fill="#15233f">Free GST</text>
     <text x="64" y="240" font-family="Segoe UI, Arial, sans-serif" font-size="52" font-weight="700" fill="#15233f">Billing Software</text>
     <text x="64" y="310" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#44526d">GST invoices, payments, stock</text>
     <text x="64" y="352" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#44526d">and GSTR-1 / GSTR-3B.</text>
@@ -194,7 +222,7 @@ const sidebar = (current) => NAV.map((g) => `
       </div>`).join('');
 
 function page(p) {
-  const sections = sectionsOf(p);
+  const sections = sectionsOf(p).filter((s) => s.level === 2); // TOC: groups only
   const i = order.indexOf(p.slug);
   const prev = i > 0 ? bySlug.get(order[i - 1]) : null;
   const next = i < order.length - 1 ? bySlug.get(order[i + 1]) : null;
@@ -204,8 +232,8 @@ function page(p) {
   const description = seo.description || clip(text(p.lead));
   const url = pageUrl(p.slug);
   const group = NAV.find((g) => g.pages.includes(p.slug));
-  const body = withImages(p.body).replace(/<section id="([a-z0-9-]+)"([^>]*)>\s*<h2>/g,
-    (_, id, rest) => `<section id="${id}"${rest}>\n<h2><a class="anchor" href="#${id}" aria-label="Link to this section">#</a>`);
+  const body = withImages(p.body).replace(/<section id="([a-z0-9-]+)"([^>]*)>\s*<(h[23])>/g,
+    (_, id, rest, h) => `<section id="${id}"${rest}>\n<${h}><a class="anchor" href="#${id}" aria-label="Link to this section">#</a>`);
   return `<!doctype html>
 <html lang="en-IN">
 <head>
@@ -263,7 +291,7 @@ function page(p) {
 </header>
 <div class="shell">
   <nav class="sidebar" id="sidebar" aria-label="Documentation">${sidebar(p.slug)}
-    <p class="sidebar-foot">Written for version ${esc(SITE.version)}. <a href="${SITE.repo}/releases">What changed in each version</a></p>
+    <p class="sidebar-foot">Written for version ${esc(SITE.version)}. <a href="${SITE.repo}/blob/main/CHANGELOG.md">Changelog: what changed in each version</a></p>
   </nav>
   <div class="scrim" hidden></div>
   <main id="main" class="doc">
@@ -360,8 +388,8 @@ for (const p of PAGES) {
   const parts = p.body.split(/<section id="/).slice(1);
   for (const part of parts) {
     const id = part.slice(0, part.indexOf('"'));
-    const h = /<h2>([\s\S]*?)<\/h2>/.exec(part);
-    index.push({ u: `${p.slug}.html#${id}`, p: p.nav || p.title, s: h ? text(h[1]) : id, t: text(part.replace(/<h2>[\s\S]*?<\/h2>/, '')).slice(0, 600) });
+    const h = /<h[23]>([\s\S]*?)<\/h[23]>/.exec(part);
+    index.push({ u: `${p.slug}.html#${id}`, p: p.nav || p.title, s: h ? text(h[1]) : id, t: text(part.replace(/<h[23]>[\s\S]*?<\/h[23]>/, '')).slice(0, 600) });
   }
 }
 writeFileSync(join(OUT, 'assets', 'search-index.js'), `window.DOCS_INDEX=${JSON.stringify(index)};\n`);

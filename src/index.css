@@ -13,6 +13,9 @@
    immediately. */
 
 :root {
+  /* v1.10.83 - the browser's own pop-ups (suggestion lists, date pickers)
+     follow the app's theme, not Windows dark mode. */
+  color-scheme: light;
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
   --primary-light: rgba(37, 99, 235, 0.08);
@@ -56,6 +59,7 @@
 
 /* Dark Mode */
 [data-theme="dark"] {
+  color-scheme: dark;
   --primary: #3b82f6;
   --primary-hover: #2563eb;
   --primary-light: rgba(59, 130, 246, 0.12);
@@ -211,85 +215,27 @@ body {
   position: relative;
 }
 
-/* PWA Install Banner */
-.pwa-install-banner {
-  position: fixed;
-  top: 0;
-  left: 260px;
-  right: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 1.25rem;
-  background: linear-gradient(135deg, #1e40af, #3b82f6);
-  color: white;
-  font-size: 0.9rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-.pwa-install-banner span { flex: 1; }
-.pwa-install-btn {
-  background: white;
-  color: #1e40af;
-  border: none;
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.pwa-install-btn:hover { background: #e0e7ff; }
-.pwa-dismiss-btn {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.7);
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-}
-.pwa-dismiss-btn:hover { color: white; }
-
-@media (max-width: 768px) {
-  .pwa-install-banner { left: 0; }
-}
-
-/* Server Status Indicator */
-.server-status {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  margin-top: 0.5rem;
-  border-radius: 8px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: #94a3b8;
-  background: rgba(255,255,255,0.03);
-}
+/* App status dot on the Control Panel menu button (v1.10.83) */
 .server-status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
+  margin-left: auto;
 }
-.server-status-online .server-status-dot {
+.server-status-dot.server-status-online {
   background: #22c55e;
   box-shadow: 0 0 6px #22c55e;
 }
-.server-status-online { color: #86efac; }
-.server-status-offline .server-status-dot {
+.server-status-dot.server-status-offline {
   background: #ef4444;
   box-shadow: 0 0 6px #ef4444;
   animation: pulse-red 1.5s ease-in-out infinite;
 }
-.server-status-offline { color: #fca5a5; }
-.server-status-checking .server-status-dot {
+.server-status-dot.server-status-checking {
   background: #f59e0b;
   animation: pulse-red 1s ease-in-out infinite;
 }
-.server-status-checking { color: #fcd34d; }
 @keyframes pulse-red {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
@@ -488,11 +434,10 @@ body {
     justify-content: center; gap: 0; padding-left: 0; padding-right: 0; font-size: 0;
   }
   .app-layout.sidebar-autohide > .sidebar:not(:hover):not(:has(:focus-visible)) .nav-btn > svg { flex-shrink: 0; }
-  .app-layout.sidebar-autohide > .sidebar:not(:hover):not(:has(:focus-visible)) .nav-btn > span:not(.nav-badge) { display: none; }
+  .app-layout.sidebar-autohide > .sidebar:not(:hover):not(:has(:focus-visible)) .nav-btn > span:not(.nav-badge):not(.server-status-dot) { display: none; }
   .app-layout.sidebar-autohide > .sidebar:not(:hover):not(:has(:focus-visible)) .nav-badge {
     top: 6px !important; right: 10px !important; min-width: 0 !important; width: 8px; height: 8px !important; padding: 0 !important; font-size: 0 !important;
   }
-  .app-layout.sidebar-autohide > .sidebar:not(:hover):not(:has(:focus-visible)) .server-status { justify-content: center; font-size: 0; gap: 0; padding-left: 0; padding-right: 0; }
 }
 @media (max-width: 768px) { .sidebar-autohide-toggle { display: none; } }
 
@@ -518,8 +463,73 @@ body {
    sidebar took most of the screen and squeezed every page into a sliver, so it
    now slides in from the left behind a menu button in a slim top bar and closes
    again once a page is picked. The desktop layout is unchanged. */
+/* v1.10.83 - Dark mode, Notifications, User guide and Lock at the top right of
+   every screen (they were in the sidebar). It sits in the content area's top
+   padding, so it costs almost no height. On phones the same buttons sit in
+   the phone top bar instead. */
+.app-topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.4rem;
+  margin: -1.25rem 0 0.6rem;
+}
+.topbar-free {
+  margin-right: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  cursor: default;
+  white-space: nowrap;
+}
+[data-theme="dark"] .topbar-free { color: #4ade80; background: rgba(34, 197, 94, 0.14); }
+/* On a PC the promise is in the top bar; a phone has no top bar, so the menu keeps it. */
+@media (min-width: 769px) { .sidebar-free-phone { display: none; } }
+.topbar-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.topbar-btn:hover { color: var(--primary); background: var(--primary-light); }
+.topbar-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.topbar-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mobile-topbar .topbar-btn { flex-shrink: 0; border-color: transparent; background: rgba(255,255,255,0.08); color: inherit; }
+
 .mobile-topbar,
 .sidebar-backdrop { display: none; }
+@media (max-width: 768px) {
+  .app-topbar { display: none; }
+}
 @media (max-width: 768px) {
   .mobile-topbar {
     display: flex;
@@ -583,7 +593,6 @@ body {
   .app-layout > .main-content { padding: calc(52px + 1rem) 1rem 1.5rem; }
   .app-layout .settings-savebar { left: 0; } /* the sidebar is off-screen on phones */
   .app-layout .settings-bar { top: -1rem; } /* just under the fixed mobile header; two classes to outrank the base rule below */
-  .pwa-install-banner { top: 52px; }
 }
 .sidebar::-webkit-scrollbar { width: 10px; }
 .sidebar::-webkit-scrollbar-thumb {
@@ -630,7 +639,18 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 500;
+  line-height: 1.35;
 }
+/* v1.10.83 - "Free forever" under the app name. */
+.sidebar-free { color: #22c55e; font-weight: 700; }
+/* v1.10.83 - the business's own logo / name in the menu: a long name gets two
+   lines, then "..." (the full name is its tooltip); a logo fits a white tile. */
+.sidebar-brand-text { min-width: 0; flex: 1; }
+.sidebar-title.sidebar-title-own { font-size: 1rem; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; margin-bottom: 2px; }
+.sidebar-logo.sidebar-logo-own { background: #fff; padding: 3px; overflow: hidden; }
+.sidebar-logo.sidebar-logo-own img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.sidebar-logo-letter { color: #fff; font-weight: 800; font-size: 1.15rem; }
+html:not([data-theme="dark"]) .sidebar-free { color: #16a34a; }
 
 .sidebar-nav {
   display: flex;
@@ -1210,6 +1230,12 @@ textarea.form-input { resize: vertical; min-height: 60px; }
   flex-wrap: wrap;
 }
 
+.generator-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
 .split-view {
   display: flex;
   flex: 1;
@@ -1493,6 +1519,18 @@ textarea.form-input { resize: vertical; min-height: 60px; }
   font-size: 0.85rem;
 }
 .line-item-field .form-label { margin-bottom: 0.3rem; font-size: 0.7rem; }
+/* v1.10.83 - the item name wraps and grows instead of being cut off; drag the
+   corner to make it taller. */
+.line-item-field textarea.line-item-name {
+  min-width: 0;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  resize: vertical;
+  overflow: hidden;
+  min-height: 2.1rem;
+  font-family: inherit;
+}
 .line-item-delete { justify-content: flex-end; padding-bottom: 0.35rem; min-width: 0; }
 
 /* Product auto-search dropdown */
@@ -2807,6 +2845,73 @@ kbd {
 
 .toast-close:hover { opacity: 1; }
 
+/* v1.10.83 - "Report" / "How to fix" on an error toast. Inherits the toast's
+   text colour, so it reads on every toast type in light and dark mode. */
+.toast-action {
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 0.15rem 0.5rem;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.toast-action:hover { background: rgba(0,0,0,0.06); }
+
+/* v1.10.83 - the "This screen ran into a problem" panel (ErrorBoundary.jsx). */
+.problem-panel {
+  max-width: 640px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border-left: 4px solid #f59e0b;
+}
+.problem-panel h2 { margin: 0 0 0.5rem; font-size: 1.15rem; }
+.problem-panel p { margin: 0 0 0.75rem; line-height: 1.55; color: var(--text-secondary, #4b5563); }
+.problem-panel code {
+  display: block;
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  background: var(--bg-secondary, #f8fafc);
+  font-size: 0.8rem;
+  word-break: break-word;
+  white-space: pre-wrap;
+  margin-bottom: 0.9rem;
+}
+.problem-panel-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.problem-known {
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: var(--bg-secondary, #f8fafc);
+  margin-bottom: 0.9rem;
+  font-size: 0.88rem;
+}
+.problem-known a { font-weight: 600; }
+.problem-known a, #problem-log a { color: var(--primary); }
+.problem-log-list { list-style: none; margin: 0; padding: 0; }
+.problem-log-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  align-items: baseline;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+}
+.problem-log-msg { flex: 1 1 240px; min-width: 0; word-break: break-word; }
+.problem-log-server {
+  max-height: 260px;
+  overflow: auto;
+  padding: 0.6rem;
+  border-radius: 6px;
+  background: var(--bg-secondary, #f8fafc);
+  font-size: 0.72rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 @keyframes toast-slide {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
@@ -2867,6 +2972,10 @@ kbd {
 }
 
 .type-chip:hover { border-color: var(--primary); color: var(--primary); }
+/* v1.10.83 - a white chip with pale text was unreadable in dark mode (Business type, Region). */
+/* v1.10.83 - hovering the picked chip turned its text blue on blue (invisible). */
+.type-chip-active:hover { color: white; }
+[data-theme="dark"] .type-chip:not(.type-chip-active) { background: #1e293b; border-color: #334155; color: #e2e8f0; }
 
 .type-chip-active {
   background: var(--primary);
@@ -3197,6 +3306,11 @@ kbd {
 
 /* ========= Stats Grid 4-col ========= */
 .stats-grid-4 { grid-template-columns: repeat(4, 1fr); }
+/* v1.10.83 - the total cards scrolled sideways on a phone and squeezed on a
+   small laptop: as many columns as fit, down to one. */
+@media (max-width: 1100px) {
+  .stats-grid, .stats-grid-4 { grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)) !important; }
+}
 
 .stat-icon-amber { background: rgba(245, 158, 11, 0.08); color: #f59e0b; }
 .stat-value-amber { color: #d97706; }
@@ -3434,9 +3548,9 @@ html:not([data-theme="dark"]) .profile-switcher-menu { background: #ffffff; bord
 html:not([data-theme="dark"]) .profile-switcher-item { color: #334155; }
 html:not([data-theme="dark"]) .profile-switcher-item:hover { background: rgba(15, 23, 42, 0.06); }
 html:not([data-theme="dark"]) .profile-switcher-manage { border-top-color: var(--border); color: #64748b; }
-html:not([data-theme="dark"]) .server-status { background: rgba(15, 23, 42, 0.04); color: #64748b; }
 html:not([data-theme="dark"]) .mobile-topbar { background: #ffffff; color: #0f172a; box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12); }
-html:not([data-theme="dark"]) .mobile-topbar-btn { background: rgba(15, 23, 42, 0.06); color: #0f172a; }
+html:not([data-theme="dark"]) .mobile-topbar-btn,
+html:not([data-theme="dark"]) .mobile-topbar .topbar-btn { background: rgba(15, 23, 42, 0.06); color: #0f172a; }
 
 /* v1.10.77 (#84) - PIN lock screen (AppLock.jsx) */
 .app-lock-screen {

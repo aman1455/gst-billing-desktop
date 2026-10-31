@@ -4,6 +4,13 @@
 # Desktop shortcut. Idempotent - safe to click multiple times.
 # If the server is already running on our chosen port, we just
 # open the browser without spawning a duplicate node.exe.
+#
+# v1.10.83 - -AppWindow opens the app in its own window (Edge --app: no tabs,
+# no address bar) instead of a browser tab; the one-line install's icons use
+# it. -Hidden says nobody can see this console (the icon runs it hidden), so
+# a problem re-opens this script in a window that shows it and waits.
+
+param([switch]$AppWindow, [switch]$Hidden)
 
 $ErrorActionPreference = 'Continue'
 $Host.UI.RawUI.WindowTitle = 'E-Munim - Server'
@@ -55,6 +62,30 @@ function Move-ToRenamedLauncher {
   }
 }
 Move-ToRenamedLauncher
+
+# v1.10.83 - the Desktop and Start Menu icons open the app directly (see
+# app-shortcut.ps1); before, the ZIP install's icons opened the launcher and
+# needed a second click on Open App. An install that updates to this version
+# keeps its old icons, so turn the ones that open THIS folder's launcher into
+# app icons. Others (another copy, anything the user made) are left alone.
+function Move-IconsToApp {
+  if ((Split-Path -Leaf $SystemDir) -ne '_system') { return }
+  $hta = Join-Path (Split-Path -Parent $SystemDir) 'Free GST Billing - WINDOWS.hta'
+  try {
+    . (Join-Path $SystemDir 'app-shortcut.ps1')
+    $wsh = New-Object -ComObject WScript.Shell
+    foreach ($dir in @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))) {
+      if (-not $dir -or -not (Test-Path -LiteralPath $dir)) { continue }
+      foreach ($lnk in Get-ChildItem -LiteralPath $dir -Filter '*.lnk' -File -ErrorAction SilentlyContinue) {
+        if (([string]$wsh.CreateShortcut($lnk.FullName).Arguments).Trim().Trim('"') -ne $hta) { continue }
+        New-AppShortcut $lnk.FullName $SystemDir
+      }
+    }
+  } catch {
+    # The old icon still opens the launcher, which still works.
+  }
+}
+Move-IconsToApp
 
 # v1.10.75 - updating only ever ADDED files, so an install that started on an
 # older version kept launchers and scripts that no longer do anything (and
@@ -142,9 +173,36 @@ function TestServerUp {
   } catch { return $false }
 }
 
+# v1.10.83 - Edge is on every Windows 10 / 11 PC; its --app window has no tabs
+# or address bar, so the app looks like a program. Otherwise: a browser tab.
+# FREEGSTBILL_TEST (the installer's test mode) opens nothing.
+function Open-App([int]$p) {
+  $url = "http://localhost:$p/"
+  if ($env:FREEGSTBILL_TEST) { Write-Host "  (test mode: would open $url)"; return }
+  if ($AppWindow) {
+    foreach ($d in @(${env:ProgramFiles(x86)}, $env:ProgramFiles, $env:LOCALAPPDATA)) {
+      if (-not $d) { continue }
+      $edge = Join-Path $d 'Microsoft\Edge\Application\msedge.exe'
+      if (Test-Path -LiteralPath $edge) { Start-Process -FilePath $edge -ArgumentList "--app=$url"; return }
+    }
+  }
+  Start-Process $url
+}
+
+# Stops with the problem on screen. Run hidden (from the icon), nobody would
+# see it, so the same script is opened again in a normal window instead.
+function Exit-WithProblem {
+  if ($Hidden) {
+    Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -AppWindow"
+    exit 1
+  }
+  Read-Host '  Press Enter to close'
+  exit 1
+}
+
 if (TestServerUp -p $port) {
-  Write-Host "  Server already running on port $port - opening browser..."
-  Start-Process "http://localhost:$port/"
+  Write-Host "  Server already running on port $port - opening the app..."
+  Open-App $port
   exit 0
 }
 
@@ -157,33 +215,49 @@ if (TestServerUp -p $port) {
 # on PATH was started here and never answered.
 . (Join-Path $SystemDir 'ensure-node.ps1')
 $NodeExe = Use-GoodNode
-if (-not $NodeExe) {
-  Read-Host '  Press Enter to close'
-  exit 1
-}
-if ($script:NodeWasFetched -or -not (Test-Path -LiteralPath (Join-Path $SystemDir 'node_modules\express\package.json'))) {
+if (-not $NodeExe) { Exit-WithProblem }
+# v1.10.83 - the ZIP ships complete packages, which work with any Node.js 18+;
+# only a missing or half-done node_modules (an old npm, ERR-060) is redone.
+if (-not (Test-PackagesReady)) {
   # The packages were installed by the old Node.js (or not at all): again.
   Write-Host '  Installing the app packages for this Node.js (one time)...'
   Reset-Packages
-  if (-not (Test-InstallReady)) {
-    Read-Host '  Press Enter to close'
-    exit 1
-  }
+  if (-not (Test-InstallReady)) { Exit-WithProblem }
   Push-Location $SystemDir
   npm install --omit=dev --no-audit --no-fund --loglevel=error
   $npmCode = $LASTEXITCODE
   Pop-Location
   if ($npmCode -ne 0) {
     Show-InstallHelp
-    Write-Host '  Then click Open App again.'
-    Read-Host '  Press Enter to close'
-    exit 1
+    Write-Host '  Then open the app again.'
+    Exit-WithProblem
   }
 }
-Write-Host "  Starting server on port $port..."
-Push-Location $SystemDir
-Start-Process -FilePath $NodeExe -ArgumentList 'server.js' -WorkingDirectory $SystemDir -WindowStyle Hidden
-Pop-Location
+# v1.10.83 - the icon runs this hidden, so during a slow first start people
+# click it again. A server for this folder started in the last two minutes is
+# still starting: wait for it instead of starting a second one on the same
+# data (it would move to another port). An older one that never answered is
+# stuck, and a new one is started as before. Two clicks a second apart both
+# get here before either has started node, so only the run holding this
+# folder's lock (held until this script ends) may start one.
+$serverJs = (Join-Path $SystemDir 'server.js').ToLower()
+$hash = [Security.Cryptography.SHA1]::Create().ComputeHash([Text.Encoding]::UTF8.GetBytes($serverJs))
+$startLock = New-Object System.Threading.Mutex($false, ('Local\FreeGSTBilling-' + (($hash[0..7] | ForEach-Object { $_.ToString('x2') }) -join '')))
+$haveLock = $false
+try { $haveLock = $startLock.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { $haveLock = $true }
+$recent = (Get-Date).AddMinutes(-2)
+$starting = @(Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue |
+  Where-Object { $_.CommandLine -and $_.CommandLine.ToLower().Contains($serverJs) -and $_.CreationDate -gt $recent })
+if (-not $haveLock -or $starting.Count) {
+  Write-Host '  The app is already starting - waiting for it...'
+} else {
+  Write-Host "  Starting server on port $port..."
+  Push-Location $SystemDir
+  # v1.10.83 - the full path, so the installer can tell this install's server
+  # from any other node.exe when it has to stop it for an update.
+  Start-Process -FilePath $NodeExe -ArgumentList "`"$(Join-Path $SystemDir 'server.js')`"" -WorkingDirectory $SystemDir -WindowStyle Hidden
+  Pop-Location
+}
 
 # Poll until the server responds. 15 seconds was not enough: the very first
 # start after an install is cold - Windows Defender reads every one of the
@@ -196,8 +270,15 @@ $deadline = (Get-Date).AddSeconds(90)
 $announced = 0
 while ((Get-Date) -lt $deadline) {
   Start-Sleep -Milliseconds 400
+  # v1.10.83 - when the port is taken the server moves to a free one and
+  # writes it to port.txt; without this, the first Open App waited 90 s on
+  # the old port and gave up.
+  if (Test-Path $portFile) {
+    $p = (Get-Content $portFile -Raw -ErrorAction SilentlyContinue)
+    if ($p -and $p.Trim() -match '^\d+$') { $port = [int]$p.Trim() }
+  }
   if (TestServerUp -p $port) {
-    Start-Process "http://localhost:$port/"
+    Open-App $port
     exit 0
   }
   # Say something every 10s so a slow first start does not look like a hang.
@@ -212,5 +293,5 @@ Write-Host ''
 Write-Host '  The server has not answered in 90 seconds.' -ForegroundColor Yellow
 Write-Host '  It may still be starting - try this address in your browser:'
 Write-Host "  http://localhost:$port/"
-Write-Host '  If that does not work, close this window and click Open App again.'
-Read-Host '  Press Enter to close'
+Write-Host '  If that does not work, close this window and open the app again.'
+Exit-WithProblem

@@ -1,61 +1,28 @@
-import { useState, useEffect } from 'react';
-import { HelpCircle, X, BookOpen } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import { docsLink } from '../utils';
 
 /*
  * v1.10.22 — Per-view help button.
  *
- * Reported: "in all tools or sidebar option there should be help button
- * in header whch will have how to use current tool."
+ * v1.10.83 - it opens that part of the online guide straight away, in the
+ * browser (asked for: "all docs buttons should take the user to the same
+ * module in the docs"). The small pop-up summary it used to show first is
+ * gone; the guide is the one place help is kept up to date.
  *
- * Consumers pass a `title` and either `children` (JSX) or a `body` string.
- * The button sits inline where dropped (typically next to a page title);
- * clicking opens a small modal explaining how to use the current view.
- * Esc closes.
- *
- * `doc` ("page" or "page#section") adds a link to that part of the online
- * documentation, which opens in a new tab.
+ * `doc` is "page" or "page#section" of the documentation site. `title` names
+ * what the guide is about (shown on hover and read out by screen readers).
+ * Older callers still pass `body` / `children`; they are no longer shown.
  */
-export default function HelpButton({ title, body, children, doc, size = 18 }) {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open]);
-
+export default function HelpButton({ title, doc, size = 18, style }) {
+  const label = `${title ? title.replace(/\s*[—-]\s*how to use$/i, '') : 'This screen'}: open the guide (opens in your browser)`;
+  // A small "?" sits inline after a card or section title: a compact box and a
+  // gap from the text, so it does not make the title row taller.
+  const inline = size < 18 ? { width: size + 8, height: size + 8, marginLeft: 6, flexShrink: 0 } : null;
   return (
-    <>
-      <button type="button" className="icon-btn" title="How to use this section"
-        onClick={() => setOpen(true)}
-        style={{ color: 'var(--primary)' }}>
-        <HelpCircle size={size} />
-      </button>
-      {open && (
-        <div className="modal-overlay" onClick={() => setOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <h3 className="section-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <HelpCircle size={18} style={{ color: 'var(--primary)' }} /> {title}
-              </h3>
-              <button className="icon-btn" onClick={() => setOpen(false)} title="Close (Esc)"><X size={18} /></button>
-            </div>
-            <div style={{ fontSize: '0.9rem', lineHeight: 1.55, color: 'var(--text)' }}>
-              {children ? children : (
-                <div style={{ whiteSpace: 'pre-wrap' }}>{body}</div>
-              )}
-            </div>
-            {doc && (
-              <a href={docsLink(doc)} target="_blank" rel="noopener noreferrer" className="btn btn-secondary"
-                style={{ marginTop: '1rem', display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
-                <BookOpen size={16} /> Read the full guide
-              </a>
-            )}
-          </div>
-        </div>
-      )}
-    </>
+    <a href={docsLink(doc || '')} target="_blank" rel="noopener noreferrer"
+      className="icon-btn" title={label} aria-label={label}
+      style={{ color: 'var(--primary)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', verticalAlign: 'middle', ...inline, ...style }}>
+      <HelpCircle size={size} />
+    </a>
   );
 }

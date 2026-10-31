@@ -147,6 +147,17 @@ for (const f of includeAtSystem) {
 // file is the whole fix. The rest of src/ stays out.
 mkdirSync(join(SYSTEM, 'src'), { recursive: true });
 copyFileSync(join(REPO_ROOT, 'src', 'utils.js'), join(SYSTEM, 'src', 'utils.js'));
+// v1.10.83 - the server redacts errors.log lines with the Problem log's own
+// rules (standalone too). assertServerImportsResolve() below checks it.
+mkdirSync(join(SYSTEM, 'src', 'utils'), { recursive: true });
+copyFileSync(join(REPO_ROOT, 'src', 'utils', 'errorReport.js'), join(SYSTEM, 'src', 'utils', 'errorReport.js'));
+// The cash book endpoints check entries with the form's own rules (imports ../utils.js only).
+copyFileSync(join(REPO_ROOT, 'src', 'utils', 'cashBook.js'), join(SYSTEM, 'src', 'utils', 'cashBook.js'));
+// Supplier payments are checked on save (#123): purchasePayments.js imports
+// purchaseOrders.js, which imports ../utils.js only.
+for (const f of ['purchasePayments.js', 'purchaseOrders.js']) {
+  copyFileSync(join(REPO_ROOT, 'src', 'utils', f), join(SYSTEM, 'src', 'utils', f));
+}
 
 copyDirRecursive(join(REPO_ROOT, 'dist'), join(SYSTEM, 'dist'));
 // Only ship the scripts that postinstall / release-time need — not the
@@ -161,6 +172,86 @@ for (const s of runtimeScripts) {
 
 // --- Create empty data folder so first-run doesn't need to mkdir ---
 mkdirSync(join(SYSTEM, 'data'), { recursive: true });
+
+// v1.10.83 - ship the production packages INSIDE the ZIP, so no user's PC
+// runs npm. Every install failure reported so far happened during
+// `npm install` on the user's machine: an old npm (ERR-060), no internet,
+// an office proxy blocking registry.npmjs.org, antivirus stopping npm half
+// way. All production packages are plain JavaScript, so one copy works on
+// every OS with Node.js 18+. `npm ci` follows package-lock.json exactly;
+// --no-bin-links leaves out node_modules/.bin (nothing runs those);
+// --ignore-scripts because the only install script is our own postinstall,
+// which does nothing in an installed copy anyway.
+console.log('  → Installing the production packages into _system/node_modules…');
+try {
+  execFileSync('npm', ['ci', '--omit=dev', '--no-audit', '--no-fund', '--no-bin-links', '--ignore-scripts', '--loglevel=error'],
+    { cwd: SYSTEM, stdio: 'inherit', shell: process.platform === 'win32' });
+} catch (e) {
+  console.error(`  x npm ci failed in the staging folder: ${e.message}`);
+  process.exit(1);
+}
+// The updaters and launchers treat this file as "the packages are complete".
+if (!existsSync(join(SYSTEM, 'node_modules', 'express', 'package.json')) || !existsSync(join(SYSTEM, 'node_modules', '.package-lock.json'))) {
+  console.error('  x _system/node_modules is incomplete after npm ci.');
+  process.exit(1);
+}
+
+// v1.10.83 - keep only what the SERVER loads. The app's own code (React,
+// jsPDF, tesseract...) is already built into dist/, so shipping those packages
+// again only made the ZIP 58 MB / 12,000 files: a slow first start (antivirus
+// reads every file) and a several-minute update for the old Windows updater.
+// The packages to keep are found by reading the shipped server files' imports,
+// so a new import can never be left out by a stale list; npm then names
+// everything they depend on.
+{
+  const serverFiles = [join(SYSTEM, 'server.js'), ...readdirSync(join(SYSTEM, 'src'), { recursive: true })
+    .filter((f) => /\.m?js$/.test(String(f))).map((f) => join(SYSTEM, 'src', String(f)))];
+  const BUILTIN = /^(node:|fs$|path$|url$|os$|crypto$|child_process$|http$|https$|zlib$|stream$|util$|events$|net$|readline$|buffer$|assert$|worker_threads$|timers$)/;
+  const wanted = new Set();
+  for (const f of serverFiles) {
+    const code = readFileSync(f, 'utf8');
+    for (const m of code.matchAll(/(?:^|\n)\s*import\s[^'"]*?from\s+['"]([^'".][^'"]*)['"]|import\(\s*['"]([^'".][^'"]*)['"]\s*\)/g)) {
+      const spec = m[1] || m[2];
+      if (BUILTIN.test(spec)) continue;
+      wanted.add(spec.startsWith('@') ? spec.split('/').slice(0, 2).join('/') : spec.split('/')[0]);
+    }
+  }
+  const nm = join(SYSTEM, 'node_modules');
+  // Walk npm's own record of the install (node_modules/.package-lock.json):
+  // each package's dependencies resolve the way Node resolves them, from its
+  // own nested node_modules up to the top.
+  const installed = JSON.parse(readFileSync(join(nm, '.package-lock.json'), 'utf8')).packages || {};
+  const resolve = (from, name) => {
+    for (let dir = from; ; dir = dir.slice(0, Math.max(0, dir.lastIndexOf('/node_modules/')))) {
+      const key = `${dir ? `${dir}/` : ''}node_modules/${name}`;
+      if (installed[key]) return key;
+      if (!dir) return null;
+    }
+  };
+  const keep = new Set();
+  const visit = (key) => {
+    if (!key || keep.has(key)) return;
+    keep.add(key);
+    const p = installed[key];
+    for (const d of Object.keys({ ...p.dependencies, ...p.optionalDependencies, ...p.peerDependencies })) visit(resolve(key, d));
+  };
+  for (const w of wanted) visit(resolve('', w));
+  // Top-level folder of every kept package ("express", "@scope/name").
+  const keepTop = new Set([...keep].map((k) => k.split('node_modules/')[1].replace(/\/$/, '')));
+  let removed = 0;
+  for (const entry of readdirSync(nm)) {
+    if (entry.startsWith('.')) continue;
+    const names = entry.startsWith('@') ? readdirSync(join(nm, entry)).map((s) => `${entry}/${s}`) : [entry];
+    for (const name of names) {
+      if (!keepTop.has(name)) { rmSync(join(nm, name), { recursive: true, force: true }); removed += 1; }
+    }
+    if (entry.startsWith('@') && readdirSync(join(nm, entry)).length === 0) rmSync(join(nm, entry), { recursive: true, force: true });
+  }
+  for (const w of wanted) {
+    if (!existsSync(join(nm, w, 'package.json'))) { console.error(`  x The server needs "${w}" but it is not in the package.`); process.exit(1); }
+  }
+  console.log(`  → Server packages: ${[...wanted].join(', ')} (+ ${keepTop.size - wanted.size} they need); ${removed} app-only packages left out`);
+}
 
 // v1.10.63 (#54) — Refuse to ship a server that cannot start.
 //

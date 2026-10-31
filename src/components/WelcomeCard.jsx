@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import { Heart, Share2, X } from 'lucide-react';
 import { SUPPORT_NUDGE_MIN_INVOICES } from '../utils/supporters';
+import HelpButton from './HelpButton';
 
 const KEY = 'freegstbill_welcomeCard';
 const SHARE_TEXT = 'I use E-Munim for my GST invoices. It works offline and keeps data on your own PC: https://github.com/aman1455/gst-billing-desktop';
@@ -25,7 +26,7 @@ export default function WelcomeCard({ invoiceCount, onOpenSupport }) {
       <button type="button" className="welcome-card-close" onClick={close} aria-label="Close the welcome note">
         <X size={18} />
       </button>
-      <h2 id="welcome-card-title">Welcome to E-Munim</h2>
+      <h2 id="welcome-card-title">Welcome to E-Munim <HelpButton title="The welcome note" doc="dashboard#welcome-card" size={16} /></h2>
       <p className="welcome-card-lead">
         Thank you for choosing E-Munim. A modern, reliable GST billing &amp; accounting solution built for your business.
 

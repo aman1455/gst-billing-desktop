@@ -1,10 +1,27 @@
 ===========================================================
-  E-MUNIM
+  FREE GST BILLING SOFTWARE
   By DiceCodes - free, and yours to keep
 ===========================================================
 
   Your invoices, clients and data stay on THIS computer.
   Nothing is uploaded. No account. No monthly fee.
+
+
+-----------------------------------------------------------
+  EASIEST: INSTALL WITH ONE LINE (no ZIP, no warnings)
+-----------------------------------------------------------
+
+  Windows: press Windows + R, paste this line, press Enter:
+
+    powershell -ExecutionPolicy Bypass -c "[Net.ServicePointManager]::SecurityProtocol='Tls12'; irm https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.ps1 | iex"
+
+  Mac / Linux: open Terminal, paste this line, press Return:
+
+    curl -fsSL https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.sh | bash
+
+  It installs the app, adds an icon and opens it. The same
+  line later updates it (your data is kept and backed up)
+  or repairs it. Or use this ZIP: follow the steps below.
 
 
 -----------------------------------------------------------
@@ -29,15 +46,15 @@
 
   Double-click the one that matches your computer:
 
-    Windows ..... E-Munim - WINDOWS
-    Mac ......... E-Munim - MAC
-    Linux / NAS . E-Munim - LINUX
+    Windows ..... Free GST Billing - WINDOWS
+    Mac ......... Free GST Billing - MAC
+    Linux / NAS . Free GST Billing - LINUX
 
   A small window opens with one button.
 
   MAC: install Node.js first (free): https://nodejs.org ->
   macOS Installer (LTS). Then hold Control, click
-  "E-Munim - MAC" and choose Open, then Open again.
+  "Free GST Billing - MAC" and choose Open, then Open again.
   A Terminal window asks "Install now? [Y/n]": press Return.
 
   LINUX: see the step-by-step guide below.
@@ -53,9 +70,10 @@
 
   Click "Install". There is nothing to fill in.
 
-  It downloads what the app needs (about 30 MB the first
-  time), sets everything up, and then opens the app in your
-  web browser by itself. Takes 1 to 3 minutes.
+  It sets everything up (if this PC has no Node.js, the
+  engine the app runs on, it downloads it: about 30 MB, one
+  time) and then opens the app in your web browser by
+  itself. Takes 1 to 3 minutes.
 
   A black window appears while it works. Leave it alone -
   it closes on its own.
@@ -73,12 +91,13 @@
   FROM NOW ON
 -----------------------------------------------------------
 
-  A "E-Munim" shortcut is put on your Desktop.
-  Use that to open the app every day.
+  A "Free GST Billing" icon is put on your Desktop and in
+  the Start menu. Click it to open the app every day: it
+  starts the app and opens it in its own window.
 
-  You can also open the launcher again any time. It is your
-  Open button, your Update button and your Backup button,
-  all in one file:
+  Update, Back up, Restore and Stop are also in the app's
+  Control Panel. The launcher stays in this folder for
+  updates and repairs:
 
     Open App .......... starts the app
     More options ...... Update, Back up, Restore,
@@ -143,13 +162,13 @@
   appropriate access privileges"
       Open Terminal (Applications -> Utilities), type
       chmod +x  (with a space after it), drag the file
-      "E-Munim - MAC" into the Terminal window,
+      "Free GST Billing - MAC" into the Terminal window,
       press Enter, then open the file again.
 
   Mac: "cannot be opened because Apple cannot check it" /
   "unidentified developer"
       The app is not signed by Apple. Hold Control and click
-      "E-Munim - MAC", choose Open, then Open again.
+      "Free GST Billing - MAC", choose Open, then Open again.
       Only the first time. (Or: System Settings -> Privacy &
       Security -> Open Anyway.)
 
@@ -169,24 +188,25 @@
 
   "could not install the app's dependencies" /
   "cannot reach the internet"
-      The first install needs the internet. Check the
-      connection (open any website). At an office, a proxy
-      or firewall may block registry.npmjs.org. Then click
-      Install again - it carries on where it stopped.
+      Check the connection (open any website). At an
+      office, a proxy or firewall may block nodejs.org or
+      github.com. Then click Install again - it carries on
+      where it stopped. Or paste the one-line install from
+      the top of this file: it also repairs.
 
   "Still starting..." / "The server has not answered in
   90 seconds"
       The first start after an install or update is slow
       (antivirus checks every new file). Wait a minute and
       open http://localhost:47371 in your browser. Still
-      nothing? Close the black window and click Open App
-      again.
+      nothing? Close the black window and open the app
+      again from its icon.
 
-  "E-Munim is already installed on this computer"
+  "Free GST Billing is already installed on this computer"
       You extracted a new ZIP into a new folder. Your
-      invoices are in the folder it names. Open that copy
-      from your Desktop shortcut and use More options ->
-      Update to the latest version. Delete the new folder.
+      invoices are in the folder it names. Click "Update
+      the installed copy" in the launcher, then delete the
+      new folder.
 
   "The app cannot write to its own folder"
       Do not keep it in C:\Program Files. Move the whole
@@ -203,8 +223,8 @@
 
   "Cannot connect to server" / "This site can't be
   reached" / a blank page
-      The app is not running. Open the Desktop shortcut and
-      click "Open App".
+      The app is not running. Click the Free GST Billing
+      icon on your Desktop.
 
   The update finished but the app looks the same
       Reload the page with Ctrl + F5.
@@ -217,7 +237,7 @@
   Still stuck?
       Report it here, with a screenshot (hide your GSTIN and
       bank details) and the message you see:
-      https://github.com/aman1455/gst-billing-desktop/issues/new?template=bug_report.yml
+      https://github.com/IamRamgarhia/Free-GST-Billing-Software/issues/new?template=bug_report.yml
 
       Fixes come in the Saturday update - one every week -
       and anything urgent straight away.

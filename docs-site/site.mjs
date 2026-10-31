@@ -2,14 +2,14 @@
 // Previous / Next order at the foot of each page.
 
 export const SITE = {
-  name: 'E-Munim',
+  name: 'Free GST Billing',
   // The folder is also the web address, so it carries the words people search.
-  folder: 'docs',
+  folder: 'free-gst-software-documentation',
   // Where the folder is published. Used for canonical links, the sitemap,
   // social previews and llms.txt, which all need full addresses.
   url: 'https://freeinvoicefast.com/docs/',
-  publisher: { name: 'Free Invoice Fast', url: 'https://freeinvoicefast.com' },
-  version: '1.10.82',
+  publisher: { name: 'DiceCodes', url: 'https://dicecodes.com' },
+  version: '1.10.83',
   repo: 'https://github.com/aman1455/gst-billing-desktop',
   // Always the newest release: GitHub resolves this to the latest release's
   // file of exactly this name (see docs/RELEASE_CHECKLIST.md, step 4b).
@@ -20,11 +20,11 @@ export const SITE = {
 // Other pages use their own title and the first ~155 characters of their lead.
 export const SEO = {
   index: {
-    title: 'E-Munim for India: documentation and user guide',
+    title: 'Free GST Billing Software for India: documentation and user guide',
     description: 'Free, open-source GST billing software for Windows, Mac and Linux. Make GST invoices, track payments and stock, and prepare GSTR-1 and GSTR-3B. No signup, works offline.',
   },
   install: {
-    title: 'How to install E-Munim on Windows, Mac and Linux',
+    title: 'How to install Free GST Billing Software on Windows, Mac and Linux',
     description: 'Download one ZIP, extract it and click Install. Sets up everything on Windows without admin rights. Step-by-step install for Windows, macOS and Linux.',
   },
   'first-invoice': {
@@ -46,9 +46,9 @@ export const SEO = {
 };
 
 export const NAV = [
-  { title: 'Start here', pages: ['index', 'install', 'install-mac', 'install-linux', 'update', 'first-run', 'first-invoice'] },
+  { title: 'Start here', pages: ['index', 'install', 'install-mac', 'install-linux', 'update', 'first-run', 'first-invoice', 'gst-basics', 'security'] },
   { title: 'Invoicing', pages: ['invoices', 'invoice-options', 'thermal-printing', 'dashboard'] },
-  { title: 'Clients, stock and payments', pages: ['clients', 'products', 'receipts', 'recurring'] },
+  { title: 'Clients, stock and payments', pages: ['clients', 'products', 'receipts', 'cash-book', 'recurring'] },
   { title: 'Buying', pages: ['purchases', 'expenses'] },
   { title: 'Tax and reports', pages: ['gst-returns', 'reports', 'income-tax'] },
   { title: 'Setting up', pages: ['settings', 'print-settings', 'backup', 'control-panel'] },

@@ -12,6 +12,10 @@ import { fileURLToPath } from 'url';
 // invoice-level discount, and round-off. Previously the recurring auto-fire
 // re-implemented totals inline and silently reintroduced every bug the
 // v1.10.1 extraction fixed. Same source of truth now.
+// v1.10.83 - same redaction as the browser's Problem log, for errors.log lines.
+import { redact } from './src/utils/errorReport.js';
+import { validateCashEntry, cleanCashEntry } from './src/utils/cashBook.js';
+import { validatePurchasePayments } from './src/utils/purchasePayments.js';
 import { templateTotals, clientYearToDate, nextCounterValue, startFor, numberSeriesFor, counterKeyFor, formatDocNumber, businessKeyOf, getFinancialYearLabel, INVOICE_TYPES } from './src/utils.js';
 import { LicenseManager } from './licensing/licenseManager.js';
 
@@ -132,10 +136,23 @@ app.use('/api', (req, res, next) => {
 });
 
 // Ensure data directory and sub-directories exist
-const DIRS = ['bills', 'clients', 'templates', 'products', 'expenses', 'recurring', 'receipts', 'profiles', 'purchases'];
-for (const dir of DIRS) {
-  const dirPath = path.join(DATA_DIR, dir);
-  if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
+const DIRS = ['bills', 'clients', 'templates', 'products', 'expenses', 'recurring', 'receipts', 'profiles', 'purchases', 'productions', 'purchase-orders', 'cash-book'];
+// v1.10.83 - a data folder the app may not write to (inside Program Files, a
+// read-only drive, antivirus "controlled folder access") or a full disk used
+// to crash here with a raw stack trace the launcher never showed. Say it in
+// words, then stop: nothing can be saved, so starting would only lose work.
+try {
+  for (const dir of DIRS) {
+    const dirPath = path.join(DATA_DIR, dir);
+    if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
+  }
+} catch (err) {
+  const why = err.code === 'ENOSPC' ? 'The disk is full. Free some space and open the app again.'
+    : (err.code === 'EACCES' || err.code === 'EPERM') ? 'The app is not allowed to write to its data folder. Move the app folder to Documents (not Program Files), or allow it in your antivirus.'
+      : `The data folder could not be created (${err.code || err.message}).`;
+  console.error(`\n  Free GST Billing cannot start: ${why}\n  Data folder: ${DATA_DIR}\n  Help: https://dicecodes.com/free-gst-software-documentation/troubleshooting.html#${err.code === 'ENOSPC' ? 'disk-full' : 'no-permission'}\n`);
+  try { fs.appendFileSync(path.join(DATA_DIR, 'errors.log'), `[${new Date().toISOString()}] [startup] ${why} ${err.code || ''}\n`, 'utf-8'); } catch { /* the folder is the problem */ }
+  process.exit(1);
 }
 
 // Helper: safe filename from ID (replace slashes, etc.)
@@ -177,6 +194,12 @@ function isPathInside(resolved, root) {
 // EACCES/EPERM strings that hint at server structure). Server-side
 // logs the full detail; client sees a stable code + generic phrase.
 function errRes(res, status, code, err) {
+  // v1.10.83 - a full disk or a refused write is something the user can fix,
+  // so it gets its own wording (the Problem log links it to the fix).
+  if (code === 'server-error' && err) {
+    if (err.code === 'ENOSPC') code = 'disk-full';
+    else if (err.code === 'EACCES' || err.code === 'EPERM') code = 'no-permission';
+  }
   if (err) {
     try {
       const ts = new Date().toISOString();
@@ -192,6 +215,8 @@ function errRes(res, status, code, err) {
     'forbidden': 'Refused',
     'invalid-path': 'Invalid path',
     'payload-too-large': 'Request body too large',
+    'disk-full': 'The disk is full: free some space and try again',
+    'no-permission': 'The app is not allowed to write to its data folder',
   };
   return res.status(status).json({ error: MESSAGES[code] || code, code });
 }
@@ -229,12 +254,34 @@ function readAllFromDir(dir) {
   const results = fs.readdirSync(dirPath)
     .filter(f => f.endsWith('.json'))
     .map(f => {
-      try { return JSON.parse(fs.readFileSync(path.join(dirPath, f), 'utf-8')); }
-      catch { return null; }
+      try {
+        // A file saved by Notepad / PowerShell 5.1 starts with a byte-order
+        // mark, which JSON.parse refuses: it is not damage, so read past it.
+        const v = JSON.parse(fs.readFileSync(path.join(dirPath, f), 'utf-8').replace(/^\uFEFF/, ''));
+        // v1.10.83 - "null", a number or a list is as damaged as a broken file:
+        // the screens expect an object and crashed on anything else.
+        if (v && typeof v === 'object' && !Array.isArray(v)) return v;
+      } catch { /* reported below */ }
+      reportDamagedFile(dir, f);
+      return null;
     })
     .filter(Boolean);
   dirCache[dir] = { at: Date.now(), value: results };
   return results;
+}
+
+// v1.10.83 - one damaged file (power cut mid-save, a disk error, a hand
+// edit) is skipped so everything else still loads - it always was - but now
+// it is named once in errors.log, which the in-app Problem log shows with the
+// fix "restore it from a backup". Once per file per run, not every 5s read.
+const reportedDamaged = new Set();
+function reportDamagedFile(dir, file) {
+  const key = `${dir}/${file}`;
+  if (reportedDamaged.has(key)) return;
+  reportedDamaged.add(key);
+  const msg = `Skipped damaged file data/${key} (not valid JSON) - restore it from a backup`;
+  console.warn(`  ${msg}`);
+  logFatal(msg, 'data');
 }
 
 // Helper: read a single JSON file
@@ -390,7 +437,7 @@ app.get('/api/clients', (req, res) => {
 
 app.post('/api/clients', (req, res) => {
   const client = req.body;
-  if (!client.id) client.id = 'cli_' + Date.now();
+  if (!client.id) client.id = 'cli_' + Date.now() + crypto.randomBytes(3).toString('hex');
   const filePath = path.join(DATA_DIR, 'clients', safeFileName(client.id) + '.json');
   writeJSON(filePath, client);
   res.json({ success: true, id: client.id });
@@ -423,7 +470,7 @@ app.get('/api/templates', (req, res) => {
 
 app.post('/api/templates', (req, res) => {
   const tpl = req.body;
-  if (!tpl.id) tpl.id = 'tpl_' + Date.now();
+  if (!tpl.id) tpl.id = 'tpl_' + Date.now() + crypto.randomBytes(3).toString('hex');
   const filePath = path.join(DATA_DIR, 'templates', safeFileName(tpl.id) + '.json');
   writeJSON(filePath, tpl);
   res.json({ success: true, id: tpl.id });
@@ -446,7 +493,10 @@ app.get('/api/products', (req, res) => {
 
 app.post('/api/products', (req, res) => {
   const product = req.body;
-  if (!product.id) product.id = 'prod_' + Date.now();
+  if (!product.id) product.id = 'prod_' + Date.now() + crypto.randomBytes(3).toString('hex');
+  // v1.10.83 (#121) - a service has no stock, whoever saves it (a purchase
+  // bill adds quantities to every product on it).
+  if (product.kind === 'service') delete product.stock;
   const filePath = path.join(DATA_DIR, 'products', safeFileName(product.id) + '.json');
   writeJSON(filePath, product);
   res.json({ success: true, id: product.id });
@@ -456,6 +506,91 @@ app.delete('/api/products/:id', (req, res) => {
   const filePath = path.join(DATA_DIR, 'products', safeFileName(req.params.id) + '.json');
   deleteFile(filePath);
   res.json({ success: true });
+});
+
+// ========================
+// PRODUCTION (manufacturing, v1.10.83 #115)
+// ========================
+// A production entry and the stock it moves are saved by ONE request: the
+// app works out entry.stockApplied ({ productId: change }, the same kind of
+// record an invoice keeps), and this applies it with the same arithmetic as
+// applyStockChanges in store.js. Doing it here, synchronously, means no other
+// request can run in between, and if any file write fails every file already
+// written is put back - a production is never half saved.
+const PRODUCTIONS_DIR = path.join(DATA_DIR, 'productions');
+const productFileFor = (id) => path.join(DATA_DIR, 'products', safeFileName(id) + '.json');
+
+// Validates and works out the new products. Throws { status, code } when bad.
+// skipMissing: on delete, a product removed from the catalog since is skipped
+// (there is no stock left to put back on it).
+function stockMoves(changes, skipMissing) {
+  if (!changes || typeof changes !== 'object' || Array.isArray(changes)) throw { status: 400, code: 'bad-request' };
+  const out = [];
+  for (const [id, change] of Object.entries(changes)) {
+    const file = productFileFor(id);
+    if (!isPathInside(file, path.join(DATA_DIR, 'products'))) throw { status: 400, code: 'invalid-path' };
+    if (typeof change !== 'number' || !Number.isFinite(change)) throw { status: 400, code: 'bad-request' };
+    const product = readJSON(file, null);
+    if (!product) { if (skipMissing) continue; throw { status: 400, code: 'Product not found. Reload the page and try again.' }; }
+    if (product.kind === 'service') continue; // #121 - no stock to move
+    out.push({ file, before: product, after: { ...product, stock: Math.round(((Number(product.stock) || 0) + change) * 1000) / 1000 } });
+  }
+  return out;
+}
+
+// Writes the products, then runs `finish` (save or delete the entry). On any
+// failure the products already written are restored.
+function commitStock(moves, finish) {
+  const done = [];
+  try {
+    for (const m of moves) { writeJSON(m.file, m.after); done.push(m); }
+    finish();
+  } catch (err) {
+    for (const m of done) { try { writeJSON(m.file, m.before); } catch { /* logged below */ } }
+    throw err;
+  }
+}
+
+app.get('/api/productions', (req, res) => {
+  const rows = readAllFromDir('productions');
+  rows.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+  res.json(rows);
+});
+
+app.post('/api/productions', (req, res) => {
+  const entry = req.body;
+  if (!entry || typeof entry !== 'object' || typeof entry.id !== 'string' || !entry.id) return errRes(res, 400, 'bad-request');
+  const file = path.join(PRODUCTIONS_DIR, safeFileName(entry.id) + '.json');
+  if (!isPathInside(file, PRODUCTIONS_DIR)) return errRes(res, 400, 'invalid-path');
+  // Never saved twice: a second save would move the stock a second time.
+  // Editing is delete + enter again.
+  if (fs.existsSync(file)) return errRes(res, 409, 'conflict');
+  try {
+    commitStock(stockMoves(entry.stockApplied, false), () => writeJSON(file, entry));
+    invalidateCache('products');
+    res.json({ success: true, id: entry.id });
+  } catch (err) {
+    if (err?.status) return errRes(res, err.status, err.code);
+    errRes(res, 500, 'server-error', err);
+  }
+});
+
+app.delete('/api/productions/:id', (req, res) => {
+  const file = path.join(PRODUCTIONS_DIR, safeFileName(req.params.id) + '.json');
+  if (!isPathInside(file, PRODUCTIONS_DIR)) return errRes(res, 400, 'invalid-path');
+  const entry = readJSON(file, null);
+  if (!entry) return errRes(res, 404, 'not-found');
+  // Exactly the reverse of what this entry recorded it did.
+  const back = {};
+  for (const [id, change] of Object.entries(entry.stockApplied || {})) back[id] = -(Number(change) || 0);
+  try {
+    commitStock(stockMoves(back, true), () => deleteFile(file));
+    invalidateCache('products');
+    res.json({ success: true });
+  } catch (err) {
+    if (err?.status) return errRes(res, err.status, err.code);
+    errRes(res, 500, 'server-error', err);
+  }
 });
 
 // ========================
@@ -469,7 +604,7 @@ app.get('/api/expenses', (req, res) => {
 
 app.post('/api/expenses', (req, res) => {
   const expense = req.body;
-  if (!expense.id) expense.id = 'exp_' + Date.now();
+  if (!expense.id) expense.id = 'exp_' + Date.now() + crypto.randomBytes(3).toString('hex');
   const filePath = path.join(DATA_DIR, 'expenses', safeFileName(expense.id) + '.json');
   writeJSON(filePath, expense);
   res.json({ success: true, id: expense.id });
@@ -492,7 +627,7 @@ app.get('/api/recurring', (req, res) => {
 
 app.post('/api/recurring', (req, res) => {
   const item = req.body;
-  if (!item.id) item.id = 'rec_' + Date.now();
+  if (!item.id) item.id = 'rec_' + Date.now() + crypto.randomBytes(3).toString('hex');
   const filePath = path.join(DATA_DIR, 'recurring', safeFileName(item.id) + '.json');
   writeJSON(filePath, item);
   res.json({ success: true, id: item.id });
@@ -515,7 +650,7 @@ app.get('/api/receipts', (req, res) => {
 
 app.post('/api/receipts', (req, res) => {
   const receipt = req.body;
-  if (!receipt.id) receipt.id = 'rcp_' + Date.now();
+  if (!receipt.id) receipt.id = 'rcp_' + Date.now() + crypto.randomBytes(3).toString('hex');
   const filePath = path.join(DATA_DIR, 'receipts', safeFileName(receipt.id) + '.json');
   writeJSON(filePath, receipt);
   res.json({ success: true, id: receipt.id });
@@ -538,7 +673,12 @@ app.get('/api/purchases', (req, res) => {
 
 app.post('/api/purchases', (req, res) => {
   const purchase = req.body;
-  if (!purchase.id) purchase.id = 'pur_' + Date.now();
+  // v1.10.83 (#123) - payments to the supplier: each more than 0 with a date,
+  // and together not more than the bill (less TDS) by more than a rupee.
+  if (!purchase || typeof purchase !== 'object' || Array.isArray(purchase)) return errRes(res, 400, 'bad-request');
+  const problem = validatePurchasePayments(purchase);
+  if (problem) return res.status(400).json({ error: problem, code: 'bad-request' });
+  if (!purchase.id) purchase.id = 'pur_' + Date.now() + crypto.randomBytes(3).toString('hex');
   const filePath = path.join(DATA_DIR, 'purchases', safeFileName(purchase.id) + '.json');
   writeJSON(filePath, purchase);
   res.json({ success: true, id: purchase.id });
@@ -548,6 +688,65 @@ app.delete('/api/purchases/:id', (req, res) => {
   const filePath = path.join(DATA_DIR, 'purchases', safeFileName(req.params.id) + '.json');
   deleteFile(filePath);
   res.json({ success: true });
+});
+
+// v1.10.83 (#112) - purchase orders, a folder of their own: GST returns and
+// reports read data/purchases, and an order is not a bill. Never deleted:
+// a PO is cancelled instead, so its number stays accounted for.
+app.get('/api/purchase-orders', (req, res) => {
+  const orders = readAllFromDir('purchase-orders');
+  orders.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.poNumber || '').localeCompare(String(a.poNumber || '')));
+  res.json(orders);
+});
+
+app.post('/api/purchase-orders', (req, res) => {
+  const order = req.body;
+  if (!order || typeof order !== 'object' || Array.isArray(order)) return errRes(res, 400, 'bad-request');
+  if (order.id !== undefined && (typeof order.id !== 'string' || !order.id.trim())) return errRes(res, 400, 'bad-request');
+  if (!order.id) order.id = 'po_' + Date.now() + crypto.randomBytes(3).toString('hex');
+  const dir = path.join(DATA_DIR, 'purchase-orders');
+  const filePath = path.join(dir, safeFileName(order.id) + '.json');
+  if (!isPathInside(filePath, dir)) return errRes(res, 400, 'invalid-path');
+  writeJSON(filePath, order);
+  res.json({ success: true, id: order.id });
+});
+
+// v1.10.83 - the cash book's own entries (cash recorded on invoices, receipts
+// and expenses is read from those, never copied here). Checked with the same
+// rules as the form, and only known fields are stored.
+app.get('/api/cash-book', (req, res) => {
+  const entries = readAllFromDir('cash-book');
+  entries.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+  res.json(entries);
+});
+
+app.post('/api/cash-book', (req, res) => {
+  const problem = validateCashEntry(req.body);
+  if (problem) return res.status(400).json({ error: problem, code: 'bad-request' });
+  const entry = cleanCashEntry(req.body);
+  if (!entry.id) entry.id = 'cash_' + Date.now().toString(36) + crypto.randomBytes(3).toString('hex');
+  else entry.updatedAt = new Date().toISOString();
+  const dir = path.join(DATA_DIR, 'cash-book');
+  const filePath = path.join(dir, safeFileName(entry.id) + '.json');
+  if (!isPathInside(filePath, dir)) return errRes(res, 400, 'invalid-path');
+  try {
+    writeJSON(filePath, entry);
+    res.json({ success: true, id: entry.id, entry });
+  } catch (err) {
+    errRes(res, 500, 'server-error', err);
+  }
+});
+
+app.delete('/api/cash-book/:id', (req, res) => {
+  const dir = path.join(DATA_DIR, 'cash-book');
+  const filePath = path.join(dir, safeFileName(req.params.id) + '.json');
+  if (!isPathInside(filePath, dir)) return errRes(res, 400, 'invalid-path');
+  try {
+    deleteFile(filePath);
+    res.json({ success: true });
+  } catch (err) {
+    errRes(res, 500, 'server-error', err);
+  }
 });
 
 // ========================
@@ -561,7 +760,7 @@ app.get('/api/profiles', (req, res) => {
 
 app.post('/api/profiles', (req, res) => {
   const prof = req.body;
-  if (!prof.id) prof.id = 'biz_' + Date.now();
+  if (!prof.id) prof.id = 'biz_' + Date.now() + crypto.randomBytes(3).toString('hex');
   const filePath = path.join(DATA_DIR, 'profiles', safeFileName(prof.id) + '.json');
   writeJSON(filePath, prof);
   res.json({ success: true, id: prof.id });
@@ -724,6 +923,9 @@ app.get('/api/export', (req, res) => {
     receipts: readAllFromDir('receipts'),
     profiles: readAllFromDir('profiles'),
     purchases: readAllFromDir('purchases'),
+    productions: readAllFromDir('productions'), // v1.10.83 (#115)
+    purchaseOrders: readAllFromDir('purchase-orders'),
+    cashBook: readAllFromDir('cash-book'),
     // v1.10.77 - never the PIN hash: a backup file can travel (email, Drive).
     meta: withoutLock(readJSON(META_PATH, {})),
     exportedAt: new Date().toISOString(),
@@ -755,6 +957,9 @@ app.post('/api/import', (req, res) => {
     receiptCount: 0, receiptSkipped: 0,
     profileCount: 0, profileSkipped: 0,
     purchaseCount: 0, purchaseSkipped: 0,
+    productionCount: 0, productionSkipped: 0,
+    purchaseOrderCount: 0, purchaseOrderSkipped: 0,
+    cashBookCount: 0, cashBookSkipped: 0,
   };
 
   // Helper: upsert one entity to a directory, honouring the overwrite flag.
@@ -781,6 +986,12 @@ app.post('/api/import', (req, res) => {
   (data.receipts || []).forEach(r => upsertOne('receipts', r, 'receiptCount', 'receiptSkipped'));
   (data.profiles || []).forEach(p => upsertOne('profiles', p, 'profileCount', 'profileSkipped'));
   (data.purchases || []).forEach(p => upsertOne('purchases', p, 'purchaseCount', 'purchaseSkipped'));
+  // v1.10.83 (#115) - saved as they are: the products in the same backup
+  // already hold the stock these entries moved, so nothing is applied again.
+  (data.productions || []).forEach(p => upsertOne('productions', p, 'productionCount', 'productionSkipped'));
+  (data.purchaseOrders || []).forEach(p => upsertOne('purchase-orders', p, 'purchaseOrderCount', 'purchaseOrderSkipped'));
+  // v1.10.83 - a cash entry that fails the form's checks is skipped, not saved.
+  (data.cashBook || []).forEach(c => { if (validateCashEntry(c)) counts.cashBookSkipped++; else upsertOne('cash-book', cleanCashEntry(c), 'cashBookCount', 'cashBookSkipped'); });
 
   // meta.json — same gating. Previously always overwrote → counters could
   // regress below existing bill numbers → collision loop on next save.
@@ -795,6 +1006,13 @@ app.post('/api/import', (req, res) => {
       const meta = readJSON(META_PATH, {});
       const series = { ...(data.meta.invoiceNumberSeries || {}), ...(meta.invoiceNumberSeries || {}) };
       if (Object.keys(series).length) meta.invoiceNumberSeries = series;
+      // v1.10.83 (#112) - and the backup's cost centres this PC does not have,
+      // so the documents it brings in keep their cost centre.
+      if (Array.isArray(data.meta.costCentres)) {
+        const have = new Set((meta.costCentres || []).map((c) => c?.id));
+        const added = data.meta.costCentres.filter((c) => c?.id && !have.has(c.id));
+        if (added.length) meta.costCentres = [...(meta.costCentres || []), ...added];
+      }
       for (const [k, v] of Object.entries(data.meta)) {
         if (k.startsWith('counter_') && Number(v) > (Number(meta[k]) || 0)) meta[k] = Number(v);
       }
@@ -1082,6 +1300,50 @@ app.get('/api/version', (req, res) => {
   res.json({ current: pkg.version });
 });
 
+// v1.10.83 - the browser's Problem log copies each entry here, so errors.log
+// holds both sides of a failure. Redacted again (never trust the sender), one
+// line per entry, capped fields, and at most 30 a minute so a looping screen
+// cannot fill the disk (rotateErrorsIfLarge caps the file as well).
+const clientErrorTimes = [];
+app.post('/api/client-errors', (req, res) => {
+  const now = Date.now();
+  while (clientErrorTimes.length && now - clientErrorTimes[0] > 60_000) clientErrorTimes.shift();
+  if (clientErrorTimes.length >= 30) return res.status(429).json({ error: 'Too many reports', code: 'rate-limited' });
+  const b = req.body;
+  if (!b || typeof b !== 'object' || Array.isArray(b)) return errRes(res, 400, 'bad-request');
+  const field = (v, n) => ((typeof v === 'string' || typeof v === 'number') ? redact(String(v)).replace(/\s*[\r\n]+\s*/g, ' | ').slice(0, n) : '');
+  const message = field(b.message, 500);
+  if (!message) return errRes(res, 400, 'bad-request');
+  clientErrorTimes.push(now);
+  const api = b.api && typeof b.api === 'object'
+    ? `${field(b.api.method, 10)} ${field(String(b.api.path || '').split('?')[0], 120)} -> ${Number(b.api.status) || 0} ` : '';
+  const stack = field(b.stack, 1500);
+  const line = `[${new Date().toISOString()}] [client:${field(b.kind, 20) || 'error'}] v${field(b.version, 20)} screen=${field(b.view, 30)} ${api}${message}${stack ? ` | ${stack}` : ''} | ${field(b.browser, 80)}`;
+  try {
+    rotateErrorsIfLarge();
+    fs.appendFileSync(ERRORS_LOG, line + '\n', 'utf-8');
+  } catch { /* disk full or read-only: the browser keeps its copy */ }
+  res.json({ ok: true });
+});
+
+// v1.10.83 - read-only tail of errors.log for the Problem log page: last 100
+// lines, each redacted and cut to 500 characters. Reads only the last 64 KB.
+app.get('/api/errors-log', (req, res) => {
+  try {
+    if (!fs.existsSync(ERRORS_LOG)) return res.json({ lines: [] });
+    const size = fs.statSync(ERRORS_LOG).size;
+    const len = Math.min(size, 64 * 1024);
+    const buf = Buffer.alloc(len);
+    const fd = fs.openSync(ERRORS_LOG, 'r');
+    try { fs.readSync(fd, buf, 0, len, size - len); } finally { fs.closeSync(fd); }
+    let lines = buf.toString('utf-8').split(/\r?\n/);
+    if (len < size) lines = lines.slice(1); // first line is cut in half
+    res.json({ lines: lines.filter((l) => l.trim()).slice(-100).map((l) => redact(l).slice(0, 500)) });
+  } catch (err) {
+    errRes(res, 500, 'server-error', err);
+  }
+});
+
 // Naive semver compare — returns +1 if a > b, -1 if a < b, 0 if equal.
 // "1.4.10" > "1.4.2" correctly (numeric parts), unlike a string compare.
 function compareSemver(a, b) {
@@ -1105,6 +1367,12 @@ app.get('/api/changelog', (req, res) => {
 });
 
 app.get('/api/check-update', async (req, res) => {
+  // v1.10.83 - Offline mode (Settings → Privacy & internet): no automatic
+  // check. ?now=1 is the Check for Updates button, which the user clicked.
+  if (readJSON(LOCAL_PREFS_PATH, {}).gst_offlineMode === '1' && req.query.now !== '1') {
+    res.json({ current: pkg.version, updateAvailable: false, offlineMode: true });
+    return;
+  }
   try {
     // Two parallel fetches: package.json (definitive version source) and the
     // GitHub Releases API (for release notes). Both have a 4s timeout so a
@@ -1165,6 +1433,7 @@ app.get('/api/check-update', async (req, res) => {
 // when running from the source repo.
 // ============================================================
 import { spawn } from 'child_process';
+import os from 'os';
 
 const isWindows = process.platform === 'win32';
 const isMac = process.platform === 'darwin';
@@ -1202,7 +1471,10 @@ function pickScript(name) {
 // ship update + backup only, so Restore / Move / Stop are shown as not
 // available there instead of failing when clicked.
 const CONTROL_ACTIONS = ['update', 'backup', 'restore', 'move', 'stop'];
-const controlActions = () => Object.fromEntries(CONTROL_ACTIONS.map(a => [a, !!pickScript(a)]));
+// v1.10.83 - Stop works everywhere: on macOS / Linux there is no stop script,
+// so the server stops itself (see launch-script below). The Mac and Linux
+// guides tell people to use it.
+const controlActions = () => Object.fromEntries(CONTROL_ACTIONS.map(a => [a, a === 'stop' && !isWindows ? true : !!pickScript(a)]));
 
 function runControlScript(scriptPath) {
   return new Promise((resolve) => {
@@ -1262,6 +1534,8 @@ app.get('/api/control-panel/status', (req, res) => {
     dataSizeBytes: dataSize,
     port: activePort,
     launcherType: controlScriptDir ? (isWindows ? 'hta' : (isMac ? 'command' : 'sh')) : 'none',
+    canRemove: path.basename(__dirname) === '_system' && !!pickScript('uninstall'),
+    appFolder: path.dirname(__dirname),
   });
 });
 
@@ -1296,9 +1570,80 @@ app.post('/api/control-panel/launch-script', async (req, res) => {
   const allowed = new Set(['update', 'restore', 'move', 'stop']);
   const action = String(req.body?.action || '');
   if (!allowed.has(action)) { res.status(400).json({ ok: false, error: 'Unknown action' }); return; }
+  if (action === 'stop' && !isWindows) {
+    // Answer first, then exit, so the page can say it stopped.
+    res.json({ ok: true, stdout: 'Stopped. Open the app again from its icon or launcher.' });
+    setTimeout(() => process.exit(0), 400);
+    return;
+  }
   const script = pickScript(action);
   const result = await runControlScript(script);
   res.json(result);
+});
+
+// v1.10.83 - Restart from the Control Panel ("if something is not working").
+// A new copy is started with --after-pid and waits for this one to exit, so
+// it gets the same port back. On Windows it is started through WMI, so it is
+// not inside this process's job and survives this process exiting.
+app.post('/api/control-panel/restart', (req, res) => {
+  const serverJs = path.join(__dirname, 'server.js');
+  try {
+    if (isWindows) {
+      const q = (v) => `'${String(v).replace(/'/g, "''")}'`;
+      const cmd = `"${process.execPath}" "${serverJs}" --after-pid ${process.pid}`;
+      const ps = `$si = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ ShowWindow = [uint16]0 }; `
+        + `$r = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = ${q(cmd)}; CurrentDirectory = ${q(__dirname)}; ProcessStartupInformation = $si }; `
+        + `exit $r.ReturnValue`;
+      const child = spawn('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', ps], { windowsHide: true, stdio: 'ignore' });
+      child.on('error', e => { if (!res.headersSent) res.json({ ok: false, error: e.message }); });
+      child.on('exit', code => {
+        if (res.headersSent) return;
+        if (code !== 0) { res.json({ ok: false, error: `Could not start a new copy (code ${code}). Close the app and open it again from its icon.` }); return; }
+        res.json({ ok: true });
+        setTimeout(() => process.exit(0), 400);
+      });
+    } else {
+      spawn(process.execPath, [serverJs, '--after-pid', String(process.pid)], { cwd: __dirname, detached: true, stdio: 'ignore' }).unref();
+      res.json({ ok: true });
+      setTimeout(() => process.exit(0), 400);
+    }
+  } catch (e) { res.json({ ok: false, error: e.message }); }
+});
+
+// v1.10.83 - Remove the app, with the user choosing what goes. The program
+// and its icons always go; data, saved PDFs and the backups folder only when
+// ticked. The script runs from a temp copy, waits for this server to exit
+// (node.exe locks its own folder on Windows), then deletes. Only an installed
+// copy (_system/) can be removed: in the source repo this would delete the repo.
+app.post('/api/control-panel/uninstall', async (req, res) => {
+  const { data, pdfs, backups, confirm } = req.body || {};
+  if (confirm !== 'REMOVE') { res.status(400).json({ ok: false, error: 'Not confirmed' }); return; }
+  const script = pickScript('uninstall');
+  if (path.basename(__dirname) !== '_system' || !script) {
+    res.json({ ok: false, error: 'Remove works only in the installed app (the folder with _system in it).' });
+    return;
+  }
+  try {
+    const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fgsb-remove-')), path.basename(script));
+    fs.copyFileSync(script, tmp);
+    const [cmd, args] = isWindows
+      ? ['powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', tmp,
+        '-Sys', __dirname, '-ServerPid', String(process.pid),
+        ...(data ? ['-Data'] : []), ...(pdfs ? ['-Pdfs'] : []), ...(backups ? ['-Backups'] : [])]]
+      : ['sh', [tmp, __dirname, String(process.pid), data ? 'data' : '', pdfs ? 'pdfs' : '', backups ? 'backups' : '']];
+    // Windows: the script hands itself to WMI and exits, so wait for that and
+    // stay running if it failed. Unix: a detached child outlives the server.
+    const child = spawn(cmd, args, { detached: !isWindows, stdio: 'ignore', windowsHide: true });
+    if (isWindows) {
+      const code = await new Promise(resolve => { child.on('exit', resolve); child.on('error', () => resolve(-1)); });
+      if (code !== 0) { res.json({ ok: false, error: `Could not start the remove step (code ${code}). Nothing was removed.` }); return; }
+    } else child.unref();
+  } catch (e) {
+    res.json({ ok: false, error: e.message });
+    return;
+  }
+  res.json({ ok: true, kept: !data || !pdfs ? __dirname : null });
+  setTimeout(() => process.exit(0), 400);
 });
 
 // ========================
@@ -1752,6 +2097,13 @@ app.get('/api/health', (req, res) => {
 
 app.get('{*path}', (req, res) => {
   if (req.path.startsWith('/api')) return res.status(404).json({ error: 'No such endpoint' });
+  // v1.10.83 - a code or style file that is not here (an old version's, still
+  // asked for by a page from before an update) is a 404, not the app's page:
+  // the page sent as "JavaScript" broke the app with a blank screen, and the
+  // offline cache could keep that page under the code file's name.
+  if (req.path.startsWith('/assets/') || /\.(m?js|css|map|wasm|json|png|svg|ico|woff2?)$/i.test(req.path)) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
   if (fs.existsSync(indexPath)) {
     return res.sendFile(indexPath);
   }
@@ -1853,8 +2205,9 @@ function logFatal(err, source = 'fatal') {
 // running server keeps serving healthy requests. Per Node best-practice,
 // uncaughtException leaves the process in an unknown state, so we write the
 // log and let the OS / a wrapper script decide whether to restart.
-process.on('uncaughtException', (err) => logFatal(err, 'uncaughtException'));
-process.on('unhandledRejection', (err) => logFatal(err, 'unhandledRejection'));
+// v1.10.83 - and say so in the console window, not only in the file.
+process.on('uncaughtException', (err) => { console.error(`  Unexpected error (the app keeps running): ${err?.message || err}`); logFatal(err, 'uncaughtException'); });
+process.on('unhandledRejection', (err) => { console.error(`  Unexpected error (the app keeps running): ${err?.message || err}`); logFatal(err, 'unhandledRejection'); });
 
 // Note: /api/health used to live below the SPA catch-all here, so the
 // catch-all was swallowing every request to it and returning "No such
@@ -1876,10 +2229,12 @@ function startServer(port) {
     console.log(`  Data stored in: ${DATA_DIR}\n`);
   });
   server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE' && port < STARTING_PORT + MAX_PORT_SCAN) {
+    // v1.10.83 - EACCES too: Windows reserves port ranges for Hyper-V / WSL
+    // and refuses them with "access denied" rather than "in use".
+    if ((err.code === 'EADDRINUSE' || err.code === 'EACCES') && port !== 0 && port < STARTING_PORT + MAX_PORT_SCAN) {
       console.log(`  Port ${port} is busy, trying ${port + 1}...`);
       startServer(port + 1);
-    } else if (err.code === 'EADDRINUSE') {
+    } else if ((err.code === 'EADDRINUSE' || err.code === 'EACCES') && port !== 0) {
       // We've exhausted the scan range. Tell the OS to pick anything free — at
       // this point the user has 50+ apps fighting for the 47371-47421 range,
       // which we treat as "do whatever works" rather than failing to start.
@@ -2148,6 +2503,15 @@ app.post('/api/recurring/:id/generate', (req, res) => {
   }
 });
 
+// v1.10.83 - started by Control Panel -> Restart: wait (up to 15 s) for the
+// old copy to exit so this one gets its port.
+const afterPid = Number(process.argv[process.argv.indexOf('--after-pid') + 1]) || 0;
+if (process.argv.includes('--after-pid') && afterPid) {
+  for (let i = 0; i < 60; i++) {
+    try { process.kill(afterPid, 0); } catch { break; }
+    await new Promise(r => setTimeout(r, 250));
+  }
+}
 startServer(STARTING_PORT);
 // Fire once after a short delay so the listener is up first; then once a day
 // for users whose server stays up >24h.

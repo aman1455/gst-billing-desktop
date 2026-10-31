@@ -38,6 +38,7 @@ npm run release:check    # everything below marked [auto]
 - [auto] the release ZIP: `/` paths only (ERR-014, ERR-061), server.js where the launchers look, all four launcher files and READ ME FIRST present
 - [auto] **every `.command` and `.sh` executable inside the ZIP** (ERR-062: Macs refused to open the launcher, #120)
 - [auto] ensure-node.ps1 and check-node.sh are shipped (#109)
+- [auto] `_system/node_modules/express` is inside the ZIP: the packages ship with the app and no user's PC runs npm (v1.10.83)
 - [auto] the docs ZIP: `/` paths, index.html and support.html in the right folder (ERR-061)
 - [auto] every `.ps1` and READ ME FIRST.txt is plain ASCII (ERR-001); every `.sh` / `.command` uses LF (ERR-014)
 - [auto] supporters.json is valid
@@ -46,9 +47,10 @@ npm run release:check    # everything below marked [auto]
 
 ## 4. Test on real systems (the script cannot do these)
 
-- [ ] **Docker, fresh Ubuntu install** of the exact ZIP + the smoke suite (`docker77/run.sh` in the playwright image).
+- [ ] **Docker, fresh Ubuntu install** of the exact ZIP + the smoke suite: `npm run test:fresh-linux` (Playwright image; it unpacks the ZIP, starts the app with its own Linux start script and runs tests/smoke.mjs).
 - [ ] **`npm run test:update-unix`**: the Linux / NAS updater in Alpine and Debian.
 - [ ] **If anything under `release-templates/` changed:** run **Open App** from the extracted ZIP on Windows with a fake old Node.js first on PATH (a `node.cmd` printing `v6.10.1`) and an empty or half-done `node_modules`; it must repair itself and start (ERR-060).
+- [ ] **If `install.ps1`, `install.sh` or `start-windows.ps1` changed:** run the one-line install against the built ZIP, never your real install: `FREEGSTBILL_ZIP=<zip>`, `FREEGSTBILL_DIR=<short temp folder>`, `FREEGSTBILL_TEST=<temp folder>` (icons and backups go there, no questions, no window), `FREEGSTBILL_PORT=47412`. Run it twice (the second run is an update: a marker file in `_system/data` must survive) and once with `-Uninstall` / `--uninstall`. Linux: in `node:20-bookworm-slim` and in plain `debian:bookworm-slim` (no Node: it must fetch it). Mac: the same three runs of `install.sh` on a real Mac, then open the Free GST Billing app from Launchpad.
 - [ ] **Every changed screen opened in a browser**, light and dark and phone width, and **the screenshots looked at**, not only the test results (an underlined button and a duplicate "Welcome" title were only caught that way).
 - [ ] Browser tests that click through the changed features pass.
 - [ ] **Mac:** we cannot test on a Mac here, so the [auto] executable check above is the guard. The READ ME FIRST, README and docs explain the first-open "Apple cannot check it" message (Control-click → Open).
@@ -59,7 +61,7 @@ npm run release:check    # everything below marked [auto]
 - [ ] If the updater itself was broken: the manual-download warning at the top.
 - [ ] Docs pages updated for every changed screen (`docs-site/pages/`), and **READ ME FIRST.txt, README and the docs troubleshooting page say the same** for any new error message.
 - [ ] Every button and menu name in the text **checked against the code** (grep the label).
-- [ ] No real customer data, GSTIN, bank details or phone numbers in screenshots or text; use the demo "Kaveri Stationers".
+- [ ] No real customer data, GSTIN, bank details or phone numbers in screenshots or text; use the demo business name **DiceCodes** (fake GSTIN 29ABCDE1234F1ZW, hello@dicecodes.example), never an invented shop name.
 
 ## 6. Publish
 

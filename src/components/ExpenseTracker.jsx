@@ -7,6 +7,9 @@ import { toast } from './Toast';
 import { confirmAction } from './ConfirmModal';
 import HelpButton from './HelpButton';
 import TableExport from './TableExport';
+import { useCostCentres } from './useCostCentres';
+import { CostCentreSelect, CostCentreFilter } from './CostCentrePicker';
+import { matchesCentre, centreFields, centreLabel, UNTAGGED } from '../utils/costCentres';
 
 // Each category is tagged with its ITR (Income Tax Return) head so the
 // v1.7.0+ ITR Filing Summary can auto-aggregate expenses under the correct
@@ -67,6 +70,9 @@ const emptyForm = {
   invoiceNo: '',
   paymentMode: 'Bank Transfer',
   note: '',
+  // v1.10.83 (#112) - optional; see utils/costCentres.js
+  costCentre: '',
+  costCentreName: '',
 };
 
 // v1.10.6 — audit L4: local copy removed, imported from utils above.
@@ -81,6 +87,8 @@ export default function ExpenseTracker() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ ...emptyForm });
+  const [centreFilter, setCentreFilter] = useState('');
+  const { on: ccOn, centres } = useCostCentres(ownerProfile);
 
   const fyOptions = getFYOptions();
   const defaultFy = fyOptions[0]?.value || '';
@@ -125,6 +133,7 @@ export default function ExpenseTracker() {
           !(exp.invoiceNo || '').toLowerCase().includes(q)) return false;
     }
     if (categoryFilter !== 'all' && exp.category !== categoryFilter) return false;
+    if (!matchesCentre(exp, centreFilter)) return false;
     if (fyFilter) {
       const fy = fyOptions.find(f => f.value === fyFilter);
       if (fy && exp.date) {
@@ -157,6 +166,8 @@ export default function ExpenseTracker() {
       paymentMode: exp.paymentMode || 'Bank Transfer',
       interstate: !!exp.interstate,
       note: exp.note || '',
+      costCentre: exp.costCentre || '',
+      costCentreName: exp.costCentreName || '',
     });
     setEditingId(exp.id);
     setShowForm(true);
@@ -194,6 +205,7 @@ export default function ExpenseTracker() {
         // exactly backwards, so the owner is kept in its own field.
         ownerGstin: ownerProfile?.gstin || '',
         ownerName: ownerProfile?.businessName || '',
+        ...centreFields(form.costCentre, form.costCentreName),
       };
       await saveExpense(expense);
       toast(editingId ? 'Expense updated' : 'Expense added', 'success');
@@ -246,6 +258,7 @@ export default function ExpenseTracker() {
   const statementPeriod = [
     fyOptions.find(f => f.value === fyFilter)?.label || 'all years',
     categoryFilter !== 'all' ? categoryFilter : '',
+    centreFilter ? (centreFilter === UNTAGGED ? 'no cost centre' : centreLabel(centres.find(c => c.id === centreFilter))) : '',
     search.trim() ? `matching "${search.trim()}"` : '',
   ].filter(Boolean).join(', ');
 
@@ -254,17 +267,9 @@ export default function ExpenseTracker() {
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div>
-            <h1 className="page-title">Expenses</h1>
+            <h1 className="page-title">Expenses <HelpButton title="Expenses — how to use" doc="expenses" size={16} /></h1>
             <p className="page-subtitle">Track business expenses for P&L and ITC claims</p>
           </div>
-          <HelpButton title="Expenses — how to use" doc="expenses">
-            <ul style={{ paddingLeft: '1.1rem', margin: 0 }}>
-              <li>For costs that are not stock: rent, electricity, internet, software, travel, fees.</li>
-              <li><strong>Amount</strong> is what you paid, including GST. Enter the <strong>GST %</strong> and the GST inside it is worked out and counted as input tax credit.</li>
-              <li>Tick <strong>Inter-state expense</strong> when the vendor charged IGST.</li>
-              <li><strong>Print / PDF</strong>, <strong>Excel</strong> and <strong>CSV</strong> above the list give your CA the expense statement for the year, category and search shown, with a total.</li>
-            </ul>
-          </HelpButton>
         </div>
         <div className="flex gap-2">
           <button className="btn btn-primary" onClick={openAdd}><Plus size={18} /> Add Expense</button>
@@ -312,8 +317,9 @@ export default function ExpenseTracker() {
             {fyOptions.map(fy => <option key={fy.value} value={fy.value}>{fy.label}</option>)}
           </select>
           {/* v1.10.74 - Clear filters also puts the FY back to the current one. */}
-          {(search || categoryFilter !== 'all' || fyFilter !== defaultFy) && (
-            <button className="icon-btn icon-btn-red" onClick={() => { setSearch(''); setCategoryFilter('all'); setFyFilter(defaultFy); }} title="Clear filters" aria-label="Clear filters"><X size={15} /></button>
+          {ccOn && <CostCentreFilter centres={centres} value={centreFilter} onChange={setCentreFilter} />}
+          {(search || categoryFilter !== 'all' || fyFilter !== defaultFy || centreFilter) && (
+            <button className="icon-btn icon-btn-red" onClick={() => { setSearch(''); setCategoryFilter('all'); setFyFilter(defaultFy); setCentreFilter(''); }} title="Clear filters" aria-label="Clear filters"><X size={15} /></button>
           )}
         </div>
       </div>
@@ -322,7 +328,7 @@ export default function ExpenseTracker() {
       {showForm && (
         <div className="modal-overlay" onClick={closeForm}>
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '620px' }}>
-            <h3 className="section-title">{editingId ? 'Edit Expense' : 'Add Expense'}</h3>
+            <h3 className="section-title">{editingId ? 'Edit Expense' : 'Add Expense'} <HelpButton title="Adding an expense" doc="expenses#add-expense" size={16} /></h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="form-group">
                 <label className="form-label">Date *</label>
@@ -372,6 +378,13 @@ export default function ExpenseTracker() {
                   {PAYMENT_MODES.map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
               </div>
+              {ccOn && (
+                <div className="form-group">
+                  <label className="form-label" htmlFor="cost-centre">Cost centre</label>
+                  <CostCentreSelect centres={centres} value={form.costCentre} name={form.costCentreName}
+                    onChange={(id, name) => setForm(prev => ({ ...prev, costCentre: id, costCentreName: name }))} />
+                </div>
+              )}
               <div className="form-group" style={{ gridColumn: 'span 2' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', cursor: 'pointer' }}>
                   <input type="checkbox" checked={!!form.interstate}
@@ -402,7 +415,7 @@ export default function ExpenseTracker() {
       {/* Expense Table */}
       <div className="glass-panel">
         <div className="table-header" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
-          <h3>Expense Records</h3>
+          <h3>Expense Records <HelpButton title="Expense Records" doc="expenses#expense-list" size={16} /></h3>
           <TableExport title="Expense statement" filename={`Expenses-${statementPeriod}`} landscape
             subtitle={[ownerProfile?.businessName, statementPeriod].filter(Boolean).join(', ')}
             headers={['Date', 'Description', 'Category', 'Amount', 'GST Amount', 'GST %', 'Vendor', 'Vendor GSTIN', 'Invoice No', 'Payment Mode', 'Inter-state', 'Note']}

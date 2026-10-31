@@ -22,6 +22,7 @@
  */
 import { firefox } from 'playwright';
 import { spawn } from 'child_process';
+import { readFileSync } from 'fs';
 import { PDFDocument } from 'pdf-lib';
 import { setTimeout as sleep } from 'timers/promises';
 
@@ -169,7 +170,7 @@ try {
   // the app's own stylesheet inside html2canvas's clone — so PDFs rendered
   // with no CSS. Both were Firefox-only and silent.
   check('app loads with no CSP violations', cspViolations.length === 0,
-    cspViolations[0]?.slice(0, 90) || '');
+    cspViolations[0]?.slice(0, 400) || '');
 
   const styled = await page.evaluate(() => document.styleSheets.length > 0
     && getComputedStyle(document.body).fontFamily.includes('Inter'));
@@ -271,10 +272,10 @@ try {
     .fill('Smoke Test Client');
   await sleep(500);
   await page.keyboard.press('Escape');           // dismiss the client suggestion list
-  // The line-item name box carries no placeholder, so target it through its
-  // row: `.line-item-row` -> first text input, then the row's numeric fields.
+  // The line-item name box (a growing textarea since v1.10.83), found through
+  // its row, then the row's numeric fields.
   const row = page.locator('.line-item-row').first();
-  await row.locator('input[type="text"]').first().fill('Test item');
+  await row.locator('textarea.line-item-name').first().fill('Test item');
   await sleep(400);
   await page.keyboard.press('Escape');           // dismiss product suggestions
   const rowNums = row.locator('input[type="number"]');
@@ -336,7 +337,7 @@ try {
   check('PDF downloads and is styled', pdfBytes > 300_000, `${pdfBytes} bytes`);
 
   check('no CSP violations during PDF generation', cspViolations.length === 0,
-    cspViolations[0]?.slice(0, 90) || '');
+    cspViolations[0]?.slice(0, 400) || '');
 
   // Generating the PDF saves the invoice, so the editor now holds a real,
   // dirty bill and navigating away raises the leave-guard. Dismiss it, then
@@ -362,6 +363,8 @@ try {
   // so "editing" changes nothing and no bar should appear — the test would
   // fail while the app behaved correctly. Original is restored below so the
   // suite leaves the user's business name untouched.
+  // v1.10.83 - Settings opens on the Business type tab; the name is on Company.
+  await page.locator('.settings-jumpnav a[href="#section-company"]').click();
   const nameField = page.locator('#section-company input[name="businessName"]');
   // The form unlocks once the saved profile has loaded (v1.10.75).
   await page.waitForFunction(() => document.querySelector('#section-company fieldset')?.disabled === false, null, { timeout: 30000 });
@@ -728,6 +731,40 @@ try {
     `3.1(b) ${JSON.stringify(zr0.cells)} -> ${JSON.stringify(zr1.cells)}`);
   check('#61 GST Returns flags the export for GSTR-1 Table 6A', zr1.notice);
 
+  // ---- v1.10.83 (#133): the GSTR-1 JSON is in the portal's current format ---
+  // Its own two invoices, in a month nothing else uses (June 2025, after the
+  // May 2025 HSN split): one to a registered buyer, one to an unregistered one.
+  const beta = { gstin: OTHER_GSTIN, businessName: 'Smoke Beta', country: 'India', state: 'Karnataka' };
+  const g1Bill = (id, inv, client) => ({ id, invoiceNumber: inv, invoiceType: 'tax-invoice', clientName: client.name, status: 'unpaid',
+    totalAmount: 1180, invoiceDate: '2025-06-15', payments: [], items: [],
+    data: { profile: beta, client, details: { invoiceNumber: inv, invoiceDate: '2025-06-15', placeOfSupply: 'Karnataka' },
+      items: [{ name: 'Smoke HSN item with a description well over thirty characters', hsn: '4820', unit: 'Nos', quantity: 2, rate: 500, taxPercent: 18 }],
+      totals: { subtotal: 1000, taxableAmount: 1000, cgst: 90, sgst: 90, igst: 0, cess: 0, total: 1180, isInterstate: false } } });
+  await api('/api/bills', g1Bill('smoketest-g1-b2b', 'SMK133-B2B', { name: 'Smoke Registered', gstin: '29AAKFM4321Q1ZP', state: 'Karnataka', country: 'India' }));
+  await api('/api/bills', g1Bill('smoketest-g1-b2c', 'SMK133-B2C', { name: 'Smoke Walk-in', state: 'Karnataka', country: 'India' }));
+  await reopenView('GST Returns');
+  await page.evaluate(() => [...document.querySelectorAll('button')].find((x) => x.innerText.trim() === 'GSTR-1')?.click());
+  await sleep(800);
+  const periodSelects = page.locator('select.form-input');
+  await periodSelects.nth(0).selectOption('month');
+  await periodSelects.nth(1).selectOption('5');
+  await periodSelects.nth(2).selectOption('2025');
+  await sleep(1000);
+  const [g1] = await Promise.all([
+    page.waitForEvent('download', { timeout: 20000 }).catch(() => null),
+    page.evaluate(() => [...document.querySelectorAll('button')].find((x) => x.innerText.trim() === 'JSON Export')?.click()),
+  ]);
+  const g1json = g1 ? JSON.parse(readFileSync(await g1.path(), 'utf8')) : null;
+  const hsnKeys = g1json?.hsn ? Object.keys(g1json.hsn) : [];
+  check('v83 #133 GSTR-1 JSON splits the HSN summary into hsn_b2b / hsn_b2c, with no blank values',
+    !!g1json && g1json.fp === '062025' && hsnKeys.join() === 'hsn_b2b,hsn_b2c'
+      && g1json.hsn.hsn_b2b[0].desc.length <= 30 && (g1json.b2cs || []).length > 0 && g1json.b2cs.every((r) => r.typ === 'OE')
+      && !JSON.stringify(g1json).includes('""') && !('gt' in g1json) && (g1json.b2b || [])[0]?.inv?.[0]?.inum === 'SMK133-B2B',
+    g1 ? `${g1.suggestedFilename()} hsn: ${hsnKeys.join(',')}` : `no download: ${await page.evaluate(() => document.body.innerText.match(/(GSTR-1 export blocked|No invoices)[^\n]*/)?.[0] || '')}`);
+  await page.evaluate(() => Promise.all(['smoketest-g1-b2b', 'smoketest-g1-b2c'].map((id) => fetch(`/api/bills/${id}`, { method: 'DELETE' }))));
+  await periodSelects.nth(1).selectOption(String(new Date().getMonth()));
+  await periodSelects.nth(2).selectOption(String(new Date().getFullYear()));
+
   // ---- #64 item 1: an open screen must follow a company switch -------------
   await reopenView('Expenses');
   const exp0 = await screenText();
@@ -1036,8 +1073,9 @@ try {
     return (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
   });
   const toggleTheme = async (label) => {
+    // v1.10.83 - the moon / sun button is at the top right, not in the sidebar.
     await page.evaluate((label) => {
-      const b = [...document.querySelectorAll('.sidebar .nav-btn')].find((x) => x.innerText.trim() === label);
+      const b = document.querySelector(`.app-topbar button[aria-label="${label.replace(' Mode', ' mode')}"]`);
       if (b) b.click();
     }, label);
     await sleep(900);
@@ -1095,6 +1133,7 @@ try {
 
   // One click saves two different sections.
   const getMeta = (key) => page.evaluate(async (k) => ((await (await fetch('/api/meta/' + k)).json()).value || {}), key);
+  await page.locator('.settings-jumpnav a[href="#section-company"]').click();
   const nameBefore = await page.locator('#section-company input[name="businessName"]').inputValue();
   const numBefore = await getMeta('invoiceNumberSettings');
   await page.locator('#section-company input[name="businessName"]').fill(`Smoke SaveAll ${Date.now() % 100000}`);
@@ -1124,6 +1163,8 @@ try {
     await page.evaluate(() => /All changes saved/.test(document.querySelector('.settings-savebar')?.innerText || '')));
 
   // ---- v1.10.75: the app-wide round-off switch saves the invoice default --
+  // v1.10.83 - Settings is tabbed; the switch lives on the Print & PDF tab.
+  await page.locator('.settings-jumpnav a[href="#section-print"]').click();
   const roundOffBox = page.locator('label', { hasText: 'Round off invoice totals' }).locator('input[type="checkbox"]');
   const roundOffBefore = await roundOffBox.isChecked();
   await roundOffBox.click();
@@ -1461,9 +1502,18 @@ try {
     await row.locator('input[type="checkbox"]').check();
     const [dl] = await Promise.all([
       page.waitForEvent('download', { timeout: 60000 }).catch(() => null),
-      page.locator('button', { hasText: 'Bulk PDF' }).first().click(),
+      page.locator('button', { hasText: 'One merged PDF' }).first().click(),
     ]);
-    check('v71 Bulk PDF downloads a PDF of the ticked invoices', !!dl && /\.pdf$/i.test(dl.suggestedFilename()), dl ? dl.suggestedFilename() : 'no download');
+    check('v71 One merged PDF downloads a PDF of the ticked invoices', !!dl && /\.pdf$/i.test(dl.suggestedFilename()), dl ? dl.suggestedFilename() : 'no download');
+    // v1.10.83: one PDF per invoice, in a ZIP.
+    const [zipDl] = await Promise.all([
+      page.waitForEvent('download', { timeout: 60000 }).catch(() => null),
+      page.locator('button', { hasText: 'Separate PDFs (ZIP)' }).first().click(),
+    ]);
+    const zipBytes = zipDl ? readFileSync(await zipDl.path()) : null;
+    const pdfName = `${String(gen.invoiceNumber).replace(/[\\/:*?"<>|]+/g, '-')}.pdf`;
+    check('v83 Separate PDFs downloads a ZIP with the invoice\'s own PDF',
+      !!zipBytes && /\.zip$/i.test(zipDl.suggestedFilename()) && zipBytes.includes(Buffer.from(pdfName)), zipDl ? `${zipDl.suggestedFilename()} (looked for ${pdfName})` : 'no download');
     await page.fill('input[placeholder="Search client or invoice..."]', '');
   }
 
@@ -1584,7 +1634,7 @@ try {
     await page.getByRole('button', { name: /Delivery charges/ }).first().click();
     await sleep(800);
     check('v77 #87 Delivery charges adds a line with SAC 996812',
-      (await page.locator('input[value="Delivery charges"]').count()) > 0 && (await page.locator('input[value="996812"]').count()) > 0);
+      (await page.locator('textarea.line-item-name').evaluateAll((els) => els.some((e) => e.value === 'Delivery charges'))) && (await page.locator('input[value="996812"]').count()) > 0);
 
     // #88 a short invoice is one page in every design
     await openDraft(seamDraft(1));
@@ -1780,10 +1830,17 @@ try {
         sessionStorage.setItem('gst_currentView', 'new'); sessionStorage.removeItem('gst_invoiceDraft');
       }, q);
       await page.reload({ waitUntil: 'networkidle' });
-      await sleep(3000);
+      await sleep(1500);
       await dismissFirstRun(page);
-      await page.getByRole('button', { name: /^Save$/ }).first().click();
-      await sleep(3500);
+      // Wait for the result, not a fixed time: under the release gate a busy
+      // machine sometimes needed longer than 3.5 s, and the check failed
+      // although both invoices were made (31 Oct 2026).
+      const save79 = page.getByRole('button', { name: /^Save$/ }).first();
+      await save79.waitFor({ state: 'visible', timeout: 30000 });
+      const count79 = async () => (await get79('/api/bills')).filter((x) => x.clientName === 'Smoke Test Client' && x.invoiceType === 'tax-invoice').length;
+      const had79 = await count79();
+      await save79.click();
+      for (let i = 0; i < 60 && (await count79()) === had79; i++) await sleep(250);
     }
     const after79 = (await get79('/api/bills')).filter((x) => x.clientName === 'Smoke Test Client' && x.invoiceType === 'tax-invoice').map((x) => x.id);
     const made79 = after79.filter((id) => !before79.includes(id));

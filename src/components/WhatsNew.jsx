@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { Bug, Lightbulb, CalendarClock, ListChecks, Sparkles } from 'lucide-react';
 import { parseChangelog, inlineParts } from '../utils/changelog';
+import HelpButton from './HelpButton';
 
 const REPO = 'https://github.com/aman1455/gst-billing-desktop';
 const CHANGELOG_URL = `${REPO}/blob/main/CHANGELOG.md`;
@@ -67,7 +68,7 @@ export default function WhatsNew() {
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
           <CalendarClock size={26} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 2 }} />
           <div style={{ flex: '1 1 300px', minWidth: 0 }}>
-            <h3 id="weekly-title" style={{ margin: '0 0 0.35rem', fontSize: '1rem' }}>A new update every Saturday</h3>
+            <h3 id="weekly-title" style={{ margin: '0 0 0.35rem', fontSize: '1rem' }}>A new update every Saturday <HelpButton title="A new update every Saturday" doc="support#weekly" size={16} /></h3>
             <p style={{ margin: '0 0 0.5rem', color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: '72ch' }}>
               Every Saturday we release one update with that week&apos;s fixes and new features. The app tells you when it is
               ready: click <b>Update</b> in the sidebar, and your invoices and settings are kept. Anything urgent, such as the
@@ -106,7 +107,7 @@ export default function WhatsNew() {
       {entries && entries.length > 0 && (
         <div id="whats-new" className="glass-panel" style={{ ...card, marginBottom: '1.25rem', scrollMarginTop: '1rem' }} aria-labelledby="whats-new-title">
           <h3 id="whats-new-title" style={{ margin: '0 0 0.25rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Sparkles size={18} style={{ color: 'var(--primary)' }} /> What&apos;s new
+            <Sparkles size={18} style={{ color: 'var(--primary)' }} /> What&apos;s new <HelpButton title="What's new" doc="support#whats-new" size={16} />
           </h3>
           <p style={{ margin: '0 0 0.75rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
             The latest updates. Every version since the first is in the <a href={CHANGELOG_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>full changelog</a>, and the downloads are on <a href={`${REPO}/releases`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>GitHub Releases</a>.

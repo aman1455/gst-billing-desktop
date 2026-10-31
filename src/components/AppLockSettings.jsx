@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Lock } from 'lucide-react';
 import { getLockStatus, setLockPin } from '../store';
 import { toast } from './Toast';
+import HelpButton from './HelpButton';
 import { lockNow, UNLOCKED_KEY, lockSettingsChanged } from '../utils/appLock';
 
 const digits = (v, n) => v.replace(/\D/g, '').slice(0, n);
@@ -56,7 +57,7 @@ export default function AppLockSettings() {
 
   return (
     <div>
-      <h3 className="section-title" style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: 8 }}><Lock size={18} /> App lock (PIN)</h3>
+      <h3 className="section-title" style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: 8 }}><Lock size={18} /> App lock (PIN) <HelpButton title="App lock (PIN)" doc="settings#lock" size={16} /></h3>
       <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 0 }}>
         {status.enabled
           ? `On: ${status.length === 8 ? "an" : "a"} ${status.length} digit PIN is asked when the app opens.`

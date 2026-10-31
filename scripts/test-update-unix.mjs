@@ -81,6 +81,9 @@ const ALPINE = [...PRELUDE,
   'set_version "$S" 1.10.0',
   'echo OLD > "$S/dist/index.html"',
   `mkdir -p "$S/data/bills" && echo ${KEEP} > "$S/data/bills/keep-me.json"`,
+  '# v1.10.83 - files an older version had and the new one does not: a clean update removes them.',
+  'echo old > "$S/old-script-v1.sh"; mkdir -p "$S/old-folder" "$S/Saved Invoices" && echo old > "$S/old-folder/x.js" && echo pdf > "$S/Saved Invoices/INV-1.pdf"',
+  'echo old > "$T/old/Free-GST-Billing/Free GST Billing - OLD LAUNCHER.sh"',
   '',
   '# 1 --- a normal update',
   'FGSB_UPDATE_ZIP=/work/pkg.zip sh "$S/update-unix.sh" > /work/alpine-1.log 2>&1; code=$?',
@@ -92,7 +95,11 @@ const ALPINE = [...PRELUDE,
   'if [ -n "$B" ] && tar -tzf "$B" | grep -q "data/bills/keep-me.json"; then pass "1 data was backed up before the update"; else fail "1 data was backed up before the update" "no backup holding the data"; fi',
   'if grep -q "All [0-9]* entries extracted completely" /work/alpine-1.log; then pass "1 every file was checked against the ZIP"; else fail "1 every file was checked against the ZIP"; fi',
   'if [ ! -e "$S/.update-previous" ]; then pass "1 rollback copy removed afterwards"; else fail "1 rollback copy removed afterwards"; fi',
+  'if [ ! -e "$S/old-script-v1.sh" ] && [ ! -e "$S/old-folder" ]; then pass "1 files the new version no longer has are removed"; else fail "1 files the new version no longer has are removed"; fi',
+  'if [ ! -e "$T/old/Free-GST-Billing/Free GST Billing - OLD LAUNCHER.sh" ]; then pass "1 old launchers are removed"; else fail "1 old launchers are removed"; fi',
+  'if [ -f "$S/Saved Invoices/INV-1.pdf" ]; then pass "1 Saved Invoices is kept"; else fail "1 Saved Invoices is kept"; fi',
   'if [ -d "$S/node_modules/express" ]; then pass "1 dependencies installed"; else fail "1 dependencies installed"; fi',
+  'if grep -q "Reinstalling dependencies" /work/alpine-1.log; then fail "1 shipped packages used, npm not run"; else pass "1 shipped packages used, npm not run"; fi',
   '(cd "$S" && node server.js > /tmp/server.log 2>&1 &)',
   'up=""; i=0',
   'while [ $i -lt 30 ]; do',
@@ -197,6 +204,10 @@ try {
   pkg.dependencies = { ...pkg.dependencies, 'fgsb-this-package-does-not-exist': '0.0.1' };
   writeFileSync(join(brokenSystem, 'package.json'), JSON.stringify(pkg, null, 2));
   writeFileSync(join(brokenSystem, 'dist', 'index.html'), '<!-- BROKEN PACKAGE -->');
+  // v1.10.83 - release ZIPs ship node_modules, so the updater runs npm only for
+  // a package without them. This one has none, so npm runs, fails, and the
+  // rollback is exercised as before.
+  rmSync(join(brokenSystem, 'node_modules'), { recursive: true, force: true });
   makeZip(join(work, 'broken-src'), join(work, 'broken.zip'));
 
   // A download cut off part way.
@@ -224,6 +235,16 @@ try {
       record(false, `${image}: all ${expected} checks ran`, `${lines.length} did`);
     }
   }
+
+  // v1.10.83 - Control Panel -> Remove the app (uninstall-unix.sh).
+  console.log(`  --- ${IMAGES.slim}: remove the app`);
+  mkdirSync(join(work, 's'), { recursive: true });
+  copyFileSync(join(REPO_ROOT, 'release-templates', '_system-scripts', 'uninstall-unix.sh'), join(work, 's', 'uninstall-unix.sh'));
+  copyFileSync(join(REPO_ROOT, 'scripts', 'test-uninstall-unix.sh'), join(work, 'test-uninstall-unix.sh'));
+  const rm = run('docker', ['run', '--rm', '-v', `${work}:/work`, IMAGES.slim, 'sh', '-c', 'ln -s /work/s /s && sh /work/test-uninstall-unix.sh']);
+  const rmLines = (rm.stdout || '').split('\n').filter((l) => /^(PASS|FAIL) /.test(l));
+  for (const l of rmLines) record(l.startsWith('PASS'), `remove: ${l.slice(5)}`);
+  if (rmLines.length !== 13) record(false, 'remove: all 13 checks ran', `${rmLines.length} did ${rm.stderr || ''}`);
 } catch (err) {
   record(false, 'test harness completed', err.message);
 } finally {

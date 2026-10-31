@@ -116,7 +116,9 @@ else
   fail 'Updating needs "unzip" (or python3) to open the release ZIP. Install it, then click Update again:
     Debian / Ubuntu:  sudo apt install unzip
     Alpine:           apk add unzip
-  Nothing was changed.'
+  Nothing was changed.
+  (Or update with the one-line install, which needs neither:
+    curl -fsSL https://raw.githubusercontent.com/IamRamgarhia/Free-GST-Billing-Software/main/install.sh | FREEGSTBILL_DIR="'"$(dirname "$SYSTEM_DIR")"'" sh )'
 fi
 
 FROM=$(version_of "$SYSTEM_DIR")
@@ -241,11 +243,18 @@ say 'Applying the update (your data folder is not touched)...'
 rm -rf "$ROLLBACK"
 mkdir -p "$ROLLBACK"
 : > "$WORK/added"
+# v1.10.83 - a release that ships its packages replaces node_modules like any
+# other app folder (and a rollback puts the old one back); npm is not needed.
+SHIPPED=''
+[ -f "$NEW_SYSTEM/node_modules/express/package.json" ] && SHIPPED=1
 STATE=applying
 for entry in "$NEW_SYSTEM"/* "$NEW_SYSTEM"/.[!.]*; do
   [ -e "$entry" ] || continue
   name=$(basename "$entry")
-  case "$name" in data|node_modules) continue ;; esac
+  case "$name" in
+    data) continue ;;
+    node_modules) [ -n "$SHIPPED" ] || continue ;;
+  esac
   if [ -e "$SYSTEM_DIR/$name" ]; then
     # A rename inside the same folder: instant, and safe even for this
     # script, which the shell keeps reading through its open file handle.
@@ -255,12 +264,26 @@ for entry in "$NEW_SYSTEM"/* "$NEW_SYSTEM"/.[!.]*; do
   fi
   cp -R "$entry" "$SYSTEM_DIR/$name"
 done
+# v1.10.83 - a clean update: what an older version had and this one does not
+# goes into the rollback folder too (so a failed update still puts it back),
+# and is gone once the update succeeds. Only for a full release package;
+# never the books, saved PDFs, the bin or Node.js.
+if [ -n "$SHIPPED" ]; then
+  for entry in "$SYSTEM_DIR"/*; do
+    [ -e "$entry" ] || continue
+    name=$(basename "$entry")
+    case "$name" in data | 'Saved Invoices' | Trash | node | node-dir.txt) continue ;; esac
+    [ -e "$NEW_SYSTEM/$name" ] || mv "$entry" "$ROLLBACK/$name"
+  done
+fi
 
 # --- Step 6: dependencies ----------------------------------------------------
-say 'Reinstalling dependencies (this can take a few minutes)...'
-STATE=installing
-(cd "$SYSTEM_DIR" && npm install --omit=dev --no-audit --no-fund --loglevel=error) \
-  || fail 'npm install failed.'
+if [ -z "$SHIPPED" ]; then
+  say 'Reinstalling dependencies (this can take a few minutes)...'
+  STATE=installing
+  (cd "$SYSTEM_DIR" && npm install --omit=dev --no-audit --no-fund --loglevel=error) \
+    || fail 'npm install failed.'
+fi
 STATE=done
 
 # Refresh the launchers beside _system/ only now that nothing can roll back.
@@ -270,6 +293,13 @@ for launcher in "$NEW_ROOT"/*.sh "$NEW_ROOT"/*.command "$NEW_ROOT"/*.hta; do
   [ -f "$launcher" ] || continue
   cp "$launcher" "$ROOT_DIR/" 2>/dev/null || true
 done
+# ...and launchers an older version had that this one no longer ships.
+if [ -n "$SHIPPED" ]; then
+  for f in "$ROOT_DIR"/'Free GST Billing - '* "$ROOT_DIR/READ ME FIRST.txt"; do
+    [ -f "$f" ] || continue
+    [ -e "$NEW_ROOT/$(basename "$f")" ] || rm -f "$f"
+  done
+fi
 
 say ''
 say "[OK] Update complete: v$FROM -> v$TO"

@@ -9,6 +9,12 @@
 # NAS (Alpine uses musl), and the right package manager differs per system.
 # So: check, and say exactly what to run.
 
+# v1.10.83 - the one-line install (install.sh) may have put Node.js inside the
+# app folder, in _system/node, when the machine had none new enough.
+if [ -n "${SYSTEM_DIR:-}" ] && [ -x "$SYSTEM_DIR/node/bin/node" ]; then
+  PATH="$SYSTEM_DIR/node/bin:$PATH"; export PATH
+fi
+
 MIN_NODE_MAJOR=18   # package.json "engines"
 MIN_NPM_MAJOR=7     # first npm that understands --omit=dev
 

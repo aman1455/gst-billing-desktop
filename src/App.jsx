@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
-import { Home, FileText, Settings, Plus, Users, Package, BarChart3, Wallet, RefreshCw, Receipt, BookOpen, Moon, Sun, Download, X, ShoppingCart, ChevronDown, Building2, Pencil, HelpCircle, Search, Command, Bell, Calculator, HardDrive, Menu, Heart } from 'lucide-react';
-import { getAllProfiles, saveProfile, getEnabledModules, getAllBills, getAllProducts, getStockAlertSettings, getAllClients, runUpdateNow, getLockStatus } from './store';
-import { isModuleEnabled, getUpcomingFilings, countsAsSales, localToday, toLocalIsoDate, DOCS_URL } from './utils';
+import { Home, FileText, Settings, Plus, Users, Package, BarChart3, Wallet, RefreshCw, Receipt, BookOpen, Moon, Sun, Download, X, ShoppingCart, ChevronDown, Building2, Pencil, HelpCircle, Search, Command, Bell, Calculator, HardDrive, Menu, Heart, Banknote } from 'lucide-react';
+import { getAllProfiles, saveProfile, getEnabledModules, getMenuOrder, onMenuChanged, getAllBills, getAllProducts, getStockAlertSettings, getAllClients, runUpdateNow, getLockStatus } from './store';
+import { isModuleEnabled, getUpcomingFilings, countsAsSales, localToday, toLocalIsoDate, DOCS_URL, findLowStock, trackedStock } from './utils';
+import { orderedMenu } from './utils/businessTypes';
 // v1.10.4 — Route-level lazy loading. Prior App.jsx synchronously
 // imported all 12 views (~15k LOC combined), so a first-paint on
 // Dashboard downloaded and parsed GSTReturns (1952), InvoiceGenerator
@@ -20,6 +21,7 @@ import Dashboard from './components/Dashboard';
 import InvoiceGenerator from './components/InvoiceGenerator';
 import SetupWizard from './components/SetupWizard';
 import ToastContainer, { toast } from './components/Toast';
+import ErrorBoundary from './components/ErrorBoundary';
 import ConfirmModalContainer from './components/ConfirmModal';
 import WelcomeGuide from './components/WelcomeGuide';
 const SettingsView = lazy(() => import('./components/SettingsView'));
@@ -29,6 +31,7 @@ const ReportsView = lazy(() => import('./components/ReportsView'));
 const ExpenseTracker = lazy(() => import('./components/ExpenseTracker'));
 const RecurringInvoices = lazy(() => import('./components/RecurringInvoices'));
 const ReceiptVoucher = lazy(() => import('./components/ReceiptVoucher'));
+const CashBook = lazy(() => import('./components/CashBook'));
 const GSTReturns = lazy(() => import('./components/GSTReturns'));
 const IncomeTax = lazy(() => import('./components/IncomeTax'));
 const PurchaseBills = lazy(() => import('./components/PurchaseBills'));
@@ -39,6 +42,9 @@ import AppFooter from './components/AppFooter';
 import LicenseBadge from './components/LicenseBadge';
 import LicenseModal from './components/LicenseModal';
 import LockButton from './components/LockButton';
+import OfflineModeButton from './components/OfflineModeButton';
+import { isOfflineMode } from './utils/offlineMode';
+import HelpButton from './components/HelpButton';
 import { lockNow } from './utils/appLock';
 import { getPrintSettings } from './utils/printSettings';
 
@@ -61,6 +67,8 @@ function ViewLoading() {
   );
 }
 
+const MENU_BRAND_KEY = 'gst_menuBrand';
+
 function App() {
   // v1.9.3 — Setup Wizard shown on first-run (before onboardingComplete = true)
   const [showWizard, setShowWizard] = useState(() => {
@@ -74,7 +82,7 @@ function App() {
       const params = new URLSearchParams(window.location.search);
       const v = params.get('view');
       // v1.10.74 - 'controlpanel' added so ?view=controlpanel deep links work too.
-      const valid = ['dashboard', 'new', 'clients', 'inventory', 'expenses', 'purchases', 'recurring', 'receipts', 'reports', 'filing', 'incometax', 'settings', 'controlpanel', 'support'];
+      const valid = ['dashboard', 'new', 'clients', 'inventory', 'expenses', 'purchases', 'recurring', 'receipts', 'cashbook', 'reports', 'filing', 'incometax', 'settings', 'controlpanel', 'support'];
       if (v && valid.includes(v)) {
         // Strip the query string so a refresh doesn't keep snapping back to
         // the shortcut target — only the *first* navigation honours it.
@@ -87,6 +95,20 @@ function App() {
     return last && last !== 'guide' ? last : 'dashboard';
   });
   const [profile, setProfile] = useState(null);
+  // v1.10.83 - the menu's own name and logo, as last shown (see `brand` below).
+  const [menuBrandCache] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(MENU_BRAND_KEY) || 'null'); } catch { return null; }
+  });
+  useEffect(() => {
+    if (!profile) return; // not loaded yet: keep what was there
+    try {
+      const name = String(profile.businessName || '').trim();
+      if (!profile.showInMenu || !name) { localStorage.removeItem(MENU_BRAND_KEY); return; }
+      const keep = { showInMenu: true, businessName: name, logo: profile.logo || '' };
+      try { localStorage.setItem(MENU_BRAND_KEY, JSON.stringify(keep)); }
+      catch { localStorage.setItem(MENU_BRAND_KEY, JSON.stringify({ ...keep, logo: '' })); } // a very large logo: the name at least
+    } catch { /* browser storage off: the menu simply waits for the profile */ }
+  }, [profile]);
   const [editingBill, setEditingBill] = useState(() => {
     try {
       const saved = sessionStorage.getItem('gst_editingBill');
@@ -97,9 +119,7 @@ function App() {
     return localStorage.getItem('freegstbill_theme') === 'dark';
   });
   const [showWelcome, setShowWelcome] = useState(false);
-  const [showInstallBanner, setShowInstallBanner] = useState(false);
   const [serverDown, setServerDown] = useState(false);
-  const deferredPrompt = useRef(null);
   const retryTimer = useRef(null);
 
   const [serverStatus, setServerStatus] = useState('checking'); // 'checking' | 'online' | 'offline'
@@ -122,6 +142,9 @@ function App() {
   useEffect(() => {
     let cancelled = false;
     const check = async () => {
+      // The server also skips it when Offline mode is on, but it reads the
+      // copy in the data folder, which can lag behind this browser's.
+      if (isOfflineMode()) return;
       try {
         const res = await fetch('/api/check-update');
         const data = await res.json();
@@ -232,7 +255,7 @@ function App() {
         const stockThreshold = Number(stockAlertCfg?.threshold ?? 5);
         const lowStock = stockAlertCfg?.enabled === false
           ? []
-          : products.filter(p => (p.stock ?? 999) <= stockThreshold);
+          : findLowStock(products, stockThreshold); // services and uncounted left out (#121)
         const filings = getUpcomingFilings().filter(f => f.daysAway <= 10);
         // Recurring auto-fire breadcrumb — set by server.js processDueRecurring().
         // Only "fresh" (today's) auto-fires count as a notification; older ones
@@ -360,28 +383,10 @@ function App() {
     };
   }, []);
 
-  // Capture PWA install prompt. Banner re-appears 14 days after dismissal
-  // (was: dismissed forever — too aggressive, users who closed it during
-  // a busy moment never saw it again).
-  useEffect(() => {
-    const dismissedAt = localStorage.getItem('freegstbill_pwa_dismissed_at');
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-      || window.navigator.standalone === true; // iOS Safari
-    if (isStandalone) return;
-    // 14-day cool-down on dismissal
-    if (dismissedAt) {
-      const days = (Date.now() - Number(dismissedAt)) / 86400000;
-      if (days < 14) return;
-    }
-
-    const handler = (e) => {
-      e.preventDefault();
-      deferredPrompt.current = e;
-      setShowInstallBanner(true);
-    };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, []);
+  // v1.10.83 - the "Install as Desktop App" banner is gone. The browser icon
+  // it made opens only a browser window: it cannot start the app's server, so
+  // after a restart it showed "Needs a Quick Start". The installers' own
+  // Free GST Billing icon starts the server and opens the app.
 
   useEffect(() => {
     sessionStorage.setItem('gst_currentView', currentView);
@@ -490,25 +495,6 @@ function App() {
     setCurrentView('new');
   };
 
-  const handleInstallPWA = async () => {
-    if (!deferredPrompt.current) return;
-    deferredPrompt.current.prompt();
-    const result = await deferredPrompt.current.userChoice;
-    if (result.outcome === 'accepted') {
-      setShowInstallBanner(false);
-    }
-    deferredPrompt.current = null;
-  };
-
-  const dismissInstallBanner = () => {
-    setShowInstallBanner(false);
-    // Timestamp-based dismissal — the 14-day cool-down in the install-prompt
-    // effect uses this to decide whether to re-show. Old boolean key kept for
-    // back-compat with v1.6.0 — readers that find only the legacy key treat
-    // it as "permanently dismissed" (same as today's behaviour for them).
-    localStorage.setItem('freegstbill_pwa_dismissed_at', String(Date.now()));
-  };
-
   const handleConvertToInvoice = (bill) => {
     setEditorKey((k) => k + 1);
     sessionStorage.removeItem('gst_invoiceDraft');
@@ -523,11 +509,18 @@ function App() {
   // when settings save, which triggers a re-render via the profile state.
   const enabledModules = getEnabledModules();
   const showIfModule = (moduleId) => isModuleEnabled(moduleId, enabledModules);
+  // v1.10.83 - a switch or a new order in Settings → Features redraws the
+  // sidebar straight away.
+  const [, setMenuTick] = useState(0);
+  useEffect(() => onMenuChanged(() => setMenuTick(t => t + 1)), []);
+  // Sidebar items in the saved order; hidden ones dropped. `module: null`
+  // items (Settings, Support & About, Lock app) are always shown.
+  const menu = orderedMenu(getMenuOrder()).filter(m => !m.module || showIfModule(m.module));
 
   // If the user just disabled the module backing the current view, kick them to dashboard
   // so they don't land on an empty page after toggling.
   useEffect(() => {
-    const map = { new: 'invoicing', clients: 'clients', inventory: 'inventory', expenses: 'expenses', purchases: 'purchases', recurring: 'recurring', receipts: 'receipts', reports: 'reports', filing: 'gstReturns' };
+    const map = { new: 'invoicing', clients: 'clients', inventory: 'inventory', expenses: 'expenses', purchases: 'purchases', recurring: 'recurring', receipts: 'receipts', cashbook: 'cashBook', reports: 'reports', filing: 'gstReturns', incometax: 'incomeTax' };
     const moduleForView = map[currentView];
     if (moduleForView && !isModuleEnabled(moduleForView, enabledModules)) {
       setCurrentView('dashboard');
@@ -535,22 +528,67 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentView, JSON.stringify(enabledModules)]);
 
-  const navItems = [
-    { id: 'dashboard', icon: Home, label: 'Dashboard', module: 'dashboard' },
-    { id: 'new', icon: Plus, label: 'New Invoice', onClick: handleNewInvoice, module: 'invoicing' },
-    { id: 'clients', icon: Users, label: 'Clients', module: 'clients' },
-    { id: 'inventory', icon: Package, label: 'Products', module: 'inventory' },
-    { id: 'expenses', icon: Wallet, label: 'Expenses', module: 'expenses' },
-    { id: 'purchases', icon: ShoppingCart, label: 'Purchases', module: 'purchases' },
-    { id: 'recurring', icon: RefreshCw, label: 'Recurring', module: 'recurring' },
-    { id: 'receipts', icon: Receipt, label: 'Receipts', module: 'receipts' },
-    { id: 'reports', icon: BarChart3, label: 'Reports', module: 'reports' },
-    { id: 'filing', icon: BookOpen, label: 'GST Returns', module: 'gstReturns' },
-    { id: 'incometax', icon: Calculator, label: 'Income Tax', module: 'incomeTax' },
+  // v1.10.83 - order, labels and switches come from MENU_ITEMS (utils.js);
+  // only the icons and click handlers live here.
+  const NAV_EXTRAS = {
+    dashboard: { icon: Home, label: 'Dashboard' },
+    new: { icon: Plus, label: 'New Invoice', onClick: handleNewInvoice },
+    clients: { icon: Users, label: 'Clients' },
+    inventory: { icon: Package, label: 'Products' },
+    expenses: { icon: Wallet, label: 'Expenses' },
+    purchases: { icon: ShoppingCart, label: 'Purchases' },
+    recurring: { icon: RefreshCw, label: 'Recurring' },
+    receipts: { icon: Receipt, label: 'Receipts' },
+    cashbook: { icon: Banknote, label: 'Cash book' },
+    reports: { icon: BarChart3, label: 'Reports' },
+    filing: { icon: BookOpen, label: 'GST Returns' },
+    incometax: { icon: Calculator, label: 'Income Tax' },
     // v1.10.75 - opens the online documentation, which covers every screen
     // and stays current; the old built-in guide had fallen far behind.
-    { id: 'guide', icon: HelpCircle, label: 'User Guide', module: 'dashboard', onClick: openDocs }, // gated by dashboard so it's always available
-  ].filter(item => showIfModule(item.module));
+    guide: { icon: HelpCircle, label: 'User Guide', onClick: openDocs },
+  };
+  const navItems = menu.filter(m => m.section === 'main').map(m => ({ id: m.id, ...NAV_EXTRAS[m.id] }));
+  const bottomIds = menu.filter(m => m.section === 'bottom').map(m => m.id);
+  // v1.10.83 - small buttons at the top right of every screen (asked for:
+  // "dark mode button should be on top, not in the sidebar").
+  const topIds = menu.filter(m => m.section === 'top').map(m => m.id);
+  // v1.10.83 - the business's own name and logo at the top of the menu, when
+  // it says so (Settings → Branding, or the first-run setup).
+  // The profile comes from the server a moment after the first paint; until
+  // then the menu uses the name and logo it showed last time (kept in this
+  // browser), so a refresh does not flash "GST Billing" before the logo.
+  const brand = profile || menuBrandCache;
+  const ownBrand = !!brand?.showInMenu && !!String(brand?.businessName || '').trim();
+  const topActions = topIds.map(id => ({
+    guide: (
+      <button key={id} type="button" className="topbar-btn" onClick={openDocs}
+        title="User guide (opens in your browser)" aria-label="User guide">
+        <HelpCircle size={18} />
+      </button>
+    ),
+    /* Opens the list of overdue / due-soon invoices, GST filing deadlines and
+       low-stock items, each a click away from the page that fixes it. */
+    notifications: (
+      <button key={id} type="button" className="topbar-btn" onClick={() => setShowNotifs(s => !s)}
+        title="Notifications" aria-label={notifTotal > 0 ? `Notifications: ${notifTotal}` : 'Notifications'}>
+        <Bell size={18} />
+        {notifTotal > 0 && <span className="topbar-badge">{notifTotal > 99 ? '99+' : notifTotal}</span>}
+      </button>
+    ),
+    /* v1.10.80 (#98) - only when a PIN is set. */
+    lock: <LockButton key={id} className="topbar-btn" label={null} />,
+    /* v1.10.83 - Offline mode on / off, and what it changes. */
+    offline: <OfflineModeButton key={id} className="topbar-btn" onOpenSettings={() => {
+      try { sessionStorage.setItem('gst_settingsTab', 'section-privacy'); } catch { /* storage blocked */ }
+      setCurrentView('settings');
+    }} />,
+    darkMode: (
+      <button key={id} type="button" className="topbar-btn" onClick={() => setDarkMode(d => !d)}
+        title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'} aria-label={darkMode ? 'Light mode' : 'Dark mode'}>
+        {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+      </button>
+    ),
+  })[id]);
 
   // Command palette actions — declared here (not earlier) because the deps
   // array references `navItems` and `handleNewInvoice`, which are consts.
@@ -566,8 +604,10 @@ function App() {
     });
     acts.push({ label: 'Go to Settings', hint: '', category: 'nav', run: () => setCurrentView('settings') });
     // v1.10.74 - Control Panel has its own sidebar button but was missing here.
-    acts.push({ label: 'Go to Control Panel', hint: '', category: 'nav', run: () => setCurrentView('controlpanel') });
+    // v1.10.83 - and, like every menu item, not when it is switched off.
+    if (bottomIds.includes('controlpanel')) acts.push({ label: 'Go to Control Panel', hint: '', category: 'nav', run: () => setCurrentView('controlpanel') });
     acts.push({ label: 'Go to Support & About', hint: '', category: 'nav', run: () => setCurrentView('support') });
+    if (topIds.includes('guide')) acts.push({ label: 'Open the User Guide', hint: '', category: 'help', run: openDocs });
     acts.push({ label: 'Toggle dark mode', hint: '', category: 'action', run: () => setDarkMode(d => !d) });
     acts.push({ label: 'Show keyboard shortcuts', hint: 'Ctrl+/', category: 'help', run: () => setShowShortcutsHelp(true) });
     if (updateInfo?.updateAvailable) {
@@ -596,10 +636,11 @@ function App() {
         run: () => setCurrentView('clients'),
       });
     });
-    searchCorpus.products.forEach(p => {
+    // v1.10.83 - a product result opens Products, so none while it is hidden.
+    if (navItems.some(i => i.id === 'inventory')) searchCorpus.products.forEach(p => {
       acts.push({
         label: `📦 ${p.name} — product${p.hsn ? ' · HSN: ' + p.hsn : ''}`,
-        hint: (p.stock ?? 0) + ' in stock',
+        hint: trackedStock(p) === null ? '' : trackedStock(p) + ' in stock',
         category: 'product',
         run: () => setCurrentView('inventory'),
       });
@@ -625,14 +666,14 @@ function App() {
       ['Business type presets', 'section-print'], ['Section labels', 'section-print'],
       ['Watermarks', 'section-print'], ['Multi-copy print', 'section-print'],
       ['Digital signature', 'section-company'], ['Company letterhead', 'section-print'],
-      ['Modules', 'section-modules'], ['Region preference', 'section-region'],
+      ['Business type', 'section-biztype'], ['Features', 'section-modules'], ['Region preference', 'section-region'],
       ['Google Drive backup', 'section-cloud'], ['App updates', 'section-updates'],
     ];
     settingsJumps.forEach(([s, sectionId]) => {
       acts.push({ label: `⚙️ Settings → ${s}`, hint: '', category: 'settings', run: () => openSettingsAt(sectionId) });
     });
     return acts;
-  }, [navItems, updateInfo, handleNewInvoice, searchCorpus]);
+  }, [navItems, bottomIds, topIds, updateInfo, handleNewInvoice, searchCorpus]);
 
   const filteredPalette = paletteActions.filter(a =>
     !paletteQuery.trim() || a.label.toLowerCase().includes(paletteQuery.toLowerCase())
@@ -740,7 +781,7 @@ function App() {
       <div className="server-down-overlay">
         <div className="server-down-modal">
           <FileText size={48} color="#3b82f6" />
-          <h2>E-Munim Needs a Quick Start</h2>
+<h2>E-Munim Needs a Quick Start <HelpButton title="Needs a Quick Start" doc="shortcuts#app-not-running" size={16} /></h2>
           <p>
             Your data is <strong>100% safe</strong> on your computer — nothing is lost.
             The app just needs to be started once.
@@ -756,9 +797,13 @@ function App() {
           <div className="server-down-steps">
             <p className="server-down-hint">How to start it:</p>
             <ol>
-              <li>Double-click <strong>E-Munim</strong> on your Desktop, then click <strong>Open App</strong></li>
+<li>Double-click the <strong>E-Munim</strong> icon on your Desktop</li>
               <li>Or search <strong>"E-Munim"</strong> in the Start Menu</li>
             </ol>
+            {/* v1.10.83 - an icon made by the browser ("Install as Desktop App",
+                removed in this version) opens this window but cannot start the
+                app. Say so, or people keep clicking it. */}
+            <p className="server-down-hint">Opened this from a Chrome or Edge app icon? That icon cannot start the app. Use the Free GST Billing icon instead; you can remove the other one (right-click it, then Uninstall).</p>
           </div>
           <p className="server-down-safe">All your invoices, clients, and data are safely stored on your computer. They are never deleted or shared.</p>
           <div className="server-down-waiting">
@@ -828,16 +873,19 @@ function App() {
         </button>
         <span className="mobile-topbar-title">E-Munim</span>
         <span className="mobile-topbar-business">{profile?.businessName || ''}</span>
+        {topActions}
       </div>
       {navOpen && <div className="sidebar-backdrop" onClick={() => setNavOpen(false)} aria-hidden="true" />}
       <div className={`sidebar${navOpen ? ' sidebar-open' : ''}`} onClick={closeNavAfterPick}>
         <div className="sidebar-brand">
-          <div className="sidebar-logo">
-            <FileText size={22} />
+          <div className={`sidebar-logo${ownBrand && brand.logo ? ' sidebar-logo-own' : ''}`}>
+            {ownBrand && brand.logo ? <img src={brand.logo} alt="" />
+              : ownBrand ? <span className="sidebar-logo-letter">{brand.businessName.trim().charAt(0).toUpperCase()}</span>
+                : <FileText size={22} />}
           </div>
-          <div>
-            <h2 className="sidebar-title">E-Munim</h2>
-            <p className="sidebar-subtitle">GST Billing Software</p>
+<div className="sidebar-brand-text">
+            <h2 className={`sidebar-title${ownBrand ? ' sidebar-title-own' : ''}`} title={ownBrand ? `${brand.businessName} - E-Munim` : undefined}>{ownBrand ? brand.businessName : 'E-Munim'}</h2>
+            <p className="sidebar-subtitle" title="Free forever. Works on this computer, even offline. No tracking, no ads."><span className="sidebar-free sidebar-free-phone">Free forever<br /></span>GST Billing Software</p>
           </div>
           {/* Auto-hide as a ☰ button (was a text checkbox): pressed = the menu
               shrinks to icons and opens when pointed at. */}
@@ -928,85 +976,61 @@ function App() {
                 }} />
               </button>
             )}
-            {/* Notification bell — opens a popover listing overdue / due-soon
-                invoices, GST filing deadlines, and low-stock items. Each row
-                is a single click away from the page that fixes it. */}
-            <button
-              className="nav-btn"
-              onClick={() => setShowNotifs(s => !s)}
-              title="Notifications"
-              style={{ position: 'relative' }}
-            >
-              <Bell size={18} />
-              Notifications
-              {notifTotal > 0 && (
-                <span className="nav-badge" style={{
-                  position: 'absolute', top: '8px', right: '12px',
-                  minWidth: 18, height: 18, padding: '0 5px', borderRadius: '9px',
-                  background: 'var(--danger)', color: '#fff',
-                  fontSize: '0.65rem', fontWeight: 700,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>{notifTotal > 99 ? '99+' : notifTotal}</span>
-              )}
-            </button>
             <LicenseBadge onClick={() => setShowLicenseModal(true)} refreshTrigger={licenseRefresh} />
-            {/* v1.10.80 (#98) - only when a PIN is set. */}
-            <LockButton className="nav-btn" label="Lock app" />
-            <button
-              className="nav-btn"
-              onClick={() => setDarkMode(!darkMode)}
-              title={darkMode ? 'Light Mode' : 'Dark Mode'}
-            >
-              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-              {darkMode ? 'Light Mode' : 'Dark Mode'}
-            </button>
-            <button
-              className={`nav-btn nav-btn-support${currentView === 'support' ? ' nav-btn-support-active' : ''}`}
-              onClick={() => setCurrentView('support')}
-              title="Who makes this app, and how to help"
-            >
-              <Heart size={18} /> Support &amp; About
-            </button>
-            <button
-              className={`nav-btn ${currentView === 'controlpanel' ? 'nav-btn-active' : ''}`}
-              onClick={() => setCurrentView('controlpanel')}
-              title="Update, backup, restore, move to another PC"
-            >
-              <HardDrive size={18} /> Control Panel
-            </button>
-            <button
-              className={`nav-btn ${currentView === 'settings' ? 'nav-btn-active' : ''}`}
-              onClick={() => setCurrentView('settings')}
-              style={updateBannerVisible ? { position: 'relative' } : undefined}
-            >
-              <Settings size={18} /> Settings
-              {updateBannerVisible && (
-                <span className="nav-badge" style={{
-                  position: 'absolute', top: '8px', right: '12px',
-                  width: 8, height: 8, borderRadius: '50%',
-                  background: '#f59e0b',
-                }} title="Update available" />
-              )}
-            </button>
-            <div className={`server-status server-status-${serverStatus}`}>
-              <span className="server-status-dot" />
-              {serverStatus === 'online' ? 'App Ready' : serverStatus === 'offline' ? 'App Not Running' : 'Connecting...'}
-            </div>
+            {/* v1.10.83 - in the order chosen in Settings → Features; switched-off
+                ones are already left out of bottomIds. */}
+            {bottomIds.map(id => ({
+              support: (
+                <button key={id}
+                  className={`nav-btn nav-btn-support${currentView === 'support' ? ' nav-btn-support-active' : ''}`}
+                  onClick={() => setCurrentView('support')}
+                  title="Who makes this app, and how to help"
+                >
+                  <Heart size={18} /> Support &amp; About
+                </button>
+              ),
+              controlpanel: (
+                <button key={id}
+                  className={`nav-btn ${currentView === 'controlpanel' ? 'nav-btn-active' : ''}`}
+                  onClick={() => setCurrentView('controlpanel')}
+                  title={`${serverStatus === 'online' ? 'App Ready' : serverStatus === 'offline' ? 'App Not Running' : 'Connecting...'} - update, backup, restore, move to another PC`}
+                >
+                  <HardDrive size={18} /> Control Panel
+                  {/* v1.10.83 - the app's status dot, formerly the "App Ready" box under the menu. */}
+                  <span className={`server-status-dot server-status-${serverStatus}`} aria-label={serverStatus === 'online' ? 'App Ready' : serverStatus === 'offline' ? 'App Not Running' : 'Connecting'} />
+                </button>
+              ),
+              settings: (
+                <button key={id}
+                  className={`nav-btn ${currentView === 'settings' ? 'nav-btn-active' : ''}`}
+                  onClick={() => setCurrentView('settings')}
+                  style={updateBannerVisible ? { position: 'relative' } : undefined}
+                >
+                  <Settings size={18} /> Settings
+                  {updateBannerVisible && (
+                    <span className="nav-badge" style={{
+                      position: 'absolute', top: '8px', right: '12px',
+                      width: 8, height: 8, borderRadius: '50%',
+                      background: '#f59e0b',
+                    }} title="Update available" />
+                  )}
+                </button>
+              ),
+            })[id])}
           </div>
         </nav>
       </div>
 
-      {showInstallBanner && (
-        <div className="pwa-install-banner">
-          <Download size={18} />
-          <span>
-            <strong>Install as Desktop App</strong> — own icon, no browser, opens instantly. Right-click the icon for quick-jump to New Invoice / GST Returns.
-          </span>
-          <button className="pwa-install-btn" onClick={handleInstallPWA}>Install App</button>
-          <button className="pwa-dismiss-btn" onClick={dismissInstallBanner} title="Remind me later (re-shows in 14 days)"><X size={16} /></button>
-        </div>
-      )}
       <div className="main-content">
+        <div className="app-topbar">
+          {/* v1.10.83 - the promise, on every screen (it was under the app name in the menu). */}
+          <span className="topbar-free" title="Free forever: no paid version, no locked features, no ads, no tracking. Works on this computer, even offline.">Free forever</span>
+          {topActions}
+        </div>
+        {/* v1.10.83 - a screen that throws shows "ran into a problem" here
+            instead of blanking the app; keyed by screen so the sidebar works
+            and opening another screen starts clean. */}
+        <ErrorBoundary key={currentView} onHome={() => setCurrentView('dashboard')}>
         {currentView !== 'new' && <StarBanner />}
         {currentView === 'dashboard' && (
           <Dashboard onNew={handleNewInvoice} onEdit={handleEditInvoice} onPrint={handlePrintInvoice} onDuplicate={handleDuplicateInvoice} onConvert={handleConvertToInvoice} onOpenProducts={() => setCurrentView('inventory')} onOpenSettings={() => setCurrentView('settings')} onOpenGuide={openDocs} onOpenSupport={() => setCurrentView('support')} activeProfile={profile} />
@@ -1025,7 +1049,8 @@ function App() {
           <ClientsView onNew={handleNewInvoice} onEdit={handleEditInvoice} onDuplicate={handleDuplicateInvoice} />
         )}
         {currentView === 'inventory' && (
-          <InventoryView />
+          // v1.10.83 (#115) - remounted per business, like the screens below, so its production list follows the switch.
+          <InventoryView key={businessKey} />
         )}
         {/* v1.10.66 (#64 item 1) — `key={businessKey}` remounts these screens
             when the business changes. Each reads the business once when it
@@ -1043,6 +1068,9 @@ function App() {
         )}
         {currentView === 'receipts' && (
           <ReceiptVoucher key={businessKey} />
+        )}
+        {currentView === 'cashbook' && (
+          <CashBook key={businessKey} onOpenView={setCurrentView} />
         )}
         {currentView === 'reports' && (
           <ReportsView key={businessKey} />
@@ -1065,6 +1093,7 @@ function App() {
         </Suspense>
         {/* Version + DiceCodes line: Dashboard only, so it never takes space on working screens. */}
         {currentView === 'dashboard' && <AppFooter onOpenSupport={() => setCurrentView('support')} />}
+        </ErrorBoundary>
       </div>
 
       {/* Update modal — release notes + Export-backup-first nudge + Update Now */}
@@ -1074,7 +1103,7 @@ function App() {
         <div className="modal-overlay" onClick={() => setShowNotifs(false)}>
           <div className="modal-content" style={{ maxWidth: '480px' }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <h3 className="section-title" style={{ margin: 0 }}>Notifications</h3>
+              <h3 className="section-title" style={{ margin: 0 }}>Notifications <HelpButton title="Notifications" doc="shortcuts#notifications" size={16} /></h3>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 {/* v1.10.62 (#53) — clears everything currently shown. Each
                     section remembers exactly WHAT was cleared, so a genuinely
@@ -1149,7 +1178,7 @@ function App() {
                     <div style={{ flex: 1 }}>
                       <strong>{notifications.lowStock.length} product{notifications.lowStock.length !== 1 ? 's' : ''} low on stock</strong>
                       <div style={{ fontSize: '0.72rem', opacity: 0.85, marginTop: '0.2rem' }}>
-                        {notifications.lowStock.slice(0, 3).map(p => `${p.name} (${p.stock} left)`).join(' · ')}
+                        {notifications.lowStock.slice(0, 3).map(p => `${p.name} (${trackedStock(p)} left)`).join(' · ')}
                       </div>
                     </div>
                   </button>
@@ -1195,7 +1224,7 @@ function App() {
               ))}
             </div>
             <div style={{ padding: '0.4rem 1rem', borderTop: '1px solid var(--border-color)', fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span><Command size={11} style={{ verticalAlign: 'middle', marginRight: 4 }} />Ctrl+K to toggle · ↑↓ navigate · Enter run</span>
+              <span><Command size={11} style={{ verticalAlign: 'middle', marginRight: 4 }} />Ctrl+K to toggle · ↑↓ navigate · Enter run <HelpButton title="Quick search" doc="shortcuts#command-palette" size={16} /></span>
               <button type="button" onClick={() => { setShowPalette(false); setShowShortcutsHelp(true); }} style={{ background: 'none', border: 0, color: 'var(--primary)', cursor: 'pointer', fontSize: '0.7rem' }}>
                 All shortcuts (Ctrl+/)
               </button>
@@ -1209,7 +1238,7 @@ function App() {
         <div className="modal-overlay" onClick={() => setShowShortcutsHelp(false)}>
           <div className="modal-content" style={{ maxWidth: '480px' }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <h3 className="section-title" style={{ margin: 0 }}>Keyboard Shortcuts</h3>
+              <h3 className="section-title" style={{ margin: 0 }}>Keyboard Shortcuts <HelpButton title="Keyboard shortcuts" doc="shortcuts#keyboard" size={16} /></h3>
               <button className="icon-btn" onClick={() => setShowShortcutsHelp(false)} title="Close"><X size={18} /></button>
             </div>
             <table className="kv-list">
@@ -1236,7 +1265,7 @@ function App() {
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.5rem' }}>
               <div>
                 <h3 className="section-title" style={{ marginTop: 0, marginBottom: '0.25rem' }}>
-                  Update available — v{updateInfo.latest}
+                  Update available — v{updateInfo.latest} <HelpButton title="Updating the app" doc="update#update-window" size={16} />
                 </h3>
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0 }}>
                   You're on v{updateInfo.current}

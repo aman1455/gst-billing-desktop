@@ -178,4 +178,19 @@
       e.preventDefault(); input.focus();
     }
   });
+
+  /* ---- open at the section the app's ? button asked for ----
+     The host's "Checking your browser" page reloads into the docs, and after
+     that reload the browser does not scroll to #section: the guide opened at
+     the top of the page. So scroll there here, once the images have their
+     size, and flash the section so it is clear where to read. */
+  function goToHash() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var el = id && document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ block: 'start' });
+    el.classList.remove('arrived'); void el.offsetWidth; el.classList.add('arrived');
+  }
+  if (document.readyState === 'complete') goToHash(); else window.addEventListener('load', goToHash);
+  window.addEventListener('hashchange', goToHash);
 })();

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
+import { lastProblemWithin, openReport } from '../utils/problemLog';
+import { knownProblemFor } from '../utils/errorReport';
 
 const ICONS = {
   success: CheckCircle,
@@ -18,10 +20,25 @@ const COLORS = {
 let toastId = 0;
 let addToastFn = null;
 
-export function toast(message, type = 'info', duration = 3500) {
-  if (addToastFn) {
-    addToastFn({ id: ++toastId, message, type, duration });
+// v1.10.83 - `actions` is an optional list of { label, onClick } or
+// { label, href }. An error toast shown right after a problem was logged (a
+// failed save, a crash) gets "Report" - and "How to fix" when it is a known
+// problem - by itself, so no caller has to change. Toasts with buttons stay
+// up longer: nobody can click a button that vanished after 3.5 seconds.
+export function toast(message, type = 'info', duration = 3500, actions = null) {
+  if (!addToastFn) return;
+  let acts = actions;
+  if (!acts && type === 'error') {
+    const p = lastProblemWithin(5000);
+    if (p) {
+      const known = knownProblemFor(p);
+      acts = [
+        ...(known ? [{ label: 'How to fix', href: known.url }] : []),
+        { label: 'Report', onClick: () => openReport(p) },
+      ];
+    }
   }
+  addToastFn({ id: ++toastId, message, type, duration: acts?.length ? Math.max(duration, 10000) : duration, actions: acts });
 }
 
 export default function ToastContainer() {
@@ -65,6 +82,9 @@ export default function ToastContainer() {
           }}>
             <Icon size={18} style={{ color: color.icon, flexShrink: 0 }} />
             <span className="toast-message">{t.message}</span>
+            {t.actions?.map((a) => (a.href
+              ? <a key={a.label} className="toast-action" href={a.href} target="_blank" rel="noopener noreferrer">{a.label}</a>
+              : <button key={a.label} type="button" className="toast-action" onClick={a.onClick}>{a.label}</button>))}
             <button className="toast-close" onClick={() => dismiss(t.id)}>
               <X size={14} />
             </button>

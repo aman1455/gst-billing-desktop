@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Users, Search, FileText, ChevronDown, ChevronUp, Trash2, X, MessageCircle, Mail, Plus, Edit3, Copy, Upload, Download } from 'lucide-react';
 import HelpButton from './HelpButton';
 import { getAllClients, getAllBills, deleteClient, saveClient, deleteBill, saveBill, getProfile, deleteReceipt, applyStockChanges, trashSavedPdf } from '../store';
@@ -24,6 +24,8 @@ function getAccentRGB() {
   return [30, 64, 175];
 }
 import ClientModal from './ClientModal';
+import CsvListImport from './CsvListImport';
+import { clientsCsvToList, CLIENTS_SAMPLE } from '../utils/listCsv';
 
 const STATUS_COLORS = {
   unpaid: { label: 'Unpaid', color: '#f59e0b', bg: '#fffbeb' },
@@ -668,61 +670,8 @@ export default function ClientsView({ onEdit, onDuplicate, onNew }) {
 
   const closeForm = () => { setShowForm(false); setModalClient(null); setEditingClientId(null); };
 
-  const csvInputRef = useRef(null);
-
-  const handleCSVImport = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const lines = text.split(/\r?\n/).filter(l => l.trim());
-      if (lines.length < 2) { toast('CSV file is empty or has no data rows', 'warning'); return; }
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
-      let imported = 0;
-      // v1.10.74 - importing the same file twice made duplicates. Skip names
-      // already saved (trimmed, any case), including repeats inside the file.
-      let skipped = 0;
-      const known = new Set(clients.map(c => (c.name || '').trim().toLowerCase()));
-      for (let i = 1; i < lines.length; i++) {
-        const values = parseCSVLine(lines[i]);
-        if (values.length === 0) continue;
-        const row = {};
-        headers.forEach((h, idx) => { row[h] = (values[idx] || '').trim(); });
-        const name = row.name || row.client || row['client name'] || '';
-        if (!name) continue;
-        if (known.has(name.toLowerCase())) { skipped++; continue; }
-        known.add(name.toLowerCase());
-        await saveClient({
-          name,
-          address: row.address || '',
-          state: row.state || '',
-          gstin: row.gstin || '',
-          email: row.email || '',
-          phone: row.phone || '',
-        });
-        imported++;
-      }
-      toast(`Imported ${imported} client(s)${skipped ? `, skipped ${skipped} already in your list` : ''}`, 'success');
-      loadData();
-    } catch {
-      toast('Failed to parse CSV file', 'error');
-    }
-    if (csvInputRef.current) csvInputRef.current.value = '';
-  };
-
-  const parseCSVLine = (line) => {
-    const result = [];
-    let current = '';
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') { inQuotes = !inQuotes; }
-      else if (ch === ',' && !inQuotes) { result.push(current); current = ''; }
-      else { current += ch; }
-    }
-    result.push(current);
-    return result;
-  };
+  // v1.10.83 (#121) - Import CSV opens a window with a sample file (CsvListImport).
+  const [showImport, setShowImport] = useState(false);
 
   const handleModalSave = async (formData) => {
     if (!formData.name.trim()) { toast('Client name is required', 'warning'); return; }
@@ -756,23 +705,12 @@ export default function ClientsView({ onEdit, onDuplicate, onNew }) {
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div>
-            <h1 className="page-title">Clients</h1>
+            <h1 className="page-title">Clients <HelpButton title="Clients — how to use" doc="clients" size={16} /></h1>
             <p className="page-subtitle">Client-wise invoice ledger and outstanding</p>
           </div>
-          <HelpButton title="Clients — how to use" doc="clients">
-            <ul style={{ paddingLeft: '1.1rem', margin: 0 }}>
-              <li><strong>Click a client name</strong> to see every invoice, payment, and credit note in one place.</li>
-              <li><strong>Statement PDF</strong> — a full account ledger with running balance. Send it when a client disputes a bill.</li>
-              <li><strong>Aging PDF</strong> — outstanding invoices bucketed by 0-30 / 31-60 / 61-90 / 90+ days. Use it for collection calls.</li>
-              <li><strong>Aging strip</strong> — the same buckets inline so you can see who's slow to pay at a glance.</li>
-              <li><strong>Import CSV</strong> — bulk-load clients from a spreadsheet (columns: name, address, state, gstin, email, phone). To back up clients, use Settings → Data Management → Export Backup.</li>
-              <li><strong>WhatsApp / Email</strong> — quick outreach without leaving the app.</li>
-            </ul>
-          </HelpButton>
         </div>
         <div className="flex gap-2">
-          <input type="file" accept=".csv" ref={csvInputRef} style={{ display: 'none' }} onChange={handleCSVImport} />
-          <button className="btn btn-secondary" onClick={() => csvInputRef.current?.click()}>
+          <button className="btn btn-secondary" onClick={() => setShowImport(true)}>
             <Upload size={16} /> Import CSV
           </button>
           <button className="btn btn-secondary" onClick={() => openAddClient()}>
@@ -783,6 +721,13 @@ export default function ClientsView({ onEdit, onDuplicate, onNew }) {
           </button>
         </div>
       </div>
+
+      {showImport && (
+        <CsvListImport what="clients" sample={CLIENTS_SAMPLE} sampleName="Clients-sample.csv" doc="clients#import-csv"
+          intro="One client per row: Name (required), GSTIN, Phone, Email, Address and State."
+          parse={(text) => { const r = clientsCsvToList(text, clients); return { list: r.clients, skipped: r.skipped, errors: r.errors }; }}
+          save={saveClient} onClose={() => setShowImport(false)} onDone={() => { setShowImport(false); loadData(); }} />
+      )}
 
       {/* Add/Edit Client Modal */}
       <ClientModal show={showForm} onClose={closeForm} onSave={handleModalSave} client={modalClient} isEditing={!!editingClientId} defaultCountry={profileCountry} />
@@ -874,6 +819,7 @@ export default function ClientsView({ onEdit, onDuplicate, onNew }) {
                         title="Aging report: outstanding invoices bucketed by how overdue they are">
                         <Download size={14} /> Aging PDF
                       </button>
+                      <HelpButton title="Statement and Aging PDFs" doc="clients#statement" size={16} style={{ alignSelf: 'center' }} />
                     </div>
 
                     {/* v1.10.22 — Aging summary strip: shows the four
@@ -891,7 +837,7 @@ export default function ClientsView({ onEdit, onDuplicate, onNew }) {
                       ];
                       return (
                         <div style={{ padding: '0.75rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', fontSize: '0.8rem' }}>
-                          <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Aging:</span>
+                          <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Aging: <HelpButton title="Ageing: who is slow to pay" doc="clients#ageing" size={16} /></span>
                           {cells.map(c => (
                             <span key={c.label} style={{ display: 'inline-flex', gap: 4, alignItems: 'baseline' }}>
                               <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{c.label}</span>
@@ -1000,6 +946,7 @@ export default function ClientsView({ onEdit, onDuplicate, onNew }) {
                           <Plus size={13} /> Save as Client
                         </button>
                       )}
+                      <HelpButton title="A client's account" doc="clients#ledger" size={16} style={{ alignSelf: 'center' }} />
                     </div>
                   </div>
                 )}

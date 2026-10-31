@@ -224,16 +224,9 @@ export default function RecurringInvoices() {
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div>
-            <h1 className="page-title">Recurring Invoices</h1>
+            <h1 className="page-title">Recurring Invoices <HelpButton title="Recurring invoices — how to use" doc="recurring" size={16} /></h1>
             <p className="page-subtitle">Auto-generate invoices for retainer clients</p>
           </div>
-          <HelpButton title="Recurring invoices — how to use" doc="recurring">
-            <ul style={{ paddingLeft: '1.1rem', margin: 0 }}>
-              <li><strong>Easiest</strong>: make the first invoice as usual and tick <em>Make this a recurring invoice</em> under Customize. Taxes, terms and options carry over.</li>
-              <li>Or use <strong>New Template</strong> here. <em>Every</em> and <em>Stop</em> set how often it repeats and when it ends.</li>
-              <li>Invoices are made automatically when the app starts and once a day. <strong>▶ Generate Now</strong> makes one straight away.</li>
-            </ul>
-          </HelpButton>
         </div>
         <button className="btn btn-primary" onClick={openAdd}><Plus size={18} /> New Template</button>
       </div>
@@ -248,7 +241,7 @@ export default function RecurringInvoices() {
 
       {dueTemplates.length > 0 && (
         <div className="glass-panel p-4 mb-6" style={{ borderLeft: '4px solid #f59e0b', background: 'var(--warn-bg)', color: 'var(--warn-text)' }}>
-          <h4 style={{ marginBottom: '0.5rem', color: 'var(--warn-text)' }}>{dueTemplates.length} invoice{dueTemplates.length > 1 ? 's' : ''} due for generation</h4>
+          <h4 style={{ marginBottom: '0.5rem', color: 'var(--warn-text)' }}>{dueTemplates.length} invoice{dueTemplates.length > 1 ? 's' : ''} due for generation<HelpButton title="Invoices due for generation" doc="recurring#due-banner" size={16} /></h4>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             {dueTemplates.map(tpl => (
               <button key={tpl.id} className="btn btn-primary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.75rem' }}
@@ -264,12 +257,15 @@ export default function RecurringInvoices() {
       {showForm && (
         <div className="modal-overlay" onClick={closeForm}>
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '680px', maxHeight: '90vh' }}>
-            <h3 className="section-title">{editingId ? 'Edit Template' : 'New Recurring Invoice'}</h3>
+            <h3 className="section-title">
+              {editingId ? 'Edit Template' : 'New Recurring Invoice'}
+              <HelpButton title={editingId ? 'Edit Template' : 'New Recurring Invoice'} doc={editingId ? 'recurring#edit-template' : 'recurring#template-form'} size={16} />
+            </h3>
 
             {/* Client picker */}
             {!editingId && clients.length > 0 && !form.clientName && (
               <div style={{ marginBottom: '1rem' }}>
-                <label className="form-label">Quick Select Client</label>
+                <label className="form-label">Quick Select Client<HelpButton title="Quick Select Client" doc="recurring#quick-select-client" size={14} /></label>
                 <div className="client-picker">
                   {clients.map(cli => (
                     <button key={cli.id} className="client-picker-item" onClick={() => selectClient(cli)}>
@@ -336,7 +332,7 @@ export default function RecurringInvoices() {
             </div>
 
             {/* Line Items */}
-            <h4 style={{ marginTop: '1rem', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>Line Items</h4>
+            <h4 style={{ marginTop: '1rem', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>Line Items<HelpButton title="Line Items" doc="recurring#line-items" size={14} /></h4>
             {form.items.map((item, idx) => (
               <div key={idx} className="line-item-row" style={{ alignItems: 'flex-end' }}>
                 <div className="line-item-field" style={{ flex: 2 }}>
@@ -376,7 +372,7 @@ export default function RecurringInvoices() {
 
       {/* Templates List */}
       <div className="glass-panel">
-        <div className="table-header"><h3>Recurring Templates</h3></div>
+        <div className="table-header"><h3>Recurring Templates<HelpButton title="Recurring Templates" doc="recurring#list" size={16} /></h3></div>
         {templates.length === 0 ? (
           <div className="empty-state">
             <RefreshCw size={48} />

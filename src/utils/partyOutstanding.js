@@ -13,6 +13,7 @@
  * column instead of disappearing.
  */
 import { countsAsSales, amountDue } from '../utils.js';
+import { purchaseBalance } from './purchasePayments.js';
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -30,18 +31,16 @@ export function periodMonths(mode, startYear) {
 export const billCurrency = (b) => b.currency || b.data?.invoiceOptions?.currency || 'INR';
 
 // One row per party (same name, ignoring case and spaces), sorted by name:
-// { name, earlier, months: { 'YYYY-MM': amount }, total }.
-export function partyOutstanding(bills, months, currency = 'INR') {
+// { name, earlier, months: { 'YYYY-MM': amount }, total }. `entries` are
+// { name, date, due }: what is still owed and the date of its bill.
+function byParty(entries, months) {
   const first = months[0].key;
   const last = months[months.length - 1].key;
   const rows = new Map();
-  for (const b of bills) {
-    if (!countsAsSales(b) || b.status === 'paid' || billCurrency(b) !== currency) continue;
-    // Less TDS the client deducts (they pay Net Receivable), as everywhere else.
-    const due = Math.round((amountDue(b) - (Number(b.paidAmount) || 0)) * 100) / 100;
-    const ym = String(b.invoiceDate || '').slice(0, 7);
-    if (due <= 0 || !ym || ym > last) continue;
-    const name = String(b.clientName || '').trim() || 'Unknown';
+  for (const { name: rawName, date, due } of entries) {
+    const ym = String(date || '').slice(0, 7);
+    if (!(due > 0) || !ym || ym > last) continue;
+    const name = String(rawName || '').trim() || 'Unknown';
     const id = name.toLowerCase();
     const row = rows.get(id) || { name, earlier: 0, months: {}, total: 0 };
     if (ym < first) row.earlier += due;
@@ -51,3 +50,16 @@ export function partyOutstanding(bills, months, currency = 'INR') {
   }
   return [...rows.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
+
+// What clients owe you.
+export function partyOutstanding(bills, months, currency = 'INR') {
+  return byParty(bills
+    .filter((b) => countsAsSales(b) && b.status !== 'paid' && billCurrency(b) === currency)
+    // Less TDS the client deducts (they pay Net Receivable), as everywhere else.
+    .map((b) => ({ name: b.clientName, date: b.invoiceDate, due: Math.round((amountDue(b) - (Number(b.paidAmount) || 0)) * 100) / 100 })), months);
+}
+
+// v1.10.83 (#123) - what you owe suppliers: the balance of each purchase bill
+// (total less TDS less payments), in the month of the bill. Rupees only.
+export const supplierOutstanding = (purchases, months) =>
+  byParty(purchases.map((p) => ({ name: p.supplierName, date: p.date, due: purchaseBalance(p) })), months);

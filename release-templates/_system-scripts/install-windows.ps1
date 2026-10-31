@@ -1,22 +1,21 @@
-# E-Munim - Windows installer.
+# Free GST Billing - Windows installer.
 #
 # Invoked by the HTA launcher on first run. Idempotent - safe to
 # re-run any time. Installs Node.js if missing, runs npm install
-# inside _system/, and creates a Desktop shortcut pointing at the
-# HTA launcher so the user never has to open the extract folder
-# again.
+# inside _system/, and creates Desktop and Start Menu icons that open
+# the app (see app-shortcut.ps1) so the user never has to open the
+# extract folder again.
 
 $ErrorActionPreference = 'Continue'
-$Host.UI.RawUI.WindowTitle = 'E-Munim - Installer'
+$Host.UI.RawUI.WindowTitle = 'Free GST Billing - Installer'
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SystemDir = $ScriptDir
 $RootDir   = Split-Path -Parent $ScriptDir
-$LauncherHTA = Join-Path $RootDir 'E-Munim - WINDOWS.hta'
 
 Write-Host ''
 Write-Host '  ============================================================'
-Write-Host '   E-Munim - Installer'
+Write-Host '   Free GST Billing Software - Installer'
 Write-Host '  ============================================================'
 Write-Host ''
 
@@ -32,11 +31,19 @@ function Find-OtherInstall {
   foreach ($dir in @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))) {
     # One unreadable or empty shortcut must not stop the others being checked.
     try {
-      $lnk = Join-Path $dir 'E-Munim.lnk'
-      if (Test-Path -LiteralPath $lnk) { $roots += Split-Path -Parent ([string](New-Object -ComObject WScript.Shell).CreateShortcut($lnk).Arguments).Trim().Trim('"') }
+      $lnk = Join-Path $dir 'Free GST Billing.lnk'
+      if (-not (Test-Path -LiteralPath $lnk)) { continue }
+      # v1.10.83 - the one-line install's shortcut runs "...\_system\start-windows.ps1"
+      # -AppWindow; the launcher's runs "...\Free GST Billing - WINDOWS.hta". The
+      # first quoted path is the script either way.
+      $a = [string](New-Object -ComObject WScript.Shell).CreateShortcut($lnk).Arguments
+      $p = if ($a -match '"([^"]+)"') { $Matches[1] } else { $a.Trim() }
+      $r = Split-Path -Parent $p
+      if ((Split-Path -Leaf $r) -eq '_system') { $r = Split-Path -Parent $r }
+      $roots += $r
     } catch { }
   }
-  $roots += Join-Path $env:LOCALAPPDATA 'Programs\E-Munim'
+  $roots += Join-Path $env:LOCALAPPDATA 'Programs\Free GST Billing'
   foreach ($r in $roots) {
     if (-not $r -or $r.TrimEnd('\') -eq $here) { continue }
     if ((Test-Path -LiteralPath (Join-Path $r '_system\server.js')) -and (Test-Path -LiteralPath (Join-Path $r '_system\node_modules'))) { return $r }
@@ -46,12 +53,12 @@ function Find-OtherInstall {
 if (-not $env:FREEGSTBILL_DIR) {
   $other = Find-OtherInstall
   if ($other) {
-    Write-Host '  E-Munim is already installed on this computer, in:' -ForegroundColor Yellow
+    Write-Host '  Free GST Billing is already installed on this computer, in:' -ForegroundColor Yellow
     Write-Host "    $other"
     Write-Host ''
     Write-Host '  Installing again here would make a second copy with no invoices in it.'
     Write-Host '  To get the newest version, update the installed copy instead:'
-    Write-Host '  open it from your E-Munim shortcut, then'
+    Write-Host '  open it from your Free GST Billing shortcut, then'
     Write-Host '  More options -> Update to the latest version.'
     Write-Host ''
     Write-Host '  Nothing was changed. This folder is not needed; you can delete it.'
@@ -81,10 +88,17 @@ if (-not (Use-GoodNode)) {
   Read-Host '  Press Enter to close'
   exit 1
 }
-if ($script:NodeWasFetched -or (Test-PackagesBroken)) { Reset-Packages }
+# v1.10.83 - the release ZIP carries its packages, so there is nothing to
+# download here. npm runs only for a folder whose packages are missing or were
+# left half-done by an old npm (ERR-060).
+$needNpm = -not (Test-PackagesReady)
+if ($needNpm -and ($script:NodeWasFetched -or (Test-PackagesBroken))) { Reset-Packages }
 
 # --- Step 2: npm install inside _system/ ---
 Write-Host ''
+if (-not $needNpm) {
+  Write-Host '  The app packages are already in place - nothing to download.'
+} else {
 Write-Host '  Installing app dependencies (npm install)...'
 if (-not (Test-InstallReady)) {
   Read-Host '  Press Enter to close'
@@ -103,43 +117,25 @@ try {
   exit 1
 }
 Pop-Location
-
-# --- Step 3: Desktop shortcut ---
-Write-Host ''
-Write-Host '  Creating Desktop shortcut...'
-try {
-  $desktop = [Environment]::GetFolderPath('Desktop')
-  $shortcutPath = Join-Path $desktop 'E-Munim.lnk'
-  $wsh = New-Object -ComObject WScript.Shell
-  $sc = $wsh.CreateShortcut($shortcutPath)
-  # Point the shortcut at mshta.exe with the HTA as its argument.
-  # This way double-clicking the shortcut always opens the launcher
-  # even if the user later associates .hta with something else.
-  $sc.TargetPath = 'mshta.exe'
-  $sc.Arguments = "`"$LauncherHTA`""
-  $sc.WorkingDirectory = $RootDir
-  $iconPath = Join-Path $SystemDir 'app-icon.ico'
-  if (Test-Path $iconPath) { $sc.IconLocation = $iconPath }
-  $sc.Description = 'E-Munim - open the launcher'
-  $sc.Save()
-  Write-Host "  Desktop shortcut created: $shortcutPath"
-} catch {
-  Write-Host "  WARNING: could not create Desktop shortcut ($($_.Exception.Message)). You can still launch by double-clicking the HTA."
 }
 
-# --- Step 4: Start Menu shortcut (Programs list) ---
-try {
-  $startMenu = Join-Path ([Environment]::GetFolderPath('Programs')) 'E-Munim.lnk'
-  $wsh = New-Object -ComObject WScript.Shell
-  $sc = $wsh.CreateShortcut($startMenu)
-  $sc.TargetPath = 'mshta.exe'
-  $sc.Arguments = "`"$LauncherHTA`""
-  $sc.WorkingDirectory = $RootDir
-  $iconPath = Join-Path $SystemDir 'app-icon.ico'
-  if (Test-Path $iconPath) { $sc.IconLocation = $iconPath }
-  $sc.Description = 'E-Munim'
-  $sc.Save()
-} catch { }
+# --- Steps 3 and 4: Desktop and Start Menu icons ---
+# v1.10.83 - the icons open the app itself (start-windows.ps1 starts the
+# server when it is not running, then opens the app in its own window), the
+# same as the one-line install's. They used to open the launcher, which
+# needed a second click on Open App. The launcher stays in the app folder for
+# installing, updating and repairs; the app's Control Panel does the rest.
+. (Join-Path $SystemDir 'app-shortcut.ps1')
+Write-Host ''
+Write-Host '  Creating the Desktop and Start Menu icons...'
+foreach ($dir in @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))) {
+  try {
+    New-AppShortcut (Join-Path $dir 'Free GST Billing.lnk') $SystemDir
+    Write-Host "  Icon created in $dir"
+  } catch {
+    Write-Host "  WARNING: could not create the icon in $dir ($($_.Exception.Message)). You can still open the app from the launcher in the app folder."
+  }
+}
 
 # --- Step 5: Hide _system folder so root looks clean ---
 try {
@@ -160,7 +156,7 @@ try {
     $lines = @(
       '[.ShellClassInfo]',
       'IconResource=_system\app-icon.ico,0',
-      'InfoTip=E-Munim - open the launcher inside'
+      'InfoTip=Free GST Billing Software - open the launcher inside'
     )
     Set-Content -Path $ini -Value $lines -Encoding ASCII -Force
     attrib +H +S "$ini" 2>$null
@@ -178,7 +174,7 @@ Write-Host '  ============================================================'
 Write-Host ''
 Write-Host '  Opening the app in your browser now...'
 Write-Host ''
-Write-Host '  Next time, use the E-Munim shortcut on your Desktop.'
+Write-Host '  Next time, click the Free GST Billing icon on your Desktop or in the Start menu.'
 Write-Host ''
 
 # v1.10.69 - finish the job. Leaving a console window saying "now go and
@@ -188,7 +184,7 @@ Write-Host ''
 # the launcher path and for the one-command install alike.
 $starter = Join-Path $SystemDir 'start-windows.ps1'
 if (Test-Path $starter) {
-  & $starter
+  & $starter -AppWindow
 } else {
   Write-Host '  Could not find start-windows.ps1 - open the launcher and click Open App.'
   Read-Host '  Press Enter to close'
