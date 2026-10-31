@@ -26,7 +26,7 @@
  * Run automatically as the last step of `npm run release:zip`.
  * Standalone: `npm run verify:release`
  */
-import { existsSync, readdirSync, rmSync, mkdirSync, statSync, writeFileSync } from 'fs';
+import { existsSync, readdirSync, rmSync, mkdirSync, statSync, writeFileSync, copyFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { spawn, spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
@@ -154,6 +154,9 @@ try {
   // already running on this machine.
   mkdirSync(join(systemDir, 'data'), { recursive: true });
   if (process.env.FGSB_VERIFY_PORT) writeFileSync(join(systemDir, 'data', 'port.txt'), process.env.FGSB_VERIFY_PORT);
+  if (existsSync(join(REPO_ROOT, 'data', 'license.lic'))) {
+    copyFileSync(join(REPO_ROOT, 'data', 'license.lic'), join(systemDir, 'data', 'license.lic'));
+  }
   log('  3/5  starting the packaged server…');
   server = await startServer(systemDir);
   log(`       bound at ${server.url}`);
