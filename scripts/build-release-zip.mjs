@@ -160,6 +160,10 @@ for (const f of ['purchasePayments.js', 'purchaseOrders.js']) {
 }
 
 copyDirRecursive(join(REPO_ROOT, 'dist'), join(SYSTEM, 'dist'));
+// Licensing runtime files required by server.js
+if (existsSync(join(REPO_ROOT, 'licensing'))) {
+  copyDirRecursive(join(REPO_ROOT, 'licensing'), join(SYSTEM, 'licensing'));
+}
 // Only ship the scripts that postinstall / release-time need — not the
 // dev-only helpers (tax-test, discount-modes-test, generate-icons,
 // build-release-zip). Keeps ZIP lean and reduces attack surface.
