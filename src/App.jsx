@@ -36,6 +36,8 @@ const ControlPanel = lazy(() => import('./components/ControlPanel'));
 const SupportView = lazy(() => import('./components/SupportView'));
 import StarBanner from './components/StarBanner';
 import AppFooter from './components/AppFooter';
+import LicenseBadge from './components/LicenseBadge';
+import LicenseModal from './components/LicenseModal';
 import LockButton from './components/LockButton';
 import { lockNow } from './utils/appLock';
 import { getPrintSettings } from './utils/printSettings';
@@ -104,6 +106,8 @@ function App() {
   const profileLoaded = useRef(false);
   const [allProfiles, setAllProfiles] = useState([]);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showLicenseModal, setShowLicenseModal] = useState(false);
+  const [licenseRefresh, setLicenseRefresh] = useState(0);
   const profileMenuRef = useRef(null);
 
   // Update notification state. Auto-checks GitHub on mount + every 6h.
@@ -129,6 +133,12 @@ function App() {
     // Then re-check every 6 hours while the app is open.
     const interval = setInterval(check, 6 * 60 * 60 * 1000);
     return () => { cancelled = true; clearTimeout(initial); clearInterval(interval); };
+  }, []);
+
+  useEffect(() => {
+    const handleLicenseReq = () => setShowLicenseModal(true);
+    window.addEventListener('license-required', handleLicenseReq);
+    return () => window.removeEventListener('license-required', handleLicenseReq);
   }, []);
 
   // ---- Notification centre ----
@@ -769,6 +779,11 @@ function App() {
         }} />
         <ToastContainer />
         <ConfirmModalContainer />
+      <LicenseModal
+        isOpen={showLicenseModal}
+        onClose={() => setShowLicenseModal(false)}
+        onLicenseUpdated={() => setLicenseRefresh(n => n + 1)}
+      />
       </>
     );
   }
@@ -934,6 +949,7 @@ function App() {
                 }}>{notifTotal > 99 ? '99+' : notifTotal}</span>
               )}
             </button>
+            <LicenseBadge onClick={() => setShowLicenseModal(true)} refreshTrigger={licenseRefresh} />
             {/* v1.10.80 (#98) - only when a PIN is set. */}
             <LockButton className="nav-btn" label="Lock app" />
             <button
@@ -1282,6 +1298,11 @@ function App() {
 
       <ToastContainer />
       <ConfirmModalContainer />
+      <LicenseModal
+        isOpen={showLicenseModal}
+        onClose={() => setShowLicenseModal(false)}
+        onLicenseUpdated={() => setLicenseRefresh(n => n + 1)}
+      />
     </div>
   );
 }

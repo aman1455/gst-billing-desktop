@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 // re-implemented totals inline and silently reintroduced every bug the
 // v1.10.1 extraction fixed. Same source of truth now.
 import { templateTotals, clientYearToDate, nextCounterValue, startFor, numberSeriesFor, counterKeyFor, formatDocNumber, businessKeyOf, getFinancialYearLabel, INVOICE_TYPES } from './src/utils.js';
+import { LicenseManager } from './licensing/licenseManager.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
@@ -87,6 +88,47 @@ const importBody = express.json({ limit: '500mb' });
 app.use((req, res, next) => {
   if (req.path === LOCAL_PREFS_ROUTE) return next();
   return (req.path === IMPORT_ROUTE ? importBody : jsonBody)(req, res, next);
+});
+
+const licenseManager = new LicenseManager(DATA_DIR);
+
+// ========================
+// LICENSING ENDPOINTS & MUTATION GUARD
+// ========================
+app.get('/api/license/status', (req, res) => {
+  res.json(licenseManager.getStatus());
+});
+
+app.post('/api/license/activate', (req, res) => {
+  try {
+    const { licenseKey } = req.body || {};
+    if (!licenseKey) {
+      return res.status(400).json({ error: 'License key is required' });
+    }
+    const result = licenseManager.activate(licenseKey);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message || 'Activation failed' });
+  }
+});
+
+// Guard all mutating API operations against unlicensed/expired use
+app.use('/api', (req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+  if (req.path.startsWith('/license') || req.path === '/local-prefs' || req.path === '/lock') {
+    return next();
+  }
+  const status = licenseManager.getStatus();
+  if (!status.valid) {
+    return res.status(403).json({
+      error: 'LICENSE_REQUIRED',
+      licenseStatus: status,
+      message: status.message || 'An active Demo or Permanent license is required to modify or create records.'
+    });
+  }
+  next();
 });
 
 // Ensure data directory and sub-directories exist

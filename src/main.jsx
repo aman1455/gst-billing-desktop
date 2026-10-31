@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
 import App from './App.jsx'
 import AppLockGate from './components/AppLock.jsx'
+import LicenseGate from './components/LicenseGate.jsx'
 import { restorePrefs, startMirroring } from './utils/prefsMirror'
 import './index.css'
 
@@ -137,9 +138,11 @@ restorePrefs().then((restored) => {
   startMirroring(restored)
   createRoot(document.getElementById('root')).render(
     <StrictMode>
-      <AppLockGate>
-        <App />
-      </AppLockGate>
+      <LicenseGate>
+        <AppLockGate>
+          <App />
+        </AppLockGate>
+      </LicenseGate>
     </StrictMode>,
   )
 })

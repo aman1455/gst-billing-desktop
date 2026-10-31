@@ -48,3 +48,8 @@ AGENTS.md
 docs-site/out/
 
 release/
+
+# Licensing developer private keys
+*.key
+.keys/
+scripts/.keys/

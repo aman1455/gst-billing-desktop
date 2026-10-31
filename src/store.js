@@ -15,13 +15,25 @@ async function apiFetch(url, options = {}) {
     // invoice number). Attach status so callers can branch on it.
     let body = null;
     try { body = await res.json(); } catch { /* non-JSON body */ }
-    const err = new Error(body?.error || `API error: ${res.status}`);
+    if (res.status === 403 && body?.error === 'LICENSE_REQUIRED') {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('license-required', { detail: body }));
+      }
+    }
+    const err = new Error(body?.message || body?.error || `API error: ${res.status}`);
     err.status = res.status;
     err.body = body;
     throw err;
   }
   return res.json();
 }
+
+// ---- Licensing ----
+export const getLicenseStatus = () => apiFetch(`${API}/license/status`);
+export const activateLicense = (licenseKey) => apiFetch(`${API}/license/activate`, {
+  method: 'POST',
+  body: JSON.stringify({ licenseKey })
+});
 
 // ---- PIN lock (v1.10.77, #84; checked by the server, see AppLock.jsx) ----
 export const getLockStatus = () => apiFetch(`${API}/lock`);

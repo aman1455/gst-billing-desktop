@@ -91,7 +91,7 @@
     "bundle:tesseract": "node scripts/bundle-tesseract-assets.mjs",
     "release:zip": "npm run lint && npm run test:unit && npm run build && node scripts/build-release-zip.mjs && node scripts/verify-release.mjs",
     "test": "npm run test:unit && node tests/smoke.mjs",
-    "test:unit": "node scripts/tax-test.mjs && node scripts/discount-modes-test.mjs && node scripts/csv-test.mjs",
+    "test:unit": "node scripts/tax-test.mjs && node scripts/discount-modes-test.mjs && node scripts/csv-test.mjs && node tests/licensing-test.mjs",
     "test:install": "playwright install firefox",
     "test:update-unix": "node scripts/test-update-unix.mjs",
     "release:check": "node scripts/release-check.mjs",
@@ -140,6 +140,7 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
+      "licensing/**/*",
       "server.js",
       "src/utils.js",
       "release-templates/_system-scripts/app-icon.ico",
