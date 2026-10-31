@@ -24,7 +24,7 @@
  * FY as CURRENT_FY makes the app default to that year end-to-end. Callers
  * that need a specific FY pass it explicitly.
  */
-export const CURRENT_FY = '2025-26';
+export const CURRENT_FY = '2026-27';
 
 // ----------------------------- Regimes ---------------------------------------
 
@@ -130,7 +130,7 @@ export const NEW_REGIME_SLABS_FY_2025_26 = [
  * v1.10.31 — Backward-compat alias for pre-v1.10.31 callers that read
  * NEW_REGIME_SLABS directly. Resolves to the CURRENT_FY's table.
  */
-export const NEW_REGIME_SLABS = CURRENT_FY === '2025-26'
+export const NEW_REGIME_SLABS = (CURRENT_FY === '2025-26' || CURRENT_FY === '2026-27')
   ? NEW_REGIME_SLABS_FY_2025_26
   : NEW_REGIME_SLABS_FY_2024_25;
 
@@ -139,7 +139,7 @@ export const NEW_REGIME_SLABS = CURRENT_FY === '2025-26'
  * to a new FY = add a new SLABS constant + a case here.
  */
 export function getNewRegimeSlabs(fy = CURRENT_FY) {
-  if (fy === '2025-26') return NEW_REGIME_SLABS_FY_2025_26;
+  if (fy === '2025-26' || fy === '2026-27') return NEW_REGIME_SLABS_FY_2025_26;
   return NEW_REGIME_SLABS_FY_2024_25; // FY 24-25 and earlier
 }
 
@@ -153,7 +153,7 @@ export function get87AConfig(regime, fy = CURRENT_FY) {
     return { threshold: 500_000, cap: 12_500 };
   }
   // new regime
-  if (fy === '2025-26') return { threshold: 1_200_000, cap: 60_000 };
+  if (fy === '2025-26' || fy === '2026-27') return { threshold: 1_200_000, cap: 60_000 };
   return { threshold: 700_000, cap: 25_000 }; // FY 24-25
 }
 

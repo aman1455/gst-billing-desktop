@@ -1071,6 +1071,22 @@ console.log('\n[V81] What\'s new: the changelog on the Support page');
   eq(inlineParts('[j](javascript:alert(1))').some((p) => p.t === 'link'), false, 'A javascript: link is never a link');
 }
 
+console.log('\n[FY 2026-27] Statutory updates — CURRENT_FY, slabs, 87A rebate & advance tax');
+{
+  eq(CURRENT_FY, '2026-27', 'CURRENT_FY is set to 2026-27');
+  eq(getNewRegimeSlabs('2026-27'), NEW_REGIME_SLABS_FY_2025_26, 'getNewRegimeSlabs("2026-27") returns Budget 2025 slabs');
+  eq(getNewRegimeSlabs(), NEW_REGIME_SLABS_FY_2025_26, 'getNewRegimeSlabs() defaults to FY 2026-27 Budget 2025 slabs');
+  eq(get87AConfig('new', '2026-27'), { threshold: 1_200_000, cap: 60_000 }, 'get87AConfig("new", "2026-27") returns 12L threshold and 60k cap');
+  eq(get87AConfig('new'), { threshold: 1_200_000, cap: 60_000 }, 'get87AConfig("new") defaults to FY 2026-27 12L threshold');
+  const s2627 = getAdvanceTaxSchedule('2026-27');
+  eq(s2627[0].dueDate, '2026-06-15', 'FY 26-27 Q1 due = 15 Jun 2026');
+  eq(s2627[3].dueDate, '2027-03-15', 'FY 26-27 Q4 due = 15 Mar 2027');
+  const r = computeTax({ salary: 1_275_000, regime: 'new', fy: '2026-27' });
+  approx(r.totalTax, 0, '12.75L salary FY 26-27 new regime -> 0 tax (75k std ded + 60k rebate on 12L)');
+  const defTax = computeTax({ salary: 1_275_000, regime: 'new' });
+  approx(defTax.totalTax, 0, 'Default computeTax uses CURRENT_FY 2026-27 with 0 tax on 12.75L salary');
+}
+
 console.log('\n────────────────────────────────────────');
 console.log(`Passed: ${passed}   Failed: ${failed}`);
 if (failed) process.exit(1);

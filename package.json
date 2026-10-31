@@ -1,6 +1,6 @@
 {
   "name": "e-munim",
-  "version": "1.10.83",
+  "version": "1.10.84",
   "description": "E-Munim — Smart, fast, and modern GST invoice & billing software for India. Tax Invoice, Proforma, Credit Note, Bill of Supply, Delivery Challan, GSTR-1 / GSTR-3B JSON exports, GSTR-2B reconciliation, e-Way Bill, TDS / TCS reports, multi-currency support, custom units, and offline-first data privacy.",
   "author": "DiceCodes <Contact@dicecodes.com>",
   "license": "MIT",

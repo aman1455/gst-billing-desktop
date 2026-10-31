@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.10.84] - 2026-10-31
+
+### How to update
+
+**Current version:** 1.10.83  →  **New version:** 1.10.84
+
+#### If the in-app Update button works for you (1.10.73 and later)
+1. Open the app and click **Update to v1.10.84** in the menu, or
+   **Settings → Updates → Update Now**.
+2. Wait about a minute, then reload the page.
+
+#### On 1.10.72 or older
+Use the launcher: **More options → Update to the latest version**, then
+**Open App**.
+
+#### If that does not work (or you are unsure)
+1. Download `Free-GST-Billing.zip` from the
+   [Releases page](https://github.com/aman1455/gst-billing-desktop/releases/latest).
+2. Close the app completely.
+3. Extract over your existing Free GST Billing folder, replacing files when asked.
+4. Double-click **Free GST Billing - WINDOWS**.
+
+### Statutory compliance updates (FY 2026-27 / AY 2027-28)
+
+- **Income tax calculations (ITR):** `CURRENT_FY` updated to `2026-27` in `src/utils/itr.js` with Budget slabs, ₹12 Lakh threshold, and ₹60k rebate cap under Section 87A.
+- **TCS under Section 206C(1H):** Disabled from UI selection and dropdowns following its statutory abolition. Fallback safely re-routed to Section 52 while preserving historical viewing of already-issued invoices.
+- **Remote state synchronization:** Connected statutory date-override engine with Vercel remote-state distribution for seamless, zero-reinstall tax rate updates.
+
+---
+
 ## [1.10.83] - 2026-10-31
 
 ### How to update

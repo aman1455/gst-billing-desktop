@@ -56,3 +56,9 @@ scripts/.keys/
 
 # Playwright MCP browser-tool scratch files
 .playwright-mcp/
+
+# Agent session scratch
+.agents/
+check.txt
+PROJECT.md
+REGULATORY_COMPLIANCE_PROMPT.md

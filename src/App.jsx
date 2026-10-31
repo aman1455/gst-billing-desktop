@@ -976,7 +976,6 @@ function App() {
                 }} />
               </button>
             )}
-            <LicenseBadge onClick={() => setShowLicenseModal(true)} refreshTrigger={licenseRefresh} />
             {/* v1.10.83 - in the order chosen in Settings → Features; switched-off
                 ones are already left out of bottomIds. */}
             {bottomIds.map(id => ({
@@ -1023,8 +1022,7 @@ function App() {
 
       <div className="main-content">
         <div className="app-topbar">
-          {/* v1.10.83 - the promise, on every screen (it was under the app name in the menu). */}
-          <span className="topbar-free" title="Free forever: no paid version, no locked features, no ads, no tracking. Works on this computer, even offline.">Free forever</span>
+          <LicenseBadge onClick={() => setShowLicenseModal(true)} refreshTrigger={licenseRefresh} />
           {topActions}
         </div>
         {/* v1.10.83 - a screen that throws shows "ran into a problem" here

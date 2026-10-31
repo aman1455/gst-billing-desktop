@@ -9,7 +9,7 @@ export const SITE = {
   // social previews and llms.txt, which all need full addresses.
   url: 'https://freeinvoicefast.com/docs/',
   publisher: { name: 'DiceCodes', url: 'https://dicecodes.com' },
-  version: '1.10.83',
+  version: '1.10.84',
   repo: 'https://github.com/aman1455/gst-billing-desktop',
   // Always the newest release: GitHub resolves this to the latest release's
   // file of exactly this name (see docs/RELEASE_CHECKLIST.md, step 4b).

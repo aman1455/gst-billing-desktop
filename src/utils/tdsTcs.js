@@ -8,7 +8,8 @@
 //   - TDS you deducted from suppliers on purchase bills (purchase.tdsAmount):
 //     what you deposit and report in your own TDS return (Form 26Q).
 
-import { countsAsSales } from '../utils.js';
+import { countsAsSales, TCS_SECTIONS, REMOVED_TCS_SECTIONS } from '../utils.js';
+export { TCS_SECTIONS, REMOVED_TCS_SECTIONS };
 import { billInInr } from './fx.js';
 
 const r2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
@@ -68,7 +69,7 @@ export const salesTaxRows = (bills, kind = 'tds', range = {}) => (bills || [])
       party: client.name || b.clientName || '',
       gstin: client.gstin || '',
       pan: client.pan || panFromGstin(client.gstin),
-      section: kind === 'tds' ? sectionLabel(opt.tdsSection || '194Q') : (opt.tcsSection || '206C(1H)'),
+      section: kind === 'tds' ? sectionLabel(opt.tdsSection || '194Q') : (opt.tcsSection || '52'),
       rate: Number(kind === 'tds' ? opt.tdsRate : opt.tcsRate) || 0,
       taxable: taxableOf(b),
       amount,

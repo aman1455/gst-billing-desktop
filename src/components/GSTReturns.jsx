@@ -2283,7 +2283,7 @@ export default function GSTReturns() {
               clientName: client.name || bill.clientName || '—',
               clientGstin: client.gstin || '',
               clientPan: client.pan || '',
-              section: opt.tcsSection || '206C(1H)',
+              section: opt.tcsSection || '52',
               rate: opt.tcsRate || 0,
               quarter: fyQuarter,
               invoiceNumber: bill.invoiceNumber,

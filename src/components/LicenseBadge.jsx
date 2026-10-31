@@ -53,19 +53,22 @@ export default function LicenseBadge({ onClick, refreshTrigger }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '0.35rem',
+        gap: '0.45rem',
         backgroundColor: bg,
         color: color,
         border: `1px solid ${border}`,
-        padding: '0.25rem 0.65rem',
+        padding: '0 0.85rem',
+        height: '36px',
+        boxSizing: 'border-box',
         borderRadius: '9999px',
-        fontSize: '0.75rem',
+        fontSize: '0.85rem',
         fontWeight: 600,
         cursor: 'pointer',
+        whiteSpace: 'nowrap',
         transition: 'opacity 0.15s ease'
       }}
     >
-      <Icon size={13} />
+      <Icon size={17} />
       <span>{label}</span>
     </button>
   );

@@ -5,7 +5,7 @@
 
 import { computeInvoiceTotals, generateEWayBillJSON, amountDue, paymentStatusFor, TCS_SECTIONS } from '../src/utils.js';
 import { fyOf, isLikelyLutArn, normaliseLutArn, lutCoversDate, isExportOrSez, exportDeclaration, lutFyOptions, LUT_DECLARATION, IGST_PAID_DECLARATION } from '../src/utils/lut.js';
-import { quarterOf, fyQuarterRange, inRange, panFromGstin, salesTaxRows, purchaseTdsAmount, paidToSupplier, purchaseTdsRows, totalsBy, withClientTds } from '../src/utils/tdsTcs.js';
+import { quarterOf, fyQuarterRange, inRange, panFromGstin, salesTaxRows, purchaseTdsAmount, paidToSupplier, purchaseTdsRows, totalsBy, withClientTds, TCS_SECTIONS as TCS_SECTIONS_FROM_TDS, REMOVED_TCS_SECTIONS } from '../src/utils/tdsTcs.js';
 
 let passed = 0, failed = 0;
 function eq(actual, expected, label) {
@@ -112,6 +112,12 @@ console.log('\n[TDS & TCS] Sales');
   eq(tds.map((r) => [r.invoiceNumber, r.section, r.amount, r.certificate, r.quarter, r.pan]), [['INV-1', '194J', 10000, true, 'Q1', 'ABCDE1234F'], ['INV-2', '194C', 1000, false, 'Q3', 'ABCDE1234F']], 'Only sales with TDS; cancelled and quotations left out');
   eq(salesTaxRows(bills, 'tds', fyQuarterRange('2026', 'Q1')).length, 1, 'Quarter filter');
   eq(salesTaxRows(bills, 'tcs').map((r) => [r.invoiceNumber, r.section, r.amount, r.taxable]), [['INV-3', '52', 100, 20000]], 'TCS collected');
+  const unlabelledTcs = [bill('INV-6', '2026-06-05', { showTCS: true, tcsRate: 0.5 }, { taxableAmount: 10000, total: 11850, tcsAmount: 50 })];
+  const unlabelledRows = salesTaxRows(unlabelledTcs, 'tcs');
+  eq(unlabelledRows[0].section, '52', 'salesTaxRows defaults missing tcsSection to 52');
+  eq(unlabelledRows[0].section !== '206C(1H)', true, 'Section 206C(1H) is not defaulted');
+  eq(TCS_SECTIONS_FROM_TDS.some((t) => t.code === '206C(1H)'), false, 'Section 206C(1H) is not in TCS_SECTIONS');
+  eq(!!REMOVED_TCS_SECTIONS['206C(1H)'], true, 'Section 206C(1H) is retained in REMOVED_TCS_SECTIONS for legacy display');
   eq(totalsBy(tds, (r) => r.party), [{ key: 'Ramesh Traders', count: 1, taxable: 100000, amount: 10000 }, { key: 'Suresh & Co', count: 1, taxable: 50000, amount: 1000 }], 'Totals by client');
 }
 
