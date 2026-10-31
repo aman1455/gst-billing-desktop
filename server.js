@@ -118,6 +118,9 @@ app.post('/api/license/activate', (req, res) => {
 
 // Guard all mutating API operations against unlicensed/expired use
 app.use('/api', (req, res, next) => {
+  if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') {
+    return next();
+  }
   if (req.method === 'OPTIONS') {
     return next();
   }
