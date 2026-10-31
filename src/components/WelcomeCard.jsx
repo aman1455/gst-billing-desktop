@@ -14,7 +14,7 @@ const SHARE_TEXT = 'I use E-Munim for my GST invoices. It works offline and keep
 
 const isClosed = () => { try { return localStorage.getItem(KEY) === 'closed'; } catch { return false; } };
 
-export default function WelcomeCard({ invoiceCount, onOpenSupport }) {
+export default function WelcomeCard({ invoiceCount }) {
   const [closed, setClosed] = useState(isClosed);
   if (closed || invoiceCount >= SUPPORT_NUDGE_MIN_INVOICES) return null;
   const close = () => {
