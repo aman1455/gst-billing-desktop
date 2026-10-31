@@ -38,6 +38,17 @@ export class TamperGuard {
       const expectedHmac = crypto.createHmac('sha256', this.secretKey).update(dataStr).digest('hex');
 
       if (hmac !== expectedHmac) {
+        const licFile = path.join(this.dataDir, 'license.lic');
+        if (!fs.existsSync(licFile)) {
+          const initial = {
+            maxSeenTimestamp: Date.now(),
+            lastHeartbeat: Date.now(),
+            totalUptimeSec: 0
+          };
+          this.saveState(initial);
+          return initial;
+        }
+
         this.tampered = true;
         this.tamperReason = 'License state file signature invalid or tampered.';
         return { maxSeenTimestamp: Date.now(), lastHeartbeat: Date.now(), totalUptimeSec: 0 };
@@ -152,6 +163,19 @@ export class TamperGuard {
     if (t1.unref) t1.unref();
     const t2 = setInterval(checkNetwork, 30 * 60 * 1000);
     if (t2.unref) t2.unref();
+  }
+
+  resetState() {
+    this.tampered = false;
+    this.tamperReason = null;
+    const initial = {
+      maxSeenTimestamp: Date.now(),
+      lastHeartbeat: Date.now(),
+      totalUptimeSec: 0
+    };
+    this.state = initial;
+    this.saveState(initial);
+    return initial;
   }
 
   isTampered() {

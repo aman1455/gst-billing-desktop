@@ -66,7 +66,10 @@ export class LicenseManager {
       throw new Error(`License is registered to a different computer (Expected: ${this.hwid}, Key: ${payload.hwid}).`);
     }
 
-    // 2. Verify Expiry if trial
+    // 2. Clear any transient tamper state on valid key activation
+    this.tamperGuard.resetState();
+
+    // 3. Verify Expiry if trial
     if (payload.type === 'TRIAL' && payload.expiresAt) {
       const expMs = new Date(payload.expiresAt).getTime();
       const currentMs = this.tamperGuard.getEffectiveCurrentTime();
@@ -75,7 +78,7 @@ export class LicenseManager {
       }
     }
 
-    // 3. Save to license file
+    // 4. Save to license file
     fs.writeFileSync(this.licenseFile, licenseKey.trim(), 'utf-8');
     return this.getStatus();
   }

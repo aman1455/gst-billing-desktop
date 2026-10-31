@@ -23,17 +23,20 @@ function getSystemFingerprints() {
   const platform = process.platform;
 
   if (platform === 'win32') {
-    // 1. Windows MachineGuid from Registry
-    const guid = runCommandSafe('powershell -NoProfile -Command "(Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Cryptography).MachineGuid"');
+    // 1. Windows MachineGuid from Registry (fast reg query with powershell fallback)
+    let guid = '';
+    try {
+      const out = execSync('reg query "HKLM\\SOFTWARE\\Microsoft\\Cryptography" /v MachineGuid', { stdio: ['ignore', 'pipe', 'ignore'], timeout: 2000 }).toString();
+      const match = out.match(/MachineGuid\s+REG_SZ\s+([A-Fa-f0-9-]+)/i);
+      if (match) guid = match[1];
+    } catch {
+      guid = runCommandSafe('powershell -NoProfile -Command "(Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Cryptography).MachineGuid"');
+    }
     if (guid) parts.push(`guid:${guid}`);
 
     // 2. Motherboard UUID
     const uuid = runCommandSafe('powershell -NoProfile -Command "(Get-CimInstance Win32_ComputerSystemProduct).UUID"');
     if (uuid && uuid !== 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF') parts.push(`uuid:${uuid}`);
-
-    // 3. CPU ProcessorId
-    const cpuId = runCommandSafe('powershell -NoProfile -Command "(Get-CimInstance Win32_Processor).ProcessorId"');
-    if (cpuId) parts.push(`cpu:${cpuId}`);
   } else if (platform === 'darwin') {
     const ioreg = runCommandSafe("ioreg -rd1 -c IOPlatformExpertDevice | awk '/IOPlatformUUID/ { print $3; }'");
     if (ioreg) parts.push(`ioreg:${ioreg}`);
